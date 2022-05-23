@@ -1,0 +1,14 @@
+.layout {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.layout .main {
+  background: #dedede;
+  width: 100%;
+}
+
+.layout .main main {
+  padding: 23px;
+}
