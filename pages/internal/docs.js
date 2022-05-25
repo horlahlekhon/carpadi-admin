@@ -1,7 +1,7 @@
 import { Button } from "../../components/shared/Button";
 import { theme } from "../../styles/theme.config";
 import classes from "../../styles/Docs.module.css";
-import { Input } from "../../components/shared/Input";
+import Input from "../../components/shared/Input";
 import Checkbox from "../../components/shared/Checkbox";
 import ToggleSwitch from "../../components/shared/ToggleSwitch";
 import { useState } from "react";
@@ -32,6 +32,7 @@ function DocsPage() {
       <div>
         <h3>Inputs</h3>
         <Input
+          label={"Password"}
           type={"password"}
           placeholder="Enter Password"
           margin={"0 5px 0 0"}
@@ -42,14 +43,14 @@ function DocsPage() {
         <h3>Checkboxes</h3>
         <Checkbox
           margin={"10px 0 0 0"}
-          value={!value}
-          checked={!value}
+          value={value}
+          checked={value}
           onChange={({ target }) => setCheckbox(!value)}
         />
         <Checkbox
           margin={"10px 0 0 10px"}
-          value={!value}
-          checked={!value}
+          value={value}
+          checked={value}
           onChange={({ target }) => setCheckbox(!value)}
           disabled={true}
         />
