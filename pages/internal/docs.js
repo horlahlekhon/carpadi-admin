@@ -1,13 +1,59 @@
 import { Button } from "../../components/shared/Button";
 import { theme } from "../../styles/theme.config";
 import classes from "../../styles/Docs.module.css";
+import { Input } from "../../components/shared/Input";
+import Checkbox from "../../components/shared/Checkbox";
+import ToggleSwitch from "../../components/shared/ToggleSwitch";
+import { useState } from "react";
 
 function DocsPage() {
+  const [value, setCheckbox] = useState(true);
   return (
     <div className={classes.main}>
       <h1>Docs</h1>
-      <Button margin={'0 0 5px 0'}>Regular Button</Button>
-      <Button width={'100%'} background={theme.primaryBlue} margin={'0 0 5px 0'}>Full Width Button</Button>
+      <Button margin={"0 0 5px 0"}>Regular Button</Button>
+      <Button
+        width={"100%"}
+        background={theme.primaryBlue}
+        margin={"0 0 5px 0"}
+      >
+        Full Width Button
+      </Button>
+      <Input
+        type={"password"}
+        placeholder="Enter Password"
+        margin={"0 5px 0 0"}
+      ></Input>
+      <Input type={"email"} placeholder="Enter Email"></Input>
+      <div>
+        <Checkbox
+          margin={"10px 0 0 0"}
+          value={!value}
+          checked={!value}
+          onChange={({ target }) => setCheckbox(!value)}
+        />
+        <Checkbox
+          margin={"10px 0 0 10px"}
+          value={!value}
+          checked={!value}
+          onChange={({ target }) => setCheckbox(!value)}
+          disabled={true}
+        />
+      </div>
+      <div>
+        <ToggleSwitch
+          value={value}
+          checked={value}
+          onChange={({ target }) => setCheckbox(!value)}
+        />
+
+        <ToggleSwitch
+          disabled={true}
+          value={value}
+          checked={value}
+          onChange={({ target }) => setCheckbox(!value)}
+        />
+      </div>
     </div>
   );
 }
