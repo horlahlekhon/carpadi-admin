@@ -12,6 +12,7 @@ function DocsPage() {
     <div className={classes.main}>
       <h1>Docs</h1>
       <Button margin={"0 0 5px 0"}>Regular Button</Button>
+      <Button margin={"0 0 5px 5px"} outline={true} color={theme.primaryDarkBlue}>Outline Button</Button>
       <Button
         width={"100%"}
         background={theme.primaryBlue}
