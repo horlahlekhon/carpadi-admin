@@ -11,22 +11,35 @@ function DocsPage() {
   return (
     <div className={classes.main}>
       <h1>Docs</h1>
-      <Button margin={"0 0 5px 0"}>Regular Button</Button>
-      <Button margin={"0 0 5px 5px"} outline={true} color={theme.primaryDarkBlue}>Outline Button</Button>
-      <Button
-        width={"100%"}
-        background={theme.primaryBlue}
-        margin={"0 0 5px 0"}
-      >
-        Full Width Button
-      </Button>
-      <Input
-        type={"password"}
-        placeholder="Enter Password"
-        margin={"0 5px 0 0"}
-      ></Input>
-      <Input type={"email"} placeholder="Enter Email"></Input>
       <div>
+        <h3>Buttons</h3>
+        <Button margin={"0 0 5px 0"}>Regular Button</Button>
+        <Button
+          margin={"0 0 5px 5px"}
+          outline={true}
+          color={theme.primaryDarkBlue}
+        >
+          Outline Button
+        </Button>
+        <Button
+          width={"100%"}
+          background={theme.primaryBlue}
+          margin={"0 0 5px 0"}
+        >
+          Full Width Button
+        </Button>
+      </div>
+      <div>
+        <h3>Inputs</h3>
+        <Input
+          type={"password"}
+          placeholder="Enter Password"
+          margin={"0 5px 0 0"}
+        ></Input>
+        <Input type={"email"} placeholder="Enter Email"></Input>
+      </div>
+      <div>
+        <h3>Checkboxes</h3>
         <Checkbox
           margin={"10px 0 0 0"}
           value={!value}
@@ -42,6 +55,7 @@ function DocsPage() {
         />
       </div>
       <div>
+        <h3>Toggle Switches</h3>
         <ToggleSwitch
           value={value}
           checked={value}
