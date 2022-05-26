@@ -1,6 +1,21 @@
 import { createGlobalStyle } from "styled-components";
+import { createTheme } from "@mui/material/styles";
 
-export const theme = {
+export const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#243773",
+      light: "#56A0D7",
+      dark: "#424F65",
+      contrastText: "#FFFFFF",
+    },
+    success: {
+      main: "#4caf50",
+    },
+  },
+});
+
+export const t = {
   primaryDarkBlue: "#243773",
   primaryBlue: "#56A0D7",
   primaryAshBlue: "#424F65",
