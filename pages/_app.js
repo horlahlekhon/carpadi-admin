@@ -1,6 +1,6 @@
 import "../styles/globals.css";
-import { ThemeProvider } from "styled-components";
 import { theme, GlobalStyles } from "../styles/theme.config";
+import { ThemeProvider } from "@mui/material/styles";
 
 function MyApp({ Component, pageProps }) {
   const getLayout = Component.getLayout || ((page) => page);
