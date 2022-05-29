@@ -1,12 +1,12 @@
-import { theme } from "../../styles/theme.config";
+import { theme } from "../../styles/theme";
 import classes from "../../styles/Docs.module.css";
 import Input from "../../components/shared/Input";
 import Checkbox from "../../components/shared/Checkbox";
 import ToggleSwitch from "../../components/shared/ToggleSwitch";
 import { useState } from "react";
 import styled from "styled-components";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Button } from "@mui/material";
+import DeleteIcon from "@material-ui/icons/Delete"
+import { Button } from "@material-ui/core";
 
 function DocsPage() {
   const [value, setCheckbox] = useState(true);

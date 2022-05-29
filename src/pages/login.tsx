@@ -1,61 +1,66 @@
-import styled from "styled-components";
-import { t } from "../../styles/theme.config";
-import Card from "@mui/material/Card";
-import { CardContent, Checkbox, TextField, Typography } from "@mui/material";
-import Image from "next/image";
-import classes from "../../styles/Auth.module.css";
-import InputAdornment from "@mui/material/InputAdornment";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import IconButton from "@mui/material/IconButton";
-import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import Input from "@mui/material/Input";
-import ReCAPTCHA from "react-google-recaptcha";
-import { useState } from "react";
-import Button from "../../components/shared/Button";
+import styled from 'styled-components'
+import { t } from '../styles/theme'
+import {
+  Card,
+  FormControl,
+  IconButton,
+  InputLabel,
+  Input,
+  InputAdornment,
+  CardContent,
+  Checkbox,
+  TextField,
+  Typography
+} from '@material-ui/core'
+import { Visibility, VisibilityOff } from '@material-ui/icons'
+import Image from 'next/image'
+import classes from '../styles/Auth.module.css'
+import ReCAPTCHA from 'react-google-recaptcha'
+import { useState } from 'react'
+import Button from '../components/shared/Button'
 
 function LoginPage() {
   const [values, setValues] = useState({
     showPassword: false,
-  });
+    password: null
+  })
 
   const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value });
-  };
+    setValues({ ...values, [prop]: event.target.value })
+  }
 
   const handleClickShowPassword = () => {
     setValues({
       ...values,
-      showPassword: !values.showPassword,
-    });
-  };
+      showPassword: !values.showPassword
+    })
+  }
 
   const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
+    event.preventDefault()
+  }
 
   const onCaptchaChange = (value) => {
-    console.log("Captcha value:", value);
-  };
+    console.log('Captcha value:', value)
+  }
 
   return (
     <Container>
       <ImageBg>
-        <PhoneImage src={"/auth/phone.png"}></PhoneImage>
+        <PhoneImage src={'/auth/phone.png'}></PhoneImage>
       </ImageBg>
       <FormContainer>
         <div>
-          <Typography mb={2} color={t.grey} fontWeight={500}>
+          <Typography className={classes.title}>
             Admin Portal
           </Typography>
           <Card
             variant="outlined"
-            sx={{ width: "437px", height: "566px", borderRadius: "12px" }}
+            className={classes.card}
           >
             <CardContent className={classes.centered}>
               <Image
-                src={"/logos/blue-full.png"}
+                src={'/logos/blue-full.png'}
                 width="300px"
                 height="114px"
               ></Image>
@@ -65,11 +70,12 @@ function LoginPage() {
                 label="Email Address"
                 variant="standard"
                 type="email"
-                sx={{ width: "372px", marginTop: "20px" }}
+                fullWidth
+                style={ { marginTop: '20px', width: '372px' } }
               />
 
               <FormControl
-                sx={{ width: "372px", marginTop: "41px" }}
+                style={{ width: '372px', marginTop: '41px' }}
                 variant="standard"
               >
                 <InputLabel htmlFor="standard-adornment-password">
@@ -77,9 +83,9 @@ function LoginPage() {
                 </InputLabel>
                 <Input
                   id="standard-adornment-password"
-                  type={values.showPassword ? "text" : "password"}
+                  type={values.showPassword ? 'text' : 'password'}
                   value={values.password}
-                  onChange={handleChange("password")}
+                  onChange={handleChange('password')}
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
@@ -106,16 +112,16 @@ function LoginPage() {
                 onChange={onCaptchaChange}
                 size="normal"
               />
-              <Button text="Login" />
+              <Button width="372px" marginTop="32px" text="Login"/>
             </CardContent>
           </Card>
         </div>
       </FormContainer>
     </Container>
-  );
+  )
 }
 
-export default LoginPage;
+export default LoginPage
 
 const Container = styled.div`
   width: 100vw;
@@ -123,25 +129,26 @@ const Container = styled.div`
   background: ${t.liteGrey};
   display: flex;
   flex-direction: row;
-`;
+`
 
 const PhoneImage = styled.img`
   height: 759px;
   width: 441px;
   margin: auto;
-`;
+`
 
 const ImageBg = styled.div`
   width: 48%;
   height: 100%;
-  background-image: url("/auth/vector.png");
+  background: white;
+  background-image: url('/auth/vector.png');
   background-repeat: no-repeat;
   background-size: cover;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`;
+`
 
 const FormContainer = styled.div`
   width: 52%;
@@ -150,7 +157,7 @@ const FormContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`;
+`
 
 const RememberMe = styled.div`
   width: 100%;
@@ -161,4 +168,4 @@ const RememberMe = styled.div`
   justify-content: start;
   margin-top: 18px;
   margin-bottom: 32px;
-`;
+`
