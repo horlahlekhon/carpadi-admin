@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "config:base",
+    ":rebaseStalePrs",
+    "group:monorepos",
+    "group:recommended",
+    ":automergeTesters",
+    ":automergeLinters",
+    ":automergeTypes",
+    ":automergePatch",
+    ":semanticCommits"
+  ],
+  "timezone": "Asia/Tokyo",
+  "schedule": "every weekend",
+  "labels": [
+    "dependencies"
+  ],
+  "vulnerabilityAlerts": {
+    "labels": [
+      "security"
+    ]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": [
+      "before 7am on the first day of the month"
+    ]
+  }
+}
