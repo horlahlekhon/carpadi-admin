@@ -10,8 +10,7 @@ import {
   CardContent,
   Checkbox,
   TextField,
-  Typography,
-  Box
+  Typography
 } from '@material-ui/core'
 import { Visibility, VisibilityOff } from '@material-ui/icons'
 import Image from 'next/image'
@@ -71,11 +70,12 @@ function LoginPage() {
                 label="Email Address"
                 variant="standard"
                 type="email"
-                sx={{ width: '372px', marginTop: '20px' }}
+                fullWidth
+                style={ { marginTop: '20px', width: '372px' } }
               />
 
               <FormControl
-                sx={{ width: '372px', marginTop: '41px' }}
+                style={{ width: '372px', marginTop: '41px' }}
                 variant="standard"
               >
                 <InputLabel htmlFor="standard-adornment-password">
@@ -112,7 +112,7 @@ function LoginPage() {
                 onChange={onCaptchaChange}
                 size="normal"
               />
-              <Button text="Login" />
+              <Button width="372px" marginTop="32px" text="Login"/>
             </CardContent>
           </Card>
         </div>

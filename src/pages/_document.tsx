@@ -7,7 +7,7 @@ import NextDocument, {
   DocumentContext,
   DocumentInitialProps
 } from 'next/document'
-import { RenderPageResult } from 'next/dist/next-server/lib/utils'
+// import { RenderPageResult } from 'next/dist/next-server/lib/utils'
 import { ServerStyleSheet } from 'styled-components'
 import { ServerStyleSheets as MaterialServerStyleSheets } from '@material-ui/core'
 
@@ -20,7 +20,7 @@ export default class CustomDocument extends NextDocument {
     const originalRenderPage = ctx.renderPage
 
     try {
-      ctx.renderPage = (): RenderPageResult | Promise<RenderPageResult> =>
+      ctx.renderPage = (): any | Promise<any> =>
         originalRenderPage({
           enhanceApp: (App) => (
             props

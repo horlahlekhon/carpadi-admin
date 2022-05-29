@@ -50,11 +50,11 @@ export const GlobalStyles = createGlobalStyle`
     body {
       margin: 0;
       padding: 0;
-      background: ${({ theme }) => theme.body};
-      color: ${({ theme }) => theme.text};
       font-family: Roboto !important;
       font-weight: 400;
       font-style: normal;
     }
     input, textarea, button {font-family: inherit}
     `;
+    // background: ${({ theme }) => theme.body};
+    // color: ${({ theme }) => theme.text};
