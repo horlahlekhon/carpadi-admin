@@ -18,6 +18,7 @@ export const theme = createTheme({
 
 export const t = {
     primaryDarkBlue: "#243773",
+    primaryDeepBlue: "#162A69",
     primaryBlue: "#56A0D7",
     primaryAshBlue: "#424F65",
     primaryLite: "#CEDAFF",

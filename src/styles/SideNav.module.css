@@ -4,3 +4,34 @@
   background: #243773;
   color: white;
 }
+
+.main__small{
+  width: 100px;
+  height: 100vh;
+  background: #243773;
+  color: white;
+}
+
+.logo {
+  padding-top: 15px;
+  margin: 0 18px;
+}
+
+.logo__small{
+  padding-top: 15px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.navitem__text {
+  margin-left: 13px;
+}
+
+.hidden{
+  display: none !important;
+}
