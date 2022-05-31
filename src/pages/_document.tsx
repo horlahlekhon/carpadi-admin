@@ -7,7 +7,6 @@ import NextDocument, {
   DocumentContext,
   DocumentInitialProps
 } from 'next/document'
-// import { RenderPageResult } from 'next/dist/next-server/lib/utils'
 import { ServerStyleSheet } from 'styled-components'
 import { ServerStyleSheets as MaterialServerStyleSheets } from '@material-ui/core'
 
@@ -52,7 +51,8 @@ export default class CustomDocument extends NextDocument {
     return (
       <Html lang="ja-JP">
         <Head>
-          <link rel="icon" href="/favicon.ico" />
+          <title>Carpadi Admin</title>
+          <link rel="icon" href="/favicon.png" />
         </Head>
         <body>
           <Main />
