@@ -34,7 +34,7 @@ function TopBar() {
       </FormControl>
       <Typography component={"div"}>
         <DateGroup>
-          <TimeParse dateString={currentDate}></TimeParse> &nbsp; - &nbsp;
+          <TimeParse dateString={currentDate}></TimeParse> - 
           <DateParse dateString={currentDate}></DateParse>
         </DateGroup>
       </Typography>

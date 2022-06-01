@@ -187,10 +187,11 @@ const Pill = styled.p`
 
 const Hambuger = styled.p`
   width: 100%;
-  heiight: 48px;
+  height: 48px;
   padding: 16px 25px;
   display: flex;
   justify-content: flex-end;
+  margin-bottom: 4px;
 `
 
 const Nav = styled.div`
