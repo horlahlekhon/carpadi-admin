@@ -280,8 +280,8 @@ function HomePage() {
                 <ArrowRightSharp />
               </Typography>
             </ActivitiesHeader>
-            {[...Array.from({ length: 5 })].map((x, i) => (
-              <ActivityItem
+            {[...Array.from({ length: 5 })].map((_, i) => (
+              <ActivityItem key={i}
                 onClick={() => {
                   handleNavigation(`/users/${i}/trade-activities`)
                 }}
