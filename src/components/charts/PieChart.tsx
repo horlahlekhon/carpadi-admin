@@ -21,7 +21,8 @@ const PChart = ({data = [], colors = [], borderColors = ["transparent"], borderW
 
     const chartOptions = {
         responsive: true,
-        radius: 110,
+        radius: 100,
+        maintainAspectRatio: true,
         plugins: {
             legend: false,
             datalabels: {
@@ -43,7 +44,7 @@ const PChart = ({data = [], colors = [], borderColors = ["transparent"], borderW
 
     return (
         <Pie data={chartData} options={chartOptions} plugins={[ChartDataLabels]}
-             style={{height: "280px", width: "280px", marginLeft: "auto", marginRight: "auto", marginTop: "10px"}}/>
+             style={{height: "280px", width: "280px", marginLeft: "auto", marginRight: "auto", marginTop: "auto"}}/>
     )
 }
 export default PChart
