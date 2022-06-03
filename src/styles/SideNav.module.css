@@ -1,15 +1,19 @@
 .main {
   width: 280px;
-  height: 100vh;
+  min-height: 100vh;
+  height: 100%;
   background: #243773;
   color: white;
+  transition: 1s;
 }
 
 .main__small{
   width: 100px;
-  height: 100vh;
+  min-height: 100vh;
+  height: 100%;
   background: #243773;
   color: white;
+  transition: 1s;
 }
 
 .logo {

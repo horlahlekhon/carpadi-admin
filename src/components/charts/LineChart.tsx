@@ -1,37 +1,73 @@
+import React from 'react';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer
-} from 'recharts'
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from 'chart.js';
+import {Line} from 'react-chartjs-2';
 
-const LChart = ({ data = [], showYAxis = false, showLegend = false, height=320, showGrid=false }) => {
-  return (
-    <ResponsiveContainer width="100%" height={height}>
-      <LineChart
-        width={707}
-        height={276}
-        data={data}
-        margin={{
-          top: 5,
-          right: 30,
-          left: 20,
-          bottom: 5
-        }}
-      >
-        <CartesianGrid strokeDasharray="2 3" />
-        <XAxis dataKey="name" />
-        {showYAxis && <YAxis />}
-        <Tooltip />
-        {showLegend && <Legend />}
-        <Line type="monotone" dataKey="pv" strokeWidth={2} stroke="#56A0D7" />
-        <Line type="monotone" dataKey="uv" stroke="#243773" strokeWidth={2} />
-      </LineChart>
-    </ResponsiveContainer>
-  )
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
+
+
+const LChart = ({data = [], showYAxis = false, showLegend = false, height = 320, showGrid = false}) => {
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+            line: {
+                fill: false,
+                tension: 0.4
+            }
+        },
+        scales: {
+            y: {
+                display: false
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            },
+            title: {
+                display: false,
+            },
+        },
+    };
+
+    const labels = ['WK 0', 'WK 1', 'WK 2', 'WK 3', 'WK 4', 'WK 5'];
+
+    const chartData = {
+        labels,
+        datasets: [
+            {
+                label: 'Total Trading Cash',
+                data: labels.map(() => Math.random() * 100),
+                borderColor: '#56A0D7',
+                backgroundColor: '#56A0D7',
+            },
+            {
+                label: 'Return On Trades',
+                data: labels.map(() => Math.random() * 100),
+                borderColor: '#162A69',
+                backgroundColor: '#162A69',
+            },
+        ],
+    };
+    return (
+        <Line options={options} data={chartData} height={"136px"}/>
+    )
 }
 export default LChart
