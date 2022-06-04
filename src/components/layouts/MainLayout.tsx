@@ -5,15 +5,15 @@ import TopBar from "./core/TopBar";
 export default function MainLayout({ children }) {
   return (
     <>
-      <div className={classes.layout}>
-        <div className={classes.side}>
+      <section className={classes.layout}>
+        <section className={classes.side}>
           <SideNav />
-        </div>
-        <div className={classes.main}>
+        </section>
+        <section className={classes.main}>
           <TopBar />
           <main>{children}</main>
-        </div>
-      </div>
+        </section>
+      </section>
     </>
   );
 }

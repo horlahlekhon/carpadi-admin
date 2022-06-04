@@ -5,20 +5,30 @@ import { t } from '../../styles/theme'
 const Btn = ({
   text,
   width,
-  marginTop,
+  marginTop = null,
+  marginBottom = null,
+  marginLeft = null,
+  marginRight = null,
   bgColor = t.primaryDarkBlue,
-  color = t.white
+  color = t.white,
+  borderRadius = '12px',
+  outlined = false
 }) => {
   return (
     <Button
-      variant="contained"
+      variant={outlined ? 'outlined' : 'contained'}
       className={classes.btn}
       disableElevation
       style={{
         width: width,
         marginTop: marginTop,
-        backgroundColor: bgColor,
-        color
+        marginBottom: marginBottom,
+        marginLeft: marginLeft,
+        marginRight: marginRight,
+        backgroundColor: `${outlined ? 'transparent' : bgColor}`,
+        border: `2px solid ${outlined ? bgColor : 'transparent'}`,
+        color: `${outlined ? bgColor : color}`,
+        borderRadius: borderRadius
       }}
     >
       {text || 'Button'}

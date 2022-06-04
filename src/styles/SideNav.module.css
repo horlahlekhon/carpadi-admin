@@ -1,6 +1,41 @@
 .main {
   width: 280px;
-  height: 100vh;
+  min-height: 100vh;
+  height: 100%;
   background: #243773;
   color: white;
+  transition: 1s;
+}
+
+.main__small{
+  width: 100px;
+  min-height: 100vh;
+  height: 100%;
+  background: #243773;
+  color: white;
+  transition: 1s;
+}
+
+.logo {
+  padding-top: 15px;
+  margin: 0 18px;
+}
+
+.logo__small{
+  padding-top: 15px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.navitem__text {
+  margin-left: 13px;
+}
+
+.hidden{
+  display: none !important;
 }
