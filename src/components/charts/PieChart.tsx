@@ -56,7 +56,6 @@ const PChart = ({
     <Pie
       data={chartData}
       options={chartOptions}
-      plugins={[ChartDataLabels]}
       style={{
         height: '240px',
         width: '240px',

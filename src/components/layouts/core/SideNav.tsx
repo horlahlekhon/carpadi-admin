@@ -19,8 +19,8 @@ function SideNav() {
   const handleResize = () => {
     if (window.innerWidth <= 1080) {
       setIsFullNav(false)
-    }else{
-        setIsFullNav(true)
+    } else {
+      setIsFullNav(true)
     }
   }
 
@@ -37,6 +37,19 @@ function SideNav() {
     margin-bottom: 4px;
     margin-left: ${!isFullNav ? 'auto' : '0'};
     margin-right: ${!isFullNav ? 'auto' : '0'};
+  `
+
+  const NotificationCount = styled.span`
+    height: 20px;
+    width: 20px;
+    background: ${t.alertError};
+    color: ${t.white};
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: ${isFullNav ? '40px' : 'auto'};
   `
 
   return (
@@ -94,6 +107,7 @@ function SideNav() {
             >
               <Typography component={'span'}>Notification</Typography>
             </p>
+            <NotificationCount>5</NotificationCount>
             {router.pathname.startsWith('/notifications') && (
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
