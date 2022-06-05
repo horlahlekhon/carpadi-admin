@@ -5,6 +5,7 @@ import { t } from '../../styles/theme'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Image from 'next/image'
+import Button from '../../components/shared/Button'
 
 function NotificationsPage() {
   const router = useRouter()
@@ -145,7 +146,87 @@ function NotificationsPage() {
           </Activities>
         </Grid>
         <Grid item xs={6}>
-          <Chat>2</Chat>
+          <Chat>
+            <CardHeader style={{ paddingBottom: '14px' }}>
+              <Typography variant="h6" style={{ fontWeight: 600 }}>
+                Help Center Chat System
+              </Typography>
+              <ChatCTA>
+                <NotificationCount>2</NotificationCount>
+                <Button width={150} marginLeft="16px" text="Select User Chat" />
+              </ChatCTA>
+            </CardHeader>
+            <UserInfo>
+              <ActivityImage
+                style={{ borderRadius: '50%', height: 64, width: 64 }}
+              >
+                <Image src="/icons/Users-Blue.svg" width={16} height={21} />
+              </ActivityImage>
+              <Typography
+                variant="body1"
+                style={{ fontWeight: 600, marginLeft: 16 }}
+              >
+                James Lee <br />
+                <Typography variant="caption">Online</Typography>
+              </Typography>
+            </UserInfo>
+            <Messages>
+              <Message>
+                <MessageContent>
+                  I Did not recieve return on my recent trade,please what is
+                  wrong?
+                </MessageContent>
+                <div className="timestamp">3:45 PM</div>
+              </Message>
+              <Message className="self">
+                <MessageContent className="self">
+                  Sorry to hear that James.Kindly provide me your trading share
+                  Id number to run a check
+                </MessageContent>
+                <div className="timestamp">3:45 PM</div>
+              </Message>
+              <Message>
+                <MessageContent>
+                  I Did not recieve return on my recent trade,please what is
+                  wrong?
+                </MessageContent>
+                <div className="timestamp">3:45 PM</div>
+              </Message>
+              <Message className="self">
+                <MessageContent className="self">
+                  Sorry to hear that James.Kindly provide me your trading share
+                  Id number to run a check
+                </MessageContent>
+                <div className="timestamp">3:45 PM</div>
+              </Message>
+            </Messages>
+            <ChatInput>
+              <input type="text" placeholder="Start a conversation ..." />
+              <div className="actionbar">
+                <div className="attachments">
+                  <img
+                    src="/icons/Typography-Dark-Blue.svg"
+                    width={22}
+                    height={16}
+                    className="attachments-icon"
+                  />
+                  <img
+                    src="/icons/Image-Grey.svg"
+                    width={22}
+                    height={20}
+                    className="attachments-icon"
+                  />
+                </div>
+                <Image
+                  src="/icons/Send-Message-Dark-Blue.svg"
+                  width={29}
+                  height={28}
+                  style={{ cursor: 'pointer' }}
+                />
+              </div>
+              <div className="powered-by">Powered by XYZ</div>
+            </ChatInput>
+          </Chat>
         </Grid>
       </Grid>
     </Container>
@@ -175,6 +256,105 @@ const Chat = withStyles({
     flexDirection: 'column'
   }
 })(Paper)
+
+const Messages = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  height: calc(100% - 200px);
+  padding: 0 18px;
+`
+
+const Message = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  .timestamp {
+    font-size: 12px;
+    color: ${t.lightGrey};
+    margin-top: 2px;
+    align-self: inherit;
+  }
+
+  &.self {
+    align-self: flex-end;
+  }
+`
+
+const MessageContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 17px;
+  background: ${t.extraLiteGrey};
+  border-radius: 14px;
+  font-size: 14px;
+  align-self: flex-start;
+  max-width: 313px;
+
+  &.self {
+    background: ${t.primaryExtraLite};
+  }
+`
+
+const ChatInput = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-self: flex-end;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 14px;
+  margin: auto 20px 0 20px;
+
+  input {
+    border: none;
+    outline: none;
+    height: 28px;
+    line-height: 28px;
+  }
+
+  .actionbar {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    .attachments {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+
+      .attachments-icon {
+        margin-right: 15px !important;
+        cursor: pointer;
+
+        :hover {
+          transform: scale(1.1);
+        }
+      }
+    }
+  }
+
+  .powered-by {
+    margin: 30px auto 21px auto;
+    color: #9b9b9b;
+  }
+`
+
+const UserInfo = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 0 20px 16px 20px;
+`
+
+const ChatCTA = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  align-items: center;
+`
 
 const Container = styled.div`
   display: flex;
@@ -292,4 +472,6 @@ const ActivityItemDate = styled.div`
   margin-left: auto;
   justify-content: space-between;
   align-items: end;
+  font-size: 12px;
+  color: ${t.grey};
 `
