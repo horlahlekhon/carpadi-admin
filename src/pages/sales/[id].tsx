@@ -85,7 +85,9 @@ function SalesProfilePage() {
               outlined={true}
               marginRight="16px"
               bgColor={t.alertError}
-              onClick={() => {showModal('deleteSale', '')}}
+              onClick={() => {
+                showModal('deleteSale', '')
+              }}
             />
             <Button
               text="Edit Images"
@@ -159,6 +161,7 @@ function SalesProfilePage() {
         <Flex>
           <div className="slideshow">
             <img
+              className="main"
               src="/images/FullSize-Default-Car.png"
               height={403}
               width={558}
@@ -520,7 +523,7 @@ function SalesProfilePage() {
               <Typography variant="h6" color="secondary">
                 Key Features
               </Typography>
-              <Features>
+              <Features className="modal">
                 <div className="key-features">
                   <img src="/images/Big-Default-Car.png" alt="Feature" />
                   <Typography variant="subtitle1" className="text">
@@ -575,7 +578,7 @@ function SalesProfilePage() {
               </Typography>
               <Flex>
                 <div className="gallery">
-                  <ImageGrid>
+                  <ImageGrid className="modal">
                     <img
                       src="/images/FullSize-Default-Car.png"
                       className="image modal"
@@ -863,6 +866,7 @@ const Flex = styled.div`
   .slideshow {
     margin-right: 20px;
     position: relative;
+    height: fit-content;
 
     .next,
     .previous {
@@ -880,6 +884,19 @@ const Flex = styled.div`
       right: 16px;
     }
   }
+
+  @media screen and (max-width: 1080px) {
+    .slideshow {
+      img.main {
+        width: 400px;
+        height: 240px;
+
+        .next,.prev{
+
+        }
+      }
+    }
+  }
 `
 
 const Features = styled.div`
@@ -888,7 +905,6 @@ const Features = styled.div`
   flex-wrap: wrap;
   margin-bottom: 40px;
   margin-top: 16px;
-  max-width: 900px;
 
   .key-features {
     display: flex;
@@ -908,13 +924,16 @@ const Features = styled.div`
       color: ${t.grey};
     }
   }
+
+  &.modal {
+    max-width: 900px;
+  }
 `
 
 const ImageGrid = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  max-width: 900px;
 
   .image {
     margin-right: 14px;
@@ -923,8 +942,12 @@ const ImageGrid = styled.div`
     border-radius: 14px;
     height: 145px;
     width: 145px;
+  }
 
-    &.modal {
+  &.modal {
+    max-width: 900px;
+
+    .image {
       width: 200px;
       height: 200px;
       margin-right: 24px;
