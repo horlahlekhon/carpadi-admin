@@ -12,7 +12,7 @@ import {SearchOutlined} from '@material-ui/icons'
 import {t} from '../../../styles/theme'
 
 function TopBar() {
-    const currentDate = new Date().toISOString()
+    const currentDate = new Date().toISOString();
     return (
         <Header>
             <div>&nbsp;</div>
@@ -35,9 +35,9 @@ function TopBar() {
             </FormControl>
             <Typography component={"div"}>
                 <DateGroup>
-                    <TimeParse dateString={currentDate}></TimeParse>
+                    <div>{currentDate.split('T')[1].substring(0, 5)}</div>
                     <div style={{marginRight: "3px", marginLeft: "3px"}}>-</div>
-                    <DateParse dateString={currentDate}></DateParse>
+                    <DateParse dateString={currentDate.split('T')[0]}></DateParse>
                 </DateGroup>
             </Typography>
         </Header>

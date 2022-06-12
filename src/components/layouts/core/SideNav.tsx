@@ -93,7 +93,7 @@ function SideNav() {
         </Link>
         <Link href="/notifications">
           <NavItem
-            className={router.pathname == '/notifications' ? 'active' : ''}
+            className={router.pathname.startsWith('/notifications') ? 'active' : ''}
           >
             <Image
               src="/icons/Notification-White.svg"
@@ -129,7 +129,7 @@ function SideNav() {
           </NavItem>
         </Link>
         <Link href="/sales">
-          <NavItem className={router.pathname == '/sales' ? 'active' : ''}>
+          <NavItem className={router.pathname.startsWith('/sales') ? 'active' : ''}>
             <Image src="/icons/Sales-White.svg" width={18} height={21.5} />
             <p
               className={`${styles.navitem__text} ${

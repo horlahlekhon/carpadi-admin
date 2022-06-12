@@ -11,4 +11,6 @@
 
 .layout .main main {
   padding: 18px 23px;
+  overflow-y: auto;
+  height: calc(100vh - 68px);
 }
