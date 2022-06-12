@@ -1082,7 +1082,6 @@ const SalesStatus = styled.div`
   align-items: start;
   justify-content: end;
   padding-bottom: 20px;
-  border-bottom: 1px solid ${t.liteGrey};
   margin-bottom: 20px;
 
   .status {
@@ -1090,7 +1089,7 @@ const SalesStatus = styled.div`
   }
 
   .cta {
-    background-color: ${t.liteGrey};
+    background-color: ${t.extraLiteGrey};
     padding: 10px 12px;
     display: flex;
     flex-direction: row;
