@@ -9,7 +9,8 @@ const StyledSwitch = withStyles((theme) => ({
     padding: 0,
     display: 'flex',
     backgroundColor: t.liteGrey,
-    borderRadius: 17
+    borderRadius: 17,
+    marginLeft: 10
   },
   switchBase: {
     padding: 2,
