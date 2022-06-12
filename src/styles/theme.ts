@@ -54,12 +54,34 @@ export const theme = createTheme({
     }
   },
   overrides: {
+    MuiBreadcrumbs: {
+      root: {
+        color: 'black !important',
+        fontSize: '14px !important',
+      },
+      separator: {
+        color: `${t.grey} !important`,
+        height: '21px !important',
+      }
+    },
     MuiRadio: {
       colorSecondary: {
-        color: `${t.primaryBlue} !important`
+        color: `${t.primaryBlue} !important`,
       }
     },
     MuiTypography: {
+      root: {
+        fontFamily: 'Roboto',
+      },
+      colorPrimary: {
+        color: `${t.primaryDeepBlue} !important`,
+      },
+      colorSecondary:{
+        color: `${t.primaryBlue} !important`,
+      },
+      colorTextPrimary: {
+        color: `${t.primaryDeepBlue} !important`,
+      },
       colorTextSecondary: {
         color: `${t.primaryBlue} !important`
       }

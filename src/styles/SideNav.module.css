@@ -1,7 +1,6 @@
 .main {
   width: 280px;
-  min-height: 100vh;
-  height: 100%;
+  height: 100vh;
   background: #243773;
   color: white;
   transition: 1s;
@@ -9,8 +8,7 @@
 
 .main__small{
   width: 100px;
-  min-height: 100vh;
-  height: 100%;
+  height: 100vh;
   background: #243773;
   color: white;
   transition: 1s;
