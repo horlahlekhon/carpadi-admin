@@ -5,6 +5,7 @@ import { t } from '../../styles/theme'
 const Btn = ({
   text,
   width,
+  height = 48,
   marginTop = null,
   marginBottom = null,
   marginLeft = null,
@@ -12,15 +13,21 @@ const Btn = ({
   bgColor = t.primaryDarkBlue,
   color = t.white,
   borderRadius = '12px',
-  outlined = false
+  outlined = false,
+  fontSize = '14px',
+  disabled = false,
+  onClick = () => {}
 }) => {
   return (
     <Button
       variant={outlined ? 'outlined' : 'contained'}
       className={classes.btn}
       disableElevation
+      disabled={disabled}
       style={{
+        display: 'block',
         width: width,
+        height: height,
         marginTop: marginTop,
         marginBottom: marginBottom,
         marginLeft: marginLeft,
@@ -28,8 +35,10 @@ const Btn = ({
         backgroundColor: `${outlined ? 'transparent' : bgColor}`,
         border: `2px solid ${outlined ? bgColor : 'transparent'}`,
         color: `${outlined ? bgColor : color}`,
-        borderRadius: borderRadius
+        borderRadius: borderRadius,
+        fontSize: fontSize
       }}
+      onClick={onClick}
     >
       {text || 'Button'}
     </Button>
