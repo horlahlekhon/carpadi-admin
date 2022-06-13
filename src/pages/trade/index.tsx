@@ -286,7 +286,7 @@ function SalesPage() {
                         width={66}
                         outlined={true}
                         onClick={() =>
-                          handleNavigation(`sales/${row.tradingId}`)
+                          handleNavigation(`trade/${row.tradingId}?type=${selectedTrade}`)
                         }
                       />
                     </TableCell>
