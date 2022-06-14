@@ -6,9 +6,8 @@ import { useRouter } from 'next/router'
 import Button from '../../components/shared/Button'
 import Image from 'next/image'
 import { withStyles } from '@material-ui/styles'
-import ToggleSwitch from '../../components/shared/ToggleSwitch'
-import { Add } from '@material-ui/icons'
 import { useState } from 'react'
+import { toast, Toaster } from 'react-hot-toast'
 
 function TradeProfilePage() {
   const router = useRouter()
@@ -31,9 +30,31 @@ function TradeProfilePage() {
 
   const saveSoldPrice = () => {
     setEditDetails(false)
+    toast.success('Selling Price Updated')
+  }
+  const deleteTrade = () => {
+    setModalState(false)
+    toast.success('Trade Deleted')
   }
   return (
     <Container>
+      <div>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              border: '1px solid #243773',
+              padding: '16px',
+              fontWeight: 'bold',
+              color: '#243773'
+            },
+            iconTheme: {
+              primary: '#243773',
+              secondary: '#FFFAEE'
+            }
+          }}
+        />
+      </div>
       <Header>
         <Typography variant="h4">
           <b>Trade</b>
@@ -393,7 +414,7 @@ function TradeProfilePage() {
                 <Button
                   text="Yes, Delete"
                   width={174}
-                  onClick={() => setModalState(false)}
+                  onClick={() => deleteTrade()}
                 />
               </Info>
             </>
