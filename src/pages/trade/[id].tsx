@@ -13,9 +13,9 @@ function TradeProfilePage() {
   const router = useRouter()
   const tradeId = router.query.id || 'NA'
   const tradeType = router.query.type || 'NA'
-  const [modalOpen, setModalState] = useState(false)
-  const [modalView, setModalView] = useState('')
-  const [modalTitle, setModalTitle] = useState('')
+  const [modalOpen, setModalState] = useState(true)
+  const [modalView, setModalView] = useState('editTrade')
+  const [modalTitle, setModalTitle] = useState('Edit Trade')
   const [editDetails, setEditDetails] = useState(false)
 
   const showModal = (viewName: string, title: string) => {
@@ -35,6 +35,10 @@ function TradeProfilePage() {
   const deleteTrade = () => {
     setModalState(false)
     toast.success('Trade Deleted')
+  }
+  const saveTrade = () => {
+    setModalState(false)
+    toast.success('Trade Updated')
   }
   return (
     <Container>
@@ -132,7 +136,7 @@ function TradeProfilePage() {
               outlined={true}
               marginRight="16px"
               disabled={String(tradeType).toLowerCase() === 'sold'}
-              onClick={() => showModal('editImages', 'Edit Car Sales Images')}
+              onClick={() => showModal('editTrade', 'Edit Trade')}
             />
             <Button
               text="Go to Car Profile"
@@ -419,6 +423,128 @@ function TradeProfilePage() {
               </Info>
             </>
           )}
+          {modalView === 'editTrade' && (
+            <>
+              <HeaderText variant="inherit" style={{ marginTop: '40px' }}>
+                Creating Trade for
+              </HeaderText>
+              <InfoSection container spacing={3}>
+                <Grid item xs={12}>
+                  <VehicleDetails style={{ width: 700 }}>
+                    <img
+                      src="/images/Big-Default-Car.png"
+                      width={185}
+                      height={135}
+                      style={{ borderRadius: '8px' }}
+                    />
+                    <div className="stats">
+                      <img
+                        src="/images/Toyota-Full.png"
+                        width={80}
+                        height={22}
+                        style={{ marginBottom: -15 }}
+                      />
+                      <Typography variant="h5" className="trade">
+                        Trade ID 09890
+                      </Typography>
+                      <Typography variant="h6">Toyota Rav4 2020</Typography>
+                    </div>
+                  </VehicleDetails>
+                </Grid>
+              </InfoSection>
+              <ModalSplitContainer>
+                <div className="left">
+                  <div className="title">Trade Information</div>
+                  <TextField className="input" placeholder="Slot Quantity" />
+                  <FlexRow className="input">
+                    <div className="currency-box">&#8358;</div>
+                    <TextField
+                      placeholder="Price per slot"
+                      fullWidth
+                    ></TextField>
+                  </FlexRow>
+                  <FlexRow className="input">
+                    <div className="currency-box">%</div>
+                    <TextField
+                      placeholder="Estimated ROT per slot"
+                      fullWidth
+                    ></TextField>
+                  </FlexRow>
+                  <TextField
+                    className="input"
+                    placeholder="Trading Duration in Months"
+                  />
+                  <div className="title" style={{ marginBottom: 20, marginTop: 40}}>
+                    Carpadi Commission
+                  </div>
+                  <FlexRow className="input">
+                    <div className="currency-box">&#8358;</div>
+                    <TextField placeholder="Bought price" fullWidth></TextField>
+                  </FlexRow>
+                  <FlexRow className="input">
+                    <div className="currency-box">&#8358;</div>
+                    <TextField
+                      placeholder="Maximum selling price"
+                      fullWidth
+                    ></TextField>
+                  </FlexRow>
+                  <FlexRow className="input">
+                    <div className="currency-box">&#8358;</div>
+                    <TextField
+                      placeholder="Maximum selling price"
+                      fullWidth
+                    ></TextField>
+                  </FlexRow>
+                </div>
+                <div className="right">
+                  <div className="title">Trade Summary</div>
+                  <div className="content">
+                    <Grid item xs={12}>
+                      <PriceCard style={{ background: t.alertSuccessLite }}>
+                        <Typography variant="body1">
+                          Total Slot Price + Total ROT
+                        </Typography>
+                        <Typography variant="h5">&#8358; 0.00</Typography>
+                      </PriceCard>
+                      <Statistic>
+                        <div className="key">Initial + ROT</div>
+                        <div className="value">&#8358; 0.00</div>
+                      </Statistic>
+                      <Statistic>
+                        <div className="key">Sold Slot Price</div>
+                        <div className="value">&#8358; 0.00</div>
+                      </Statistic>
+                      <PriceCard style={{ marginTop: 40 }}>
+                        <Typography variant="body1">
+                          Estimated Carpadi minimum Profit on Sales
+                        </Typography>
+                        <Typography variant="h5">&#8358; 0.00</Typography>
+                      </PriceCard>
+                      <PriceCard
+                        style={{
+                          background: t.alertSuccessLite,
+                          marginTop: 20
+                        }}
+                      >
+                        <Typography variant="body1">
+                          Estimated Carpadi maximum Profit on Sales
+                        </Typography>
+                        <Typography variant="h5">&#8358; 0.00</Typography>
+                      </PriceCard>
+                    </Grid>
+                  </div>
+                </div>
+              </ModalSplitContainer>
+              <Button
+                text={modalTitle}
+                width={590}
+                marginLeft="auto"
+                marginRight="auto"
+                marginTop="40px"
+                onClick={() => saveTrade()}
+              />
+            </>
+          )}
         </ModalBody>
       </Modal>
     </Container>
@@ -430,6 +556,14 @@ export default TradeProfilePage
 TradeProfilePage.getLayout = function getLayout(page) {
   return <MainLayout>{page}</MainLayout>
 }
+
+const HeaderText = withStyles({
+  root: {
+    color: t.lightGrey,
+    fontWeight: 'bold',
+    display: 'block'
+  }
+})(Typography)
 
 const PriceCard = withStyles({
   elevation1: { boxShadow: 'none' },
@@ -443,6 +577,16 @@ const PriceCard = withStyles({
     background: `${t.primaryExtraLite}`
   }
 })(Paper)
+
+const InfoSection = withStyles({
+  root: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: '20px',
+    marginTop: '8px'
+  }
+})(Grid)
 
 const Info = styled.div`
   display: flex;
@@ -484,6 +628,10 @@ const ModalBody = styled.div`
   height: fit-content;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `
 
 const ModalBodyHeader = styled.div`
@@ -648,5 +796,49 @@ const Statistic = styled.div`
 
   .value {
     font-weight: bold;
+  }
+`
+const ModalSplitContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+  min-width: 800px;
+
+  .left,
+  .right {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      font-weight: bold;
+      color: ${t.grey};
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+  }
+
+  .left {
+    width: 45%;
+    margin-right: 24px;
+    display: flex;
+    flex-direction: column;
+
+    .input {
+      margin-bottom: 30px;
+    }
+  }
+  .right {
+    width: 55%;
+    .content {
+      border: 2px solid ${t.extraLiteGrey};
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .title {
+      font-weight: bold;
+      color: ${t.grey};
+      margin-bottom: 10px;
+    }
   }
 `
