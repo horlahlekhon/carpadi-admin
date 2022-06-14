@@ -429,7 +429,7 @@ function TradeProfilePage() {
                 Creating Trade for
               </HeaderText>
               <InfoSection container spacing={3}>
-                <Grid item xs={12}>
+                <Grid item xs={12} style={{ display: 'flex' }}>
                   <VehicleDetails style={{ width: 700 }}>
                     <img
                       src="/images/Big-Default-Car.png"
@@ -450,6 +450,12 @@ function TradeProfilePage() {
                       <Typography variant="h6">Toyota Rav4 2020</Typography>
                     </div>
                   </VehicleDetails>
+                  <Button
+                    text="Go to Car Profile"
+                    width={150}
+                    outlined={true}
+                    onClick={() => handleNavigation(`/inventory/${tradeId}`)}
+                  />
                 </Grid>
               </InfoSection>
               <ModalSplitContainer>
@@ -474,7 +480,10 @@ function TradeProfilePage() {
                     className="input"
                     placeholder="Trading Duration in Months"
                   />
-                  <div className="title" style={{ marginBottom: 20, marginTop: 40}}>
+                  <div
+                    className="title"
+                    style={{ marginBottom: 20, marginTop: 40 }}
+                  >
                     Carpadi Commission
                   </div>
                   <FlexRow className="input">
