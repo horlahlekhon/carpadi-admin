@@ -1,9 +1,9 @@
-import MainLayout from '../../components/layouts/MainLayout'
+import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import { Grid, Typography, Paper, Modal, TextField } from '@material-ui/core'
-import { t } from '../../styles/theme'
+import { t } from '../../../styles/theme'
 import { useRouter } from 'next/router'
-import Button from '../../components/shared/Button'
+import Button from '../../../components/shared/Button'
 import Image from 'next/image'
 import { withStyles } from '@material-ui/styles'
 import { useState } from 'react'
@@ -13,9 +13,9 @@ function TradeProfilePage() {
   const router = useRouter()
   const tradeId = router.query.id || 'NA'
   const tradeType = router.query.type || 'NA'
-  const [modalOpen, setModalState] = useState(true)
-  const [modalView, setModalView] = useState('editTrade')
-  const [modalTitle, setModalTitle] = useState('Edit Trade')
+  const [modalOpen, setModalState] = useState(false)
+  const [modalView, setModalView] = useState('')
+  const [modalTitle, setModalTitle] = useState('')
   const [editDetails, setEditDetails] = useState(false)
 
   const showModal = (viewName: string, title: string) => {
@@ -127,7 +127,7 @@ function TradeProfilePage() {
               outlined={true}
               marginRight="16px"
               onClick={() => {
-                handleNavigation(`/inventory/${tradeId}/manage`)
+                handleNavigation(`/trade/${tradeId}/manage-trade`)
               }}
             />
             <Button
