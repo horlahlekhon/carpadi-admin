@@ -6,7 +6,7 @@ import {
     InputLabel,
     Typography
 } from '@material-ui/core'
-import {DateParse, TimeParse} from '../../shared/date'
+import {DateParse} from '../../shared/date'
 import styled from 'styled-components'
 import {SearchOutlined} from '@material-ui/icons'
 import {t} from '../../../styles/theme'
