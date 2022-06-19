@@ -132,7 +132,9 @@ function SettingsPage() {
               <FormControl style={{ width: 370, marginTop: 30 }}>
                 <Select
                   value={bankAccount}
-                  onChange={(event) => setBankAccount(event.target.value)}
+                  onChange={(event) =>
+                    setBankAccount(String(event.target.value))
+                  }
                   displayEmpty
                   inputProps={{ 'aria-label': 'Without label' }}
                 >
