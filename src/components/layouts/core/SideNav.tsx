@@ -114,7 +114,7 @@ function SideNav() {
           </NavItem>
         </Link>
         <Link href="/trade">
-          <NavItem className={router.pathname == '/trade' ? 'active' : ''}>
+          <NavItem className={router.pathname.startsWith('/trade') ? 'active' : ''}>
             <Image src="/icons/Trade-White.svg" width={18} height={21.5} />
             <p
               className={`${styles.navitem__text} ${
@@ -266,5 +266,6 @@ const ActiveNavItem = styled.span`
 
 const Logout = styled.span`
   margin-top: auto;
+  margin-bottom: 40px;
   justify-self: flex-end;
 `
