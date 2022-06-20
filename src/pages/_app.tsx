@@ -11,8 +11,7 @@ import { animations } from '../lib/animations'
 
 const MyApp = ({ Component, pageProps, router }): JSX.Element => {
   const getLayout = Component.getLayout || ((page) => page)
-  const startIndex = 0
-  const [animation, setAnimation] = useState(animations[startIndex])
+  const [animation, setAnimation] = useState(animations[1])
 
   // Remove the server-side injected CSS.
   useEffect(() => {
@@ -29,13 +28,12 @@ const MyApp = ({ Component, pageProps, router }): JSX.Element => {
           <GlobalStyles />
           <CssBaseline />
           <LazyMotion features={domAnimation}>
-            <AnimatePresence exitBeforeEnter={true}>
+            <AnimatePresence exitBeforeEnter={false}>
               <m.div
                 key={router.route.concat(animation.name)}
                 className="page-wrap"
                 initial="initial"
                 animate="animate"
-                exit="exit"
                 variants={animation.variants}
                 transition={animation.transition}
               >
