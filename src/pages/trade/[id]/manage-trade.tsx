@@ -1,13 +1,6 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
-  FormControl,
-  Grid,
-  IconButton,
-  Input,
-  InputAdornment,
-  InputLabel,
-  Modal,
   Paper,
   Table,
   TableBody,
@@ -15,7 +8,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
   withStyles
 } from '@material-ui/core'
@@ -25,20 +17,18 @@ import { useRouter } from 'next/router'
 import Button from '../../../components/shared/Button'
 import { makeStyles } from '@material-ui/styles'
 import { usePagination } from '@material-ui/lab/Pagination'
-import Image from 'next/image'
-import { SearchOutlined, Add } from '@material-ui/icons'
-import ToggleSwitch from '../../../components/shared/ToggleSwitch'
 
 function ManageTradePage() {
   enum Trades {
-    ACTIVE = 'Active',
-    SOLD = 'Sold',
-    CLOSED = 'Closed'
+    ACTIVE = 'active',
+    SOLD = 'sold',
+    CLOSED = 'closed'
   }
   const rowsPerPage = 10
   const router = useRouter()
   const tradeId = router.query.id || 'NA'
-  const [selectedTrade, setSelected] = useState(Trades.ACTIVE)
+  const tradeType = router.query.status || 'active'
+  const [selectedTrade, setSelected] = useState(tradeType)
   const [page, setPage] = useState(0)
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -155,13 +145,11 @@ function ManageTradePage() {
         <FlexRow>
           <ActivityTab
             className={`${selectedTrade === Trades.ACTIVE ? 'active' : ''}`}
-            onClick={() => setSelected(Trades.ACTIVE)}
           >
             Active
           </ActivityTab>
           <ActivityTab
             className={`${selectedTrade === Trades.CLOSED ? 'active' : ''}`}
-            onClick={() => setSelected(Trades.CLOSED)}
           >
             Closed
           </ActivityTab>
@@ -178,7 +166,6 @@ function ManageTradePage() {
                 <TableCell align="left">Total Slot Price</TableCell>
                 <TableCell align="left">Expected ROT</TableCell>
                 <TableCell align="left">Closed Date</TableCell>
-                <TableCell align="left">Trade Status</TableCell>
                 <TableCell align="left">&nbsp;</TableCell>
               </TableRow>
             </TableHead>
@@ -207,18 +194,6 @@ function ManageTradePage() {
                     <TableCell align="left">{row.expectedROT}</TableCell>
                     <TableCell align="left">
                       &#8358; {row.purchaseDate}
-                    </TableCell>
-                    <TableCell align="left">
-                      <ActivityTab
-                        style={{
-                          background:
-                            selectedTrade === Trades.ACTIVE
-                              ? t.alertSuccessLite
-                              : t.extraLiteGrey
-                        }}
-                      >
-                        {selectedTrade}
-                      </ActivityTab>
                     </TableCell>
                     <TableCell align="left">
                       <Button
@@ -395,6 +370,7 @@ const Breadcrumbs = styled.div`
       .text {
         padding-right: 10px;
         cursor: pointer;
+        text-transform: capitalize;
       }
       .separator {
         :after {

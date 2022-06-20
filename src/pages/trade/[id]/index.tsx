@@ -127,7 +127,7 @@ function TradeProfilePage() {
               outlined={true}
               marginRight="16px"
               onClick={() => {
-                handleNavigation(`/trade/${tradeId}/manage-trade`)
+                handleNavigation(`/trade/${tradeId}/manage-trade?status=${tradeType}`)
               }}
             />
             <Button

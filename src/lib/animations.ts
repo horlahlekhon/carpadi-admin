@@ -37,7 +37,7 @@ const slideRight = {
         }
     },
     transition: {
-        duration: 0.1
+        duration: 0.4
     }
 };
 
