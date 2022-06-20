@@ -28,7 +28,9 @@ function ManageTradePage() {
   const router = useRouter()
   const tradeId = router.query.id || 'NA'
   const tradeType = router.query.status || 'active'
-  const [selectedTrade, setSelected] = useState(tradeType)
+  const [selectedTrade, setSelected] = useState(
+    String(tradeType).toLowerCase() === 'active' ? Trades.ACTIVE : Trades.CLOSED
+  )
   const [page, setPage] = useState(0)
 
   const handleChangePage = (event: unknown, newPage: number) => {
