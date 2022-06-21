@@ -20,6 +20,7 @@ import {
 } from '@material-ui/icons'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
+import { toast, Toaster } from 'react-hot-toast'
 
 function SettingsPage() {
   const router = useRouter()
@@ -35,6 +36,7 @@ function SettingsPage() {
   }
 
   const saveChanges = () => {
+    toast.success("Changes Saved")
     if (currentTab === 'payment-setup') {
       return
     } else if (currentTab === 'fee-management') {
@@ -63,6 +65,23 @@ function SettingsPage() {
 
   return (
     <Container>
+      <div>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              border: '1px solid #243773',
+              padding: '16px',
+              fontWeight: 'bold',
+              color: '#243773'
+            },
+            iconTheme: {
+              primary: '#243773',
+              secondary: '#FFFAEE'
+            }
+          }}
+        />
+      </div>
       <Header>
         <Typography variant="h4">
           <b>Settings</b>
@@ -353,7 +372,7 @@ function SettingsPage() {
             </>
           )}
           <div className="submit">
-            <Button text="Save Changes" width={372} />
+            <Button text="Save Changes" width={372} onClick={() => saveChanges()} />
           </div>
         </div>
       </MainCard>
