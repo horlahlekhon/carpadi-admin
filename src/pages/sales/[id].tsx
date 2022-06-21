@@ -726,6 +726,10 @@ const ModalBody = styled.div`
   height: fit-content;
   max-height: calc(100vh - 100px);
   overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `
 
 const ModalBodyHeader = styled.div`
