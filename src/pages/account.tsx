@@ -29,12 +29,11 @@ function AccountPage() {
     'december'
   ]
   const pieChartData = [
-    { name: 'Inspection', value: 10 },
-    { name: 'Available', value: 40 },
-    { name: 'Trading', value: 35 },
-    { name: 'Sold', value: 25 }
+    { name: 'Total Deposits', value: 40 },
+    { name: 'Total Withdrawals', value: 35 },
+    { name: 'Total Paid Out Trade', value: 25 }
   ]
-  const COLORS = ['black', t.primaryDeepBlue, t.primaryBlue, t.primaryLite]
+  const COLORS = [t.primaryDeepBlue, t.primaryBlue, t.primaryLite]
 
   const updateYear = (action: string) => {
     if (action === 'next') {
@@ -141,6 +140,125 @@ function AccountPage() {
                 <Button text="Apply" width={94} marginLeft="24px" />
               </FilterCTA>
             </Filter>
+            <Grid container spacing={3} xs={12} style={{ marginTop: 20 }}>
+              <Grid container item spacing={2} xs={8}>
+                <Grid item xs={4}>
+                  <Card>
+                    <Typography variant="body1">Total Trading Cash</Typography>
+                    <Grid item>
+                      <Typography variant="h5" style={{fontSize: '1.2rem'}}>
+                        &#8358; 10,000,000.00
+                      </Typography>
+                      <Typography variant="inherit">with 200 Users</Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+                <Grid item xs={4}>
+                  <Card>
+                    <Typography variant="body1">
+                      Total Withdraw-able Cash
+                    </Typography>
+                    <Grid item>
+                      <Typography variant="h5" style={{fontSize: '1.2rem'}}>&#8358; 2,000,000.00</Typography>
+                      <Typography variant="inherit">with 200 Users</Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+                <Grid item xs={4}>
+                  <Card>
+                    <Typography variant="body1">
+                      Total Unsettled Cash
+                    </Typography>
+                    <Grid item>
+                      <Typography variant="h5" style={{fontSize: '1.2rem'}}>&#8358; 800,000.00</Typography>
+                      <Typography variant="inherit">with 200 Users</Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+                <Grid container item xs={6}>
+                  <Card style={{ background: t.primaryLite, height: 190 }}>
+                    <Typography variant="body1">
+                      Total Transfer Charges
+                    </Typography>
+                    <Grid item>
+                      <Typography variant="h5">&#8358; 12,800.00</Typography>
+                      <Typography variant="inherit">with 200 Users</Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+                <Grid container item xs={6}>
+                  <Card style={{ background: t.alertSuccessLite, height: 190 }}>
+                    <Typography variant="body1">
+                      Total Closed Trade Charges
+                    </Typography>
+                    <Grid item>
+                      <Typography variant="h5">&#8358; 5,000.00</Typography>
+                      <Typography variant="inherit">with 200 Users</Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+                <Grid container item xs={6}>
+                  <Card style={{ height: 190 }}>
+                    <Typography variant="body1">
+                      Total Number of made Deposit
+                    </Typography>
+                    <Grid item>
+                      <Typography variant="h5">58</Typography>
+                      <Typography variant="inherit">with 200 Users</Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+                <Grid container item xs={6}>
+                  <Card style={{ height: 190 }}>
+                    <Typography variant="body1">
+                      Total Number of made Withdrawals
+                    </Typography>
+                    <Grid item>
+                      <Typography variant="h5">62</Typography>
+                      <Typography variant="inherit">with 200 Users</Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+              </Grid>
+              <Grid container item xs={4}>
+                <Grid item xs={12}>
+                  <Card
+                    style={{ color: 'white', background: t.primaryAshBlue }}
+                  >
+                    <Typography variant="body1">Total Assets</Typography>
+                    <Grid item>
+                      <Typography variant="h5">
+                        &#8358; 12,800,000.00
+                      </Typography>
+                      <Typography variant="inherit">
+                        with 10,000 Users
+                      </Typography>
+                    </Grid>
+                  </Card>
+                </Grid>
+                <Grid item xs={12} style={{marginTop: 14}}>
+                  <Card style={{ height: 'fit-content' }}>
+                    <PieChart
+                      data={pieChartData}
+                      colors={COLORS}
+                      labels={pieChartData.map((x) => x.name)}
+                    />
+                    <ChartStats>
+                      <div className="stat">Total Deposits</div>
+                      <div className="value">&#8358; 2,800,000.00</div>
+                    </ChartStats>
+                    <ChartStats>
+                      <div className="stat">Total Withdrawals</div>
+                      <div className="value">&#8358; 2,800,000.00</div>
+                    </ChartStats>
+                    <ChartStats>
+                      <div className="stat">Total Paid Out Trade</div>
+                      <div className="value">&#8358; 2,800,000.00</div>
+                    </ChartStats>
+                  </Card>
+                </Grid>
+              </Grid>
+            </Grid>
           </MainSection>
         </Grid>
       </Grid>
@@ -171,6 +289,33 @@ const Filter = withStyles({
     justifyContent: 'space-between'
   }
 })(Paper)
+
+const Card = withStyles({
+  elevation1: { boxShadow: 'none' },
+  root: {
+    height: '154px',
+    width: '100%',
+    padding: '13px 19px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    background: `${t.white}`
+  }
+})(Paper)
+
+const ChartStats = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 1px solid ${t.extraLiteGrey};
+  padding-bottom: 8px;
+  margin-top: 12px;
+
+  .value {
+    font-weight: bold;
+  }
+`
 
 const FilterCTA = styled.div`
   display: flex;
