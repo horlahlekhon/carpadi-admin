@@ -16,7 +16,9 @@ import {
   ChevronRight,
   CreditCard,
   Visibility,
-  VisibilityOff
+  VisibilityOff,
+  MonetizationOn,
+  Lock
 } from '@material-ui/icons'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
@@ -36,7 +38,7 @@ function SettingsPage() {
   }
 
   const saveChanges = () => {
-    toast.success("Changes Saved")
+    toast.success('Changes Saved')
     if (currentTab === 'payment-setup') {
       return
     } else if (currentTab === 'fee-management') {
@@ -113,7 +115,7 @@ function SettingsPage() {
             <div className="main">
               <div className="top">
                 <div className="icon">
-                  <CreditCard />
+                  <MonetizationOn />
                 </div>
                 <div className="text">Fee Management</div>
               </div>
@@ -130,7 +132,7 @@ function SettingsPage() {
             <div className="main">
               <div className="top">
                 <div className="icon">
-                  <CreditCard />
+                  <Lock />
                 </div>
                 <div className="text">Security</div>
               </div>
@@ -372,7 +374,11 @@ function SettingsPage() {
             </>
           )}
           <div className="submit">
-            <Button text="Save Changes" width={372} onClick={() => saveChanges()} />
+            <Button
+              text="Save Changes"
+              width={372}
+              onClick={() => saveChanges()}
+            />
           </div>
         </div>
       </MainCard>
