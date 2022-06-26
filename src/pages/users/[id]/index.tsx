@@ -8,16 +8,16 @@ import Image from 'next/image'
 import { withStyles } from '@material-ui/styles'
 import { useState } from 'react'
 import { toast, Toaster } from 'react-hot-toast'
-import { Check } from '@material-ui/icons'
+import { ArrowBack, Check } from '@material-ui/icons'
 
 function UserProfilePage() {
   const router = useRouter()
   const userId = router.query.id || 'NA'
-  const tradeType = router.query.type || 'NA'
   const [modalOpen, setModalState] = useState(false)
   const [modalView, setModalView] = useState('')
   const [modalTitle, setModalTitle] = useState('')
   const [editDetails, setEditDetails] = useState(false)
+  const [viewAllTransactions, setViewAllTransactions] = useState(false)
 
   const showModal = (viewName: string, title: string) => {
     setModalView(viewName)
@@ -109,91 +109,274 @@ function UserProfilePage() {
               </p>
             </div>
           </div>
-          <div className="right">
-            <ActionBar>
-              <div className="button-group">
-                <Button
-                  text="Suspend User Account"
-                  width={180}
-                  outlined={true}
-                  marginRight="16px"
-                  bgColor={t.alertValidation}
-                  disabled={String(tradeType).toLowerCase() === 'sold'}
-                  onClick={() => showModal('suspendAccount', '')}
-                />
-                <Button
-                  text="Delete User Account"
-                  width={165}
-                  outlined={true}
-                  marginRight="16px"
-                  bgColor={t.alertError}
-                  disabled={
-                    String(tradeType).toLowerCase() === 'active' ||
-                    String(tradeType).toLowerCase() === 'sold'
-                  }
-                  onClick={() => {
-                    showModal('deleteAccount', '')
-                  }}
-                />
-                <Button
-                  text="Trading Activities"
-                  width={150}
-                  onClick={() =>
-                    handleNavigation(`/users/${userId}/trading-activities`)
-                  }
-                />
-              </div>
-            </ActionBar>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <PriceCard style={{ background: t.alertSuccessLite }}>
-                  <Typography variant="body1">Total Asset</Typography>
-                  <Typography variant="h5">&#8358; 10,000.00</Typography>
-                </PriceCard>
-              </Grid>
-              <Grid item xs={12}>
-                <Statistic>
-                  <div className="key">Trading Cash</div>
-                  <div className="value">&#8358; 5,000.00</div>
-                </Statistic>
-                <Statistic>
-                  <div className="key">Withdrawable Cash</div>
-                  <div className="value">&#8358; 3,000.00</div>
-                </Statistic>
-                <Statistic>
-                  <div className="key">Unsettled Cash</div>
-                  <div className="value">&#8358; 2,000.00</div>
-                </Statistic>
-              </Grid>
-              <Button
-                text="View All Transactions"
-                width="90%"
-                marginLeft="auto"
-                marginRight="auto"
-                marginBottom="40px"
-                marginTop={40}
-              />
-              <Grid container spacing={3}>
-                <Grid item xs={12} style={{ fontWeight: 600 }}>
-                  <Statistic style={{ fontSize: 14 }}>
-                    <div className="key">Personal Bank Account</div>
-                  </Statistic>
-                  <Statistic>
-                    <div className="key stacked">
-                      <div className="account-number">0320090101</div>
-                      <div className="bank-name">WEMA Bank Plc</div>
-                      <div className="account-name">Maxwell Samuel Anthony</div>
-                    </div>
-                    <div className="value">
-                      <div className="checkmark">
-                        <Check style={{ height: 12 }} />
+          {viewAllTransactions && (
+            <>
+              <div className="right">
+                <div className="title">
+                  <ArrowBack
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      setViewAllTransactions(false)
+                    }}
+                  />
+                  <div className="text">All Transactions</div>
+                </div>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Deposit-Green.svg"
+                          alt="Deposit"
+                        />
+                        <div className="stacked">
+                          <div>Deposit</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
                       </div>
-                    </div>
-                  </Statistic>
+                      <div className="value" style={{ color: t.alertSuccess }}>
+                        +&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Withdraw-Red.svg"
+                          alt="Withdraw"
+                        />
+                        <div className="stacked">
+                          <div>Withdraw</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertError }}>
+                        -&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Deposit-Green.svg"
+                          alt="Deposit"
+                        />
+                        <div className="stacked">
+                          <div>Deposit</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertSuccess }}>
+                        +&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Withdraw-Red.svg"
+                          alt="Withdraw"
+                        />
+                        <div className="stacked">
+                          <div>Withdraw</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertError }}>
+                        -&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Deposit-Green.svg"
+                          alt="Deposit"
+                        />
+                        <div className="stacked">
+                          <div>Deposit</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertSuccess }}>
+                        +&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Withdraw-Red.svg"
+                          alt="Withdraw"
+                        />
+                        <div className="stacked">
+                          <div>Withdraw</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertError }}>
+                        -&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Deposit-Green.svg"
+                          alt="Deposit"
+                        />
+                        <div className="stacked">
+                          <div>Deposit</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertSuccess }}>
+                        +&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Withdraw-Red.svg"
+                          alt="Withdraw"
+                        />
+                        <div className="stacked">
+                          <div>Withdraw</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertError }}>
+                        -&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Deposit-Green.svg"
+                          alt="Deposit"
+                        />
+                        <div className="stacked">
+                          <div>Deposit</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertSuccess }}>
+                        +&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Withdraw-Red.svg"
+                          alt="Withdraw"
+                        />
+                        <div className="stacked">
+                          <div>Withdraw</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertError }}>
+                        -&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Grid>
-          </div>
+              </div>
+            </>
+          )}
+          {!viewAllTransactions && (
+            <>
+              <div className="right">
+                <ActionBar>
+                  <div className="button-group">
+                    <Button
+                      text="Suspend User Account"
+                      width={180}
+                      outlined={true}
+                      marginRight="16px"
+                      bgColor={t.alertValidation}
+                      onClick={() => showModal('suspendAccount', '')}
+                    />
+                    <Button
+                      text="Delete User Account"
+                      width={165}
+                      outlined={true}
+                      marginRight="16px"
+                      bgColor={t.alertError}
+                      onClick={() => {
+                        showModal('deleteAccount', '')
+                      }}
+                    />
+                    <Button
+                      text="Trading Activities"
+                      width={150}
+                      onClick={() =>
+                        handleNavigation(`/users/${userId}/trading-activities`)
+                      }
+                    />
+                  </div>
+                </ActionBar>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <PriceCard style={{ background: t.alertSuccessLite }}>
+                      <Typography variant="body1">Total Asset</Typography>
+                      <Typography variant="h5">&#8358; 10,000.00</Typography>
+                    </PriceCard>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Statistic>
+                      <div className="key">Trading Cash</div>
+                      <div className="value">&#8358; 5,000.00</div>
+                    </Statistic>
+                    <Statistic>
+                      <div className="key">Withdrawable Cash</div>
+                      <div className="value">&#8358; 3,000.00</div>
+                    </Statistic>
+                    <Statistic>
+                      <div className="key">Unsettled Cash</div>
+                      <div className="value">&#8358; 2,000.00</div>
+                    </Statistic>
+                  </Grid>
+                  <Button
+                    text="View All Transactions"
+                    width="90%"
+                    marginLeft="auto"
+                    marginRight="auto"
+                    marginBottom="40px"
+                    marginTop={40}
+                    onClick={() => {
+                      setViewAllTransactions(true)
+                    }}
+                  />
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} style={{ fontWeight: 600 }}>
+                      <Statistic style={{ fontSize: 14 }}>
+                        <div className="key">Personal Bank Account</div>
+                      </Statistic>
+                      <Statistic>
+                        <div className="key stacked">
+                          <div className="account-number">0320090101</div>
+                          <div className="bank-name">WEMA Bank Plc</div>
+                          <div className="account-name">
+                            Maxwell Samuel Anthony
+                          </div>
+                        </div>
+                        <div className="value">
+                          <div className="checkmark">
+                            <Check style={{ height: 12 }} />
+                          </div>
+                        </div>
+                      </Statistic>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </div>
+            </>
+          )}
         </SplitContainer>
       </Body>
       <Modal
@@ -440,11 +623,18 @@ const SplitContainer = styled.div`
     border: 2px solid ${t.extraLiteGrey};
     border-radius: 12px;
     padding: 20px;
+    overflow-y: auto;
 
     .title {
-      font-weight: bold;
-      color: ${t.grey};
+      display: flex;
+      flex-direction: row;
+      align-items: center;
       margin-bottom: 10px;
+      .text {
+        font-weight: bold;
+        color: ${t.grey};
+        margin-left: 8px;
+      }
     }
   }
 `
@@ -496,4 +686,38 @@ const ActivityTab = styled.div`
   color: ${t.grey};
   text-transform: capitalize;
   margin-top: 16px;
+`
+
+const Transaction = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  padding-bottom: 5px;
+  font-size: 16px;
+  border-bottom: 1px solid ${t.extraLiteGrey};
+  width: 100%;
+
+  .value {
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .left {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    .stacked {
+      display: flex;
+      flex-direction: column;
+      margin-left: 15px;
+
+      .date {
+        font-size: 11px;
+        margin-top: 4px;
+      }
+    }
+  }
 `
