@@ -128,7 +128,7 @@ function TradingActivitiesPage() {
                                             </Grid>
                                         </div>
                                         <div className='btn-group'>
-                                            <Button text={'View Trade'} width={'100%'} onClick={() => handleNavigation('/users/1111/view-trade')}/>
+                                            <Button text={'View Trade'} width={'100%'} onClick={() => handleNavigation('/users/1111/view-trade?status=active')}/>
                                             <Button text={'Manage Trade'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation('/trade/1111?type=Active')}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
