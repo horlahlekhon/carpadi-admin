@@ -721,7 +721,6 @@ const ActivityTab = styled.div`
   text-transform: capitalize;
   margin-top: 16px;
 `
-
 const Transaction = styled.div`
   display: flex;
   flex-direction: row;
