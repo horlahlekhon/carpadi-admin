@@ -283,6 +283,38 @@ function UserProfilePage() {
                         -&#8358;5,000.00
                       </div>
                     </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Deposit-Green.svg"
+                          alt="Deposit"
+                        />
+                        <div className="stacked">
+                          <div>Deposit</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertSuccess }}>
+                        +&#8358;5,000.00
+                      </div>
+                    </Transaction>
+                    <Transaction>
+                      <div className="left">
+                        <img
+                          className="icon"
+                          src="/icons/Withdraw-Red.svg"
+                          alt="Withdraw"
+                        />
+                        <div className="stacked">
+                          <div>Withdraw</div>
+                          <div className="date">Jan 23, 2022</div>
+                        </div>
+                      </div>
+                      <div className="value" style={{ color: t.alertError }}>
+                        -&#8358;5,000.00
+                      </div>
+                    </Transaction>
                   </Grid>
                 </Grid>
               </div>
@@ -623,6 +655,7 @@ const SplitContainer = styled.div`
     border: 2px solid ${t.extraLiteGrey};
     border-radius: 12px;
     padding: 20px;
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
 
     .title {
