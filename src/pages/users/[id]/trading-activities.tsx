@@ -88,7 +88,7 @@ function TradingActivitiesPage() {
                                                 <Image src="/images/Toyota-Full.png" height={11} width={40}/>
                                                 <div className='text'>Toyota Corolla 2022</div>
                                             </div>
-                                            <Grid container spacing={3}>
+                                            <Grid container spacing={2}>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Price Per Slot</div>
@@ -149,7 +149,7 @@ function TradingActivitiesPage() {
                                                 <Image src="/images/Toyota-Full.png" height={11} width={40}/>
                                                 <div className='text'>Toyota Corolla 2022</div>
                                             </div>
-                                            <Grid container spacing={3}>
+                                            <Grid container spacing={2}>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Price Per Slot</div>
@@ -211,7 +211,7 @@ function TradingActivitiesPage() {
                                                 <Image src="/images/Toyota-Full.png" height={11} width={40}/>
                                                 <div className='text'>Toyota Corolla 2022</div>
                                             </div>
-                                            <Grid container spacing={3}>
+                                            <Grid container spacing={2}>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Refund Status</div>
