@@ -77,7 +77,7 @@ function TradingActivitiesPage() {
                         <ActivitiesBody>
                             {activityTab === ActivityStatus.ACTIVE &&
                                 [...Array.from({length: 8})].map((_, i) => (
-                                    <ActivityCard>
+                                    <ActivityCard key={i}>
                                         <img
                                             src="/images/FullSize-Default-Car.png"
                                             alt="car"
@@ -128,7 +128,8 @@ function TradingActivitiesPage() {
                                             </Grid>
                                         </div>
                                         <div className='btn-group'>
-                                            <Button text={'View Trade'} width={'100%'} onClick={() => handleNavigation('/users/1111/view-trade?status=active')}/>
+                                            <Button text={'View Trade'} width={'100%'}
+                                                    onClick={() => handleNavigation('/users/1111/view-trade?status=active')}/>
                                             <Button text={'Manage Trade'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation('/trade/1111?type=Active')}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
@@ -138,7 +139,7 @@ function TradingActivitiesPage() {
                                 ))}
                             {activityTab === ActivityStatus.SOLD &&
                                 [...Array.from({length: 8})].map((_, i) => (
-                                    <ActivityCard>
+                                    <ActivityCard key={i}>
                                         <img
                                             src="/images/FullSize-Default-Car.png"
                                             alt="car"
@@ -189,7 +190,8 @@ function TradingActivitiesPage() {
                                             </Grid>
                                         </div>
                                         <div className='btn-group'>
-                                            <Button text={'View Trade'} width={'100%'} onClick={() => handleNavigation('/users/1111/view-trade')}/>
+                                            <Button text={'View Trade'} width={'100%'}
+                                                    onClick={() => handleNavigation('/users/1111/view-trade')}/>
                                             <Button text={'Manage Trade'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation('/trade/1111?type=Active')}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
@@ -199,7 +201,7 @@ function TradingActivitiesPage() {
                                 ))}
                             {activityTab === ActivityStatus.CLOSED &&
                                 [...Array.from({length: 10})].map((_, i) => (
-                                    <ActivityCard>
+                                    <ActivityCard key={i}>
                                         <img
                                             src="/images/FullSize-Default-Car.png"
                                             alt="car"
@@ -251,7 +253,8 @@ function TradingActivitiesPage() {
                                             </Grid>
                                         </div>
                                         <div className='btn-group'>
-                                            <Button text={'View Trade'} width={'100%'} onClick={() => handleNavigation('/users/1111/view-trade')}/>
+                                            <Button text={'View Trade'} width={'100%'}
+                                                    onClick={() => handleNavigation('/users/1111/view-trade')}/>
                                             <Button text={'Manage Trade'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation('/trade/1111?type=Active')}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
