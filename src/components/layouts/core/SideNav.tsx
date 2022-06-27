@@ -159,7 +159,7 @@ function SideNav() {
           </NavItem>
         </Link>
         <Link href="/users">
-          <NavItem className={router.pathname == '/users' ? 'active' : ''}>
+          <NavItem className={router.pathname.startsWith('/users') ? 'active' : ''}>
             <Image src="/icons/Users-White.svg" width={18} height={21.5} />
             <p
               className={`${styles.navitem__text} ${
