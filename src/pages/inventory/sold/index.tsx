@@ -18,7 +18,7 @@ import Button from '../../../components/shared/Button'
 import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
 
-function OngoingTradePage() {
+function SoldInventoryPage() {
     const rowsPerPage = 10
     const router = useRouter()
     const [page, setPage] = useState(0)
@@ -101,7 +101,7 @@ function OngoingTradePage() {
         <Container>
             <Header>
                 <Typography variant="h4">
-                    <b>Ongoing Trade</b>
+                    <b>Sold</b>
                 </Typography>
             </Header>
             <Breadcrumbs>
@@ -120,7 +120,7 @@ function OngoingTradePage() {
                     <span className="separator"></span>
                 </div>
                 <div>
-                    <span className="text">Ongoing Trade</span>
+                    <span className="text">Sold</span>
                     <span className="separator"></span>
                 </div>
             </Breadcrumbs>
@@ -173,7 +173,7 @@ function OngoingTradePage() {
                                                 width={66}
                                                 outlined={true}
                                                 onClick={() =>
-                                                    handleNavigation(`/inventory/ongoing-trade/${row.tradingId}`)
+                                                    handleNavigation(`/inventory/sold/${row.tradingId}`)
                                                 }
                                             />
                                         </TableCell>
@@ -251,9 +251,9 @@ function OngoingTradePage() {
     )
 }
 
-export default OngoingTradePage
+export default SoldInventoryPage
 
-OngoingTradePage.getLayout = function getLayout(page) {
+SoldInventoryPage.getLayout = function getLayout(page) {
     return <MainLayout>{page}</MainLayout>
 }
 
