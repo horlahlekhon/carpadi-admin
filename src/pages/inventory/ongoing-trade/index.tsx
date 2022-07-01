@@ -18,7 +18,7 @@ import Button from '../../../components/shared/Button'
 import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
 
-function AvaialableForTradePage() {
+function OngoingTradePage() {
     const rowsPerPage = 10
     const router = useRouter()
     const [page, setPage] = useState(0)
@@ -101,7 +101,7 @@ function AvaialableForTradePage() {
         <Container>
             <Header>
                 <Typography variant="h4">
-                    <b>Available For Trade</b>
+                    <b>Ongoing Trade</b>
                 </Typography>
             </Header>
             <Breadcrumbs>
@@ -120,7 +120,7 @@ function AvaialableForTradePage() {
                     <span className="separator"></span>
                 </div>
                 <div>
-                    <span className="text">Available For Trade</span>
+                    <span className="text">Ongoing Trade</span>
                     <span className="separator"></span>
                 </div>
             </Breadcrumbs>
@@ -251,9 +251,9 @@ function AvaialableForTradePage() {
     )
 }
 
-export default AvaialableForTradePage
+export default OngoingTradePage
 
-AvaialableForTradePage.getLayout = function getLayout(page) {
+OngoingTradePage.getLayout = function getLayout(page) {
     return <MainLayout>{page}</MainLayout>
 }
 
