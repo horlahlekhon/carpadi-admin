@@ -1,4 +1,4 @@
-import MainLayout from '../../components/layouts/MainLayout'
+import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
     Paper,
@@ -11,10 +11,10 @@ import {
     Typography,
     withStyles
 } from '@material-ui/core'
-import {t} from '../../styles/theme'
+import {t} from '../../../styles/theme'
 import {useState} from 'react'
 import {useRouter} from 'next/router'
-import Button from '../../components/shared/Button'
+import Button from '../../../components/shared/Button'
 import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
 
