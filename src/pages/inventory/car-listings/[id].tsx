@@ -1,42 +1,51 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {Grid, Typography, Paper, Modal, TextField, Select, FormControl} from '@material-ui/core'
+import {Typography, Modal, TextField, Select, FormControl} from '@material-ui/core'
 import {t} from '../../../styles/theme'
 import {useRouter} from 'next/router'
 import Button from '../../../components/shared/Button'
 import Image from 'next/image'
 import {withStyles} from '@material-ui/styles'
-import ToggleSwitch from '../../../components/shared/ToggleSwitch'
-import {Add} from '@material-ui/icons'
-import {useState} from 'react'
+import {useState, useRef} from 'react'
 import Checkbox from "../../../components/shared/Checkbox";
 
 function SingleCarListingPage() {
     const router = useRouter()
     const pageId = router.query.id || 'NA'
-    const [state, setState] = useState({
-        saleActive: true
-    })
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
+    const [modalTagline, setModalTagline] = useState(' Kindly provide the following information below.')
     const [transmissionType, setTransmissionType] = useState('')
     const [fuelType, setFuelType] = useState('')
     const [carBrand, setCarBrand] = useState('')
+    const hiddenFileInput = useRef(null);
 
-    const showModal = (viewName: string, title: string) => {
+    const showModal = (viewName: string, title: string, customTagline: string = null!) => {
         setModalView(viewName)
         setModalTitle(title)
+        if (!!customTagline) {
+            setModalTagline(customTagline)
+        }
         setModalState(true)
-    }
-
-    const handleChange = (event) => {
-        setState({...state, [event.target.name]: event.target.checked})
     }
 
     const handleNavigation = (action: string) => {
         router.push(`${action}`)
     }
+
+    const handleFileClick = event => {
+        hiddenFileInput.current.click();
+    };
+
+    const handleFileChange = event => {
+        const fileUploaded = event.target.files[0];
+        handleFile(fileUploaded);
+    };
+
+    const handleFile = (file) => {
+    }
+
     return (
         <Container>
             <Header>
@@ -98,7 +107,7 @@ function SingleCarListingPage() {
                             width={150}
                             outlined={true}
                             marginRight="16px"
-                            onClick={() => showModal('editImages', 'Edit Car Sales Images')}
+                            onClick={() => showModal('editImages', 'Edit Car Images', 'Upload minimum of 5 images to complete profile')}
                         />
                         <Button
                             text="Edit Details"
@@ -248,7 +257,7 @@ function SingleCarListingPage() {
                     </ModalBodyHeader>
                     <Typography variant="inherit" style={{marginBottom: 20}}>
                         {modalTitle !== ''
-                            ? ' Kindly provide the following information below.'
+                            ? modalTagline
                             : ''}{' '}
                         &nbsp;
                     </Typography>
@@ -347,291 +356,51 @@ function SingleCarListingPage() {
                     )}
                     {modalView === 'editImages' && (
                         <>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Sales For
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12}>
-                                    <VehicleDetails style={{width: 700}}>
-                                        <img
-                                            src="/images/Big-Default-Car.png"
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                Trade ID 09890
-                                            </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
-                                        </div>
-                                    </VehicleDetails>
-                                </Grid>
-                            </InfoSection>
-                            <FlexRow style={{marginBottom: 20}}>
-                                <HeaderText>Key Features</HeaderText>
-                                <IconPill>
-                                    Add key feature
-                                    <Add className="icon"/>
-                                </IconPill>
-                            </FlexRow>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Key Feature 1"
-                                />
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
+                            <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                            </ImageGrid>
+                            <ImageUpload>
+                                <div className='content'>
+                                    <Image src='/images/Upload.png' alt='Upload' height={38} width={44}/>
+                                    <div style={{marginTop: 10}}>
+                                        Upload Vehicle Image
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        ref={hiddenFileInput}
+                                        onChange={handleFileChange}
+                                        style={{display: 'none'}}
                                     />
+                                    <Button text='Upload' width={128} marginTop={40}
+                                            onClick={() => handleFileClick(event)}/>
                                 </div>
-                            </InputGrid>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Key Feature 2"
-                                />
-                                <div className="input">
-                                    <div className="text">engine indlmor.png</div>
-                                    <Button
-                                        text="Delete"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        bgColor={t.alertError}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <FlexRow style={{marginBottom: 20, marginTop: 60}}>
-                                <HeaderText>Car Sales Image</HeaderText>
-                                <IconPill>
-                                    Add Image
-                                    <Add className="icon"/>
-                                </IconPill>
-                            </FlexRow>
-                            <InputGrid>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <InputGrid>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <InputGrid>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                                <div className="input">
-                                    <div className="text">engine indlmor.png</div>
-                                    <Button
-                                        text="Delete"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        bgColor={t.alertError}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <Button
-                                text="Proceed"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={50}
-                                onClick={() =>
-                                    showModal('imagesPreview', 'Car Sales Image Preview')
-                                }
-                            />
-                        </>
-                    )}
-                    {modalView === 'imagesPreview' && (
-                        <>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Sales For
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12}>
-                                    <VehicleDetails style={{width: 700}}>
-                                        <img
-                                            src="/images/Big-Default-Car.png"
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                Trade ID 09890
-                                            </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
-                                        </div>
-                                    </VehicleDetails>
-                                </Grid>
-                            </InfoSection>
-                            <Typography variant="h6" color="secondary">
-                                Key Features
-                            </Typography>
-                            <Features className="modal">
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                            </Features>
-                            <Typography variant="h6" color="secondary">
-                                Car Sales Image
-                            </Typography>
-                            <Flex>
-                                <div className="gallery">
-                                    <ImageGrid className="modal">
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image modal"
-                                        />
-                                    </ImageGrid>
-                                </div>
-                            </Flex>
+                            </ImageUpload>
                             <Button
                                 text="Save Changes"
                                 width={510}
                                 marginLeft="auto"
                                 marginRight="auto"
                                 marginTop={50}
-                                onClick={() => setModalState(false)}
                             />
                         </>
                     )}
@@ -683,15 +452,6 @@ const HeaderText = withStyles({
         display: 'block'
     }
 })(Typography)
-const InfoSection = withStyles({
-    root: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: '20px',
-        marginTop: '8px'
-    }
-})(Grid)
 const Info = styled.div`
   display: flex;
   flex-direction: column;
@@ -790,26 +550,6 @@ const Body = styled.div`
   border-radius: 12px;
   margin-top: 17px;
 `
-const VehicleDetails = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: end;
-  margin-bottom: 27px;
-
-  .stats {
-    height: 100%;
-    margin-left: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    .trade {
-      color: ${t.primaryBlue};
-      margin-top: 36px;
-      margin-bottom: 17px;
-    }
-  }
-`
 const Flex = styled.div`
   display: flex;
   flex-direction: column;
@@ -857,36 +597,6 @@ const Flex = styled.div`
     }
   }
 `
-const Features = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-bottom: 40px;
-  margin-top: 16px;
-
-  .key-features {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-
-    img {
-      height: 200px;
-      width: 200px;
-      object-fit: cover;
-      border-radius: 0;
-      margin-bottom: 14px;
-      margin-right: 24px;
-    }
-
-    .text {
-      color: ${t.grey};
-    }
-  }
-
-  &.modal {
-    max-width: 900px;
-  }
-`
 const ImageGrid = styled.div`
   display: flex;
   flex-direction: row;
@@ -900,23 +610,18 @@ const ImageGrid = styled.div`
     border-radius: 14px;
     height: 130px;
     width: 135px;
-  }
-`
-const FlexRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    position: relative;
 
-  .currency-box {
-    height: 27px;
-    width: 27px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: ${t.lightGrey};
-    background: ${t.liteGrey};
-    margin-right: 10px;
+    .delete {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      cursor: pointer;
+    }
+
+    &:not(:last-child) {
+      margin-right: 14px;
+    }
   }
 `
 const InputGrid = styled.div`
@@ -948,28 +653,6 @@ const InputGrid = styled.div`
     justify-content: space-between;
     height: 39px;
     margin: auto;
-  }
-`
-const IconPill = styled.button`
-  margin-left: auto;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 7px 12px;
-  border-radius: 8px;
-  background: ${t.primaryExtraLite};
-  color: ${t.primaryDeepBlue};
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-
-  &:hover {
-    transform: scale(1.02);
-    transition: all 0.3s ease-out;
-  }
-
-  .icon {
-    margin-left: 8px;
   }
 `
 const SplitContainer = styled.div`
@@ -1051,5 +734,21 @@ const CheckItem = styled.div`
     .success {
       color: ${t.alertSuccess}
     }
+  }
+`
+const ImageUpload = styled.div`
+  border: 2px solid ${t.extraLiteGrey};
+  border-radius: 14px;
+  padding: 31px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  .content {
+    display: inherit;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 `
