@@ -1,6 +1,6 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {Grid, Typography, Paper, Modal, TextField} from '@material-ui/core'
+import {Grid, Typography, Paper, Modal, TextField, Select, FormControl} from '@material-ui/core'
 import {t} from '../../../styles/theme'
 import {useRouter} from 'next/router'
 import Button from '../../../components/shared/Button'
@@ -20,6 +20,9 @@ function SingleCarListingPage() {
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
+    const [transmissionType, setTransmissionType] = useState('')
+    const [fuelType, setFuelType] = useState('')
+    const [carBrand, setCarBrand] = useState('')
 
     const showModal = (viewName: string, title: string) => {
         setModalView(viewName)
@@ -32,7 +35,7 @@ function SingleCarListingPage() {
     }
 
     const handleNavigation = (action: string) => {
-        router.replace(`${action}`)
+        router.push(`${action}`)
     }
     return (
         <Container>
@@ -101,7 +104,7 @@ function SingleCarListingPage() {
                             text="Edit Details"
                             width={150}
                             outlined={true}
-                            onClick={() => showModal('editDetails', 'Edit Car Sales Details')}
+                            onClick={() => showModal('editDetails', 'Edit Car Profile')}
                         />
                     </div>
                 </ActionBar>
@@ -251,73 +254,93 @@ function SingleCarListingPage() {
                     </Typography>
                     {modalView === 'editDetails' && (
                         <>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Sales For
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12}>
-                                    <VehicleDetails style={{width: 700}}>
-                                        <img
-                                            src="/images/Big-Default-Car.png"
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                Trade ID 09890
-                                            </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
-                                        </div>
-                                    </VehicleDetails>
-                                </Grid>
-                            </InfoSection>
-                            <HeaderText style={{marginBottom: 16}}>
-                                Car Sales Highlight
-                            </HeaderText>
-                            <TextField
-                                fullWidth
-                                placeholder="Accident free | full customs duty paid | good history report ..."
-                            ></TextField>
-
-                            <FlexRow
-                                style={{marginBottom: 50, marginTop: 40, alignItems: 'start'}}
-                            >
-                                <div style={{display: 'flex', flexDirection: 'column'}}>
-                                    <HeaderText variant="inherit" style={{marginBottom: 14}}>
-                                        Selling Price
-                                    </HeaderText>
-                                    <FlexRow>
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Enter price"
-                                            style={{width: 400}}
-                                        ></TextField>
-                                    </FlexRow>
-                                </div>
-                                <SalesStatus className="stacked" style={{marginLeft: 'auto'}}>
-                                    <HeaderText className="status">Sales Status</HeaderText>
-                                    <div className="cta">
-                                        <span>Set As Active</span>
-                                        <ToggleSwitch
-                                            checked={state.saleActive}
-                                            onChange={handleChange}
-                                            name="saleActive"
-                                        />
-                                    </div>
-                                </SalesStatus>
-                            </FlexRow>
+                            <HeaderText style={{marginBottom: 10, marginTop: 20}}>Select Car Brand</HeaderText>
+                            <FormControl style={{width: 330, marginBottom: 30}}>
+                                <Select
+                                    value={carBrand}
+                                    onChange={(event) =>
+                                        setCarBrand(String(event.target.value))
+                                    }
+                                    displayEmpty
+                                    inputProps={{'aria-label': 'Without label'}}
+                                >
+                                    <option value="" disabled>
+                                        Car Brand
+                                    </option>
+                                    <option value={'Toyota Rav4'}>Toyota Rav4</option>
+                                    <option value={'Toyoya Sequoia'}>Toyoya Sequoia</option>
+                                </Select>
+                            </FormControl>
+                            <HeaderText style={{marginBottom: 10, marginTop: 10}}>Car Profile Details</HeaderText>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="VIN"
+                                />
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Color"
+                                    type='color'
+                                />
+                            </InputGrid>
+                            <InputGrid>
+                                <FormControl fullWidth>
+                                    <Select
+                                        value={transmissionType}
+                                        onChange={(event) =>
+                                            setTransmissionType(String(event.target.value))
+                                        }
+                                        displayEmpty
+                                        inputProps={{'aria-label': 'Without label'}}
+                                    >
+                                        <option value="" disabled>
+                                            Transmission Type
+                                        </option>
+                                        <option value={'Manual'}>Manual</option>
+                                        <option value={'Automatic'}>Automatic</option>
+                                    </Select>
+                                </FormControl>
+                                <FormControl fullWidth>
+                                    <Select
+                                        value={fuelType}
+                                        onChange={(event) =>
+                                            setFuelType(String(event.target.value))
+                                        }
+                                        displayEmpty
+                                        inputProps={{'aria-label': 'Without label'}}
+                                    >
+                                        <option value="" disabled>
+                                            Fuel Type
+                                        </option>
+                                        <option value={'Petrol'}>Petrol</option>
+                                        <option value={'Diesel'}>Diesel</option>
+                                    </Select>
+                                </FormControl>
+                            </InputGrid>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Vehicle Age"
+                                />
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Mileage"
+                                />
+                            </InputGrid>
+                            <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Description</HeaderText>
+                            <TextField fullWidth type='textfield' multiline rows={4} placeholder='
+                                A detailed vehicle description'>
+                            </TextField>
                             <Button
                                 text="Save Changes"
                                 width={510}
                                 marginLeft="auto"
                                 marginRight="auto"
+                                marginTop={40}
                                 onClick={() => setModalState(false)}
                             />
                         </>
@@ -787,38 +810,6 @@ const VehicleDetails = styled.div`
     }
   }
 `
-const SalesStatus = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: end;
-  padding-bottom: 20px;
-  border-bottom: 1px solid ${t.liteGrey};
-  margin-bottom: 20px;
-
-  .status {
-    color: ${t.primaryBlue};
-  }
-
-  .cta {
-    background-color: ${t.extraLiteGrey};
-    margin-left: 14px;
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-
-  &.stacked {
-    flex-direction: column;
-    border-bottom: none;
-    align-items: flex-start;
-
-    .cta {
-      margin-left: 0;
-    }
-  }
-`
 const Flex = styled.div`
   display: flex;
   flex-direction: column;
@@ -932,10 +923,8 @@ const InputGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-column-gap: 24px;
-  padding: 8px 12px;
-  height: 54px;
-  background: ${t.extraLiteGrey};
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  width: 700px;
 
   .input {
     width: 97%;
@@ -1049,8 +1038,8 @@ const CheckItem = styled.div`
     .title {
       font-weight: bold;
     }
-    
-    .danger,.success{
+
+    .danger, .success {
       font-size: 12px;
       margin-left: 4px;
     }
