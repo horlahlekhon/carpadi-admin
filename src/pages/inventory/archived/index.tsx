@@ -168,7 +168,7 @@ function ArchivedInventoryPage() {
                                                 text="View"
                                                 width={66}
                                                 outlined={true}
-                                                onClick={() => handleNavigation(`/inventory/car-listings/${row.vin}`)}
+                                                onClick={() => handleNavigation(`/inventory/archived/${row.vin}`)}
                                             />
                                         </TableCell>
                                     </TableRow>
