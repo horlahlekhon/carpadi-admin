@@ -173,7 +173,7 @@ function OngoingTradePage() {
                                                 width={66}
                                                 outlined={true}
                                                 onClick={() =>
-                                                    handleNavigation(`/inventory/ongoing-trade/${row.tradingId}`)
+                                                    handleNavigation(`/inventory/car-profile/${row.tradingId}?status=ongoing trade`)
                                                 }
                                             />
                                         </TableCell>

@@ -173,7 +173,7 @@ function AvaialableForTradePage() {
                                                 width={66}
                                                 outlined={true}
                                                 onClick={() =>
-                                                    handleNavigation(`/inventory/available-for-trade/${row.tradingId}`)
+                                                    handleNavigation(`/inventory/car-profile/${row.tradingId}?status=available for trade`)
                                                 }
                                             />
                                         </TableCell>

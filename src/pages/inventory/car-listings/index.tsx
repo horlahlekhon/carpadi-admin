@@ -168,7 +168,7 @@ function CarListingsPage() {
                                                 text="View"
                                                 width={66}
                                                 outlined={true}
-                                                onClick={() => handleNavigation(`/inventory/car-listings/${row.vin}`)}
+                                                onClick={() => handleNavigation(`/inventory/car-profile/${row.vin}?status=car listings`)}
                                             />
                                         </TableCell>
                                     </TableRow>

@@ -12,9 +12,10 @@ import Button from "../../../../components/shared/Button";
 import {withStyles} from "@material-ui/styles";
 import {Add} from "@material-ui/icons";
 
-function SingleCarListingMaintenancePage() {
+function SingleUnderInspectionMaintenancePage() {
     const router = useRouter()
     const pageId = router.query.id || 'NA'
+    const status = String(router.query.status).toLowerCase() || 'NA'
     const [isPageEmpty, setPageState] = useState(true)
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
@@ -62,7 +63,7 @@ function SingleCarListingMaintenancePage() {
                     <span className="separator"></span>
                 </div>
                 <div>
-                    <span className="text">Ongoing Trade</span>
+                    <span className="text" style={{textTransform: 'capitalize'}}>{status}</span>
                     <span className="separator"></span>
                 </div>
                 <div>
@@ -97,7 +98,7 @@ function SingleCarListingMaintenancePage() {
                             <Button text="Manage Maintenance" width={160} outlined={true} marginRight={10}
                                     onClick={() => showModal("createSparePart", "Manage Maintenance Record")}/>
                         </>)}
-                        <Button text="Go to Car Profile" width={150} outlined={true} marginRight={10}/>
+                        <Button text="Go to Car Profile" width={150} outlined={true} marginRight={10} onClick={() => handleNavigation(`/inventory/car-profile/1?status=${status}`)}/>
                         {!isPageEmpty && (
                             <>
                                 <PriceCard>
@@ -504,9 +505,9 @@ function SingleCarListingMaintenancePage() {
     )
 }
 
-export default SingleCarListingMaintenancePage
+export default SingleUnderInspectionMaintenancePage
 
-SingleCarListingMaintenancePage.getLayout = function getLayout(page) {
+SingleUnderInspectionMaintenancePage.getLayout = function getLayout(page) {
     return <MainLayout>{page}</MainLayout>
 }
 

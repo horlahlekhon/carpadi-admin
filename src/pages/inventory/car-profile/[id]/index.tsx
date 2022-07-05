@@ -21,10 +21,12 @@ import Checkbox from "../../../../components/shared/Checkbox";
 import {Add, SearchOutlined} from "@material-ui/icons";
 import ToggleSwitch from "../../../../components/shared/ToggleSwitch";
 import {usePagination} from "@material-ui/lab/Pagination";
+import {toast} from "react-hot-toast";
 
-function SingleCarListingPage() {
+function SingleUnderInspectionPage() {
     const router = useRouter()
     const pageId = router.query.id || 'NA'
+    const status = String(router.query.status).toLowerCase() || 'NA'
     const rowsPerPage = 10
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
@@ -119,6 +121,11 @@ function SingleCarListingPage() {
         onChange: handleChangePage
     })
 
+    const saveTrade = () => {
+        setModalState(false)
+        toast.success('Trade Created')
+    }
+
     return (
         <Container>
             <Header>
@@ -142,7 +149,7 @@ function SingleCarListingPage() {
                     <span className="separator"></span>
                 </div>
                 <div>
-                    <span className="text">Sold</span>
+                    <span className="text" style={{textTransform: 'capitalize'}}>{status}</span>
                     <span className="separator"></span>
                 </div>
                 <div>
@@ -217,37 +224,37 @@ function SingleCarListingPage() {
                             <Button text="Create Sales Profile" width='100%' outlined={true}
                                     onClick={() => showModal('addCar', "Add Car To Sales Platform")}/>
                             <Button text="Maintenance Record" width='100%' outlined={true} marginTop={16}
-                                    marginBottom={30} onClick={() => handleNavigation('/inventory/sold/VID-110/maintenance-record')}/>
-                            <CheckItem>
+                                    marginBottom={30} onClick={() => handleNavigation(`/inventory/car-profile/VID-110/maintenance-record?status=${status}`)}/>
+                            <CheckItem style={{background: status === 'car listings' ? t.alertSuccessLite : ''}}>
                                 <span>Car Listings</span>
                                 <Checkbox color='primary'/>
                             </CheckItem>
-                            <CheckItem>
+                            <CheckItem style={{background: status === 'under inspection' ? t.alertSuccessLite : ''}}>
                                 <span>Under Inspection</span>
                                 <Checkbox color='primary'/>
                             </CheckItem>
-                            <CheckItem>
+                            <CheckItem style={{background: status === 'available for trade' ? t.alertSuccessLite : ''}}>
                                 <div className='multi'>
                                     <span className='title'>Available for Trade</span>
                                     <span className='success'>controlled by created trade</span>
                                 </div>
                                 <Checkbox color='primary'/>
                             </CheckItem>
-                            <CheckItem>
+                            <CheckItem style={{background: status === 'ongoing trade' ? t.alertSuccessLite : ''}}>
                                 <div className='multi'>
                                     <span className='title'>Ongoing Trade</span>
                                     <span className='danger'>system controlled</span>
                                 </div>
                                 <Checkbox color='primary'/>
                             </CheckItem>
-                            <CheckItem style={{background: t.alertSuccessLite}}>
+                            <CheckItem style={{background: status === 'sold' ? t.alertSuccessLite : ''}}>
                                 <div className='multi'>
                                     <span className='title'>Sold</span>
                                     <span className='danger'>system controlled</span>
                                 </div>
                                 <Checkbox color='primary'/>
                             </CheckItem>
-                            <CheckItem>
+                            <CheckItem style={{background: status === 'archived' ? t.alertSuccessLite : ''}}>
                                 <span>Add to Archived</span>
                                 <Checkbox color='primary'/>
                             </CheckItem>
@@ -306,8 +313,14 @@ function SingleCarListingPage() {
                             <div className="key">Vehicle Age</div>
                             <div className="value">3 Years</div>
                         </Detail>
-                        <Button text='Create Trade' width='100%' marginTop={30}
-                                onClick={() => handleNavigation(`/trade/${pageId}`)}/>
+                        {['car listings'].includes(status) && (
+                            <Button text='Create Trade' width='100%' marginTop={30} onClick={() => showModal('createTrade', 'Create Trade')}
+                            />
+                        )}
+                        {['available for trade', 'ongoing trade', 'sold'].includes(status) && (
+                            <Button text='View Trade' width='100%' marginTop={30}
+                                    onClick={() => handleNavigation(`/trade/${pageId}`)}/>
+                        )}
                     </div>
                 </SplitContainer>
             </Body>
@@ -958,15 +971,146 @@ function SingleCarListingPage() {
                             </Body>
                         </>
                     )}
+                    {modalView === 'createTrade' && (
+                        <div style={{maxWidth: 980}}>
+                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                Creating Trade for
+                            </HeaderText>
+                            <InfoSection container spacing={3}>
+                                <Grid item xs={12} style={{display: 'flex'}}>
+                                    <VehicleDetails style={{width: 700}}>
+                                        <img
+                                            src="/images/Big-Default-Car.png"
+                                            width={185}
+                                            height={135}
+                                            style={{borderRadius: '8px'}}
+                                        />
+                                        <div className="stats">
+                                            <img
+                                                src="/images/Toyota-Full.png"
+                                                width={80}
+                                                height={22}
+                                                style={{marginBottom: -15}}
+                                            />
+                                            <Typography variant="h5" className="trade">
+                                                Trade ID 09890
+                                            </Typography>
+                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                        </div>
+                                    </VehicleDetails>
+                                    <Button
+                                        text="Go to Car Profile"
+                                        width={150}
+                                        outlined={true}
+                                        onClick={() => handleNavigation(`/inventory/car-profile/1?status=Available For Trade`)}
+                                    />
+                                </Grid>
+                            </InfoSection>
+                            <ModalSplitContainer>
+                                <div className="left">
+                                    <div className="title">Trade Information</div>
+                                    <TextField className="input" placeholder="Slot Quantity"/>
+                                    <FlexRow className="input">
+                                        <div className="currency-box">&#8358;</div>
+                                        <TextField
+                                            placeholder="Price per slot"
+                                            fullWidth
+                                        ></TextField>
+                                    </FlexRow>
+                                    <FlexRow className="input">
+                                        <div className="currency-box">%</div>
+                                        <TextField
+                                            placeholder="Estimated ROT per slot"
+                                            fullWidth
+                                        ></TextField>
+                                    </FlexRow>
+                                    <TextField
+                                        className="input"
+                                        placeholder="Trading Duration in Months"
+                                    />
+                                    <div
+                                        className="title"
+                                        style={{marginBottom: 20, marginTop: 40}}
+                                    >
+                                        Carpadi Commission
+                                    </div>
+                                    <FlexRow className="input">
+                                        <div className="currency-box">&#8358;</div>
+                                        <TextField placeholder="Bought price" fullWidth></TextField>
+                                    </FlexRow>
+                                    <FlexRow className="input">
+                                        <div className="currency-box">&#8358;</div>
+                                        <TextField
+                                            placeholder="Maximum selling price"
+                                            fullWidth
+                                        ></TextField>
+                                    </FlexRow>
+                                    <FlexRow className="input">
+                                        <div className="currency-box">&#8358;</div>
+                                        <TextField
+                                            placeholder="Maximum selling price"
+                                            fullWidth
+                                        ></TextField>
+                                    </FlexRow>
+                                </div>
+                                <div className="right">
+                                    <div className="title">Trade Summary</div>
+                                    <div className="content">
+                                        <Grid item xs={12} style={{marginTop: -30}}>
+                                            <PriceCard style={{background: t.alertSuccessLite, marginBottom: 10}}>
+                                                <Typography variant="body1">
+                                                    Total Slot Price + Total ROT
+                                                </Typography>
+                                                <Typography variant="h5">&#8358; 0.00</Typography>
+                                            </PriceCard>
+                                            <Statistic>
+                                                <div className="key">Initial + ROT</div>
+                                                <div className="value">&#8358; 0.00</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Sold Slot Price</div>
+                                                <div className="value">&#8358; 0.00</div>
+                                            </Statistic>
+                                            <PriceCard style={{marginTop: 40}}>
+                                                <Typography variant="body1">
+                                                    Estimated Carpadi minimum Profit on Sales
+                                                </Typography>
+                                                <Typography variant="h5">&#8358; 0.00</Typography>
+                                            </PriceCard>
+                                            <PriceCard
+                                                style={{
+                                                    background: t.alertSuccessLite,
+                                                    marginTop: 20
+                                                }}
+                                            >
+                                                <Typography variant="body1">
+                                                    Estimated Carpadi maximum Profit on Sales
+                                                </Typography>
+                                                <Typography variant="h5">&#8358; 0.00</Typography>
+                                            </PriceCard>
+                                        </Grid>
+                                    </div>
+                                </div>
+                            </ModalSplitContainer>
+                            <Button
+                                text={modalTitle}
+                                width={590}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop="40px"
+                                onClick={() => saveTrade()}
+                            />
+                        </div>
+                    )}
                 </ModalBody>
             </Modal>
         </Container>
     )
 }
 
-export default SingleCarListingPage
+export default SingleUnderInspectionPage
 
-SingleCarListingPage.getLayout = function getLayout(page) {
+SingleUnderInspectionPage.getLayout = function getLayout(page) {
     return <MainLayout>{page}</MainLayout>
 }
 
@@ -1434,5 +1578,67 @@ const Features = styled.div`
     .text {
       color: ${t.grey};
     }
+  }
+`
+const ModalSplitContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+  min-width: 800px;
+
+  .left,
+  .right {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      font-weight: bold;
+      color: ${t.grey};
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+  }
+
+  .left {
+    width: 45%;
+    margin-right: 24px;
+    display: flex;
+    flex-direction: column;
+
+    .input {
+      margin-bottom: 30px;
+    }
+  }
+
+  .right {
+    width: 55%;
+
+    .content {
+      border: 2px solid ${t.extraLiteGrey};
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .title {
+      font-weight: bold;
+      color: ${t.grey};
+      margin-bottom: 10px;
+    }
+  }
+`
+const Statistic = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  padding-bottom: 5px;
+  font-size: 16px;
+  border-bottom: 1px solid ${t.extraLiteGrey};
+  width: 100%;
+
+  .value {
+    font-weight: bold;
   }
 `

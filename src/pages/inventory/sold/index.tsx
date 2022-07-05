@@ -173,7 +173,7 @@ function SoldInventoryPage() {
                                                 width={66}
                                                 outlined={true}
                                                 onClick={() =>
-                                                    handleNavigation(`/inventory/sold/${row.tradingId}`)
+                                                    handleNavigation(`/inventory/car-profile/${row.tradingId}?status=sold`)
                                                 }
                                             />
                                         </TableCell>
