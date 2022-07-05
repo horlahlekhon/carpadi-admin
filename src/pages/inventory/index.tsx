@@ -1,9 +1,9 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {Grid, Modal, Paper, TextField, Typography, withStyles} from '@material-ui/core'
+import {FormControl, Grid, Modal, Paper, Select, TextField, Typography, withStyles} from '@material-ui/core'
 import Button from '../../components/shared/Button'
 import {t} from '../../styles/theme'
-import {useState} from 'react'
+import {useRef, useState} from 'react'
 import {useRouter} from 'next/router'
 import Image from "next/image";
 import {toast} from "react-hot-toast";
@@ -13,6 +13,12 @@ function InventoryPage() {
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
+    const [modalTagline, setModalTagline] = useState(' Kindly provide the following information below.')
+    const [transmissionType, setTransmissionType] = useState('')
+    const [seatNumber, setSeatNumber] = useState(4)
+    const [fuelType, setFuelType] = useState('')
+
+    const hiddenFileInput = useRef(null);
 
     const handleNavigation = (action: string) => {
         router.push(`${action}`)
@@ -20,9 +26,24 @@ function InventoryPage() {
             })
     }
 
-    const showModal = (viewName: string, title: string) => {
+    const handleFileClick = event => {
+        hiddenFileInput.current.click();
+    };
+
+    const handleFileChange = event => {
+        const fileUploaded = event.target.files[0];
+        handleFile(fileUploaded);
+    };
+
+    const handleFile = (file) => {
+    }
+
+    const showModal = (viewName: string, title: string, customTagline: string = null!) => {
         setModalView(viewName)
         setModalTitle(title)
+        if (!!customTagline) {
+            setModalTagline(customTagline)
+        }
         setModalState(true)
     }
 
@@ -38,7 +59,8 @@ function InventoryPage() {
                     <b>Inventory</b>
                 </Typography>
                 <ActionBar>
-                    <Button text="Add Car Profile" width={150} marginLeft="18px" onClick={() => showModal('createCarProfile', '')}/>
+                    <Button text="Add Car Profile" width={150} marginLeft="18px"
+                            onClick={() => showModal('createCarProfile', '')}/>
                     <Button
                         text="Create Brand"
                         width={150}
@@ -170,7 +192,7 @@ function InventoryPage() {
                     </ModalBodyHeader>
                     <Typography variant="inherit" style={{marginBottom: 20}}>
                         {modalTitle !== ''
-                            ? ' Kindly provide the following information below.'
+                            ? modalTagline
                             : ''}{' '}
                         &nbsp;
                     </Typography>
@@ -334,6 +356,169 @@ function InventoryPage() {
                                     onClick={() => showModal('fetchedCarProfile', 'Fetched Car Profile')}
                                 />
                             </Info>
+                        </>
+                    )}
+                    {modalView === 'fetchedCarProfile' && (
+                        <>
+                            <HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>
+                            <TextField placeholder='VIN (Number Plate)' style={{width: 330, marginBottom: 30}}/>
+                            <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Info</HeaderText>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="VIN"
+                                />
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Color"
+                                    type='color'
+                                />
+                            </InputGrid>
+                            <InputGrid>
+                                <FormControl fullWidth>
+                                    <Select
+                                        value={transmissionType}
+                                        onChange={(event) =>
+                                            setTransmissionType(String(event.target.value))
+                                        }
+                                        displayEmpty
+                                        inputProps={{'aria-label': 'Without label'}}
+                                    >
+                                        <option value="" disabled>
+                                            Transmission Type
+                                        </option>
+                                        <option value={'Manual'}>Manual</option>
+                                        <option value={'Automatic'}>Automatic</option>
+                                    </Select>
+                                </FormControl>
+                                <FormControl fullWidth>
+                                    <Select
+                                        value={fuelType}
+                                        onChange={(event) =>
+                                            setFuelType(String(event.target.value))
+                                        }
+                                        displayEmpty
+                                        inputProps={{'aria-label': 'Without label'}}
+                                    >
+                                        <option value="" disabled>
+                                            Fuel Type
+                                        </option>
+                                        <option value={'Petrol'}>Petrol</option>
+                                        <option value={'Diesel'}>Diesel</option>
+                                    </Select>
+                                </FormControl>
+                            </InputGrid>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Vehicle Age"
+                                />
+                                <FormControl fullWidth>
+                                    <Select
+                                        value={seatNumber}
+                                        onChange={(event) =>
+                                            setSeatNumber(Number(event.target.value))
+                                        }
+                                        displayEmpty
+                                        inputProps={{'aria-label': 'Without label'}}
+                                    >
+                                        <option value="" disabled>
+                                            Number of Setas
+                                        </option>
+                                        <option value={'4'}>4</option>
+                                        <option value={'5'}>5</option>
+                                        <option value={'6'}>6</option>
+                                        <option value={'7'}>7</option>
+                                        <option value={'8'}>8</option>
+                                    </Select>
+                                </FormControl>
+                            </InputGrid>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Make"
+                                />
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Current Mileage"
+                                />
+                            </InputGrid>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Year"
+                                />
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Model"
+                                />
+                            </InputGrid>
+                            <Button
+                                text="Proceed"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={40}
+                                onClick={() => showModal('uploadCarImages', 'Upload Car Images', 'Upload minimum of 5 images to complete profile')}
+                            />
+                        </>
+                    )}
+                    {modalView === 'uploadCarImages' && (
+                        <>
+                            <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                                <div className='image'>
+                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
+                                </div>
+                            </ImageGrid>
+                            <ImageUpload>
+                                <div className='content'>
+                                    <Image src='/images/Upload.png' alt='Upload' height={38} width={44}/>
+                                    <div style={{marginTop: 10}}>
+                                        Upload Vehicle Image
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        ref={hiddenFileInput}
+                                        onChange={handleFileChange}
+                                        style={{display: 'none'}}
+                                    />
+                                    <Button text='Upload' width={128} marginTop={40}
+                                            onClick={() => handleFileClick(event)}/>
+                                </div>
+                            </ImageUpload>
+                            <Button
+                                text="Create Car Profile"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={50}
+                                onClick={() => setModalState(false)}
+                            />
                         </>
                     )}
                 </ModalBody>
@@ -590,4 +775,78 @@ const Info = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
+`
+const InputGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 24px;
+  margin-bottom: 20px;
+  width: 700px;
+
+  .input {
+    width: 97%;
+    background: ${t.white};
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: fit-content;
+    padding: 5px 10px;
+    margin: auto;
+    border-bottom: 1px solid ${t.lightGrey};
+  }
+
+  .text-field {
+    width: 97%;
+    background: ${t.white};
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+    height: 39px;
+    margin: auto;
+  }
+`
+const ImageGrid = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  justify-content: space-between;
+
+  .image {
+    margin-bottom: 14px;
+    object-fit: cover;
+    border-radius: 14px;
+    height: 130px;
+    width: 135px;
+    position: relative;
+
+    .delete {
+      position: absolute;
+      right: 8px;
+      top: 8px;
+      cursor: pointer;
+    }
+
+    &:not(:last-child) {
+      margin-right: 14px;
+    }
+  }
+`
+const ImageUpload = styled.div`
+  border: 2px solid ${t.extraLiteGrey};
+  border-radius: 14px;
+  padding: 31px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  .content {
+    display: inherit;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 `
