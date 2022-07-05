@@ -38,7 +38,7 @@ function InventoryPage() {
                     <b>Inventory</b>
                 </Typography>
                 <ActionBar>
-                    <Button text="Add Car Profile" width={150} marginLeft="18px"/>
+                    <Button text="Add Car Profile" width={150} marginLeft="18px" onClick={() => showModal('createCarProfile', '')}/>
                     <Button
                         text="Create Brand"
                         width={150}
@@ -305,6 +305,37 @@ function InventoryPage() {
                             />
                         </>
                     )}
+                    {modalView === 'createCarProfile' && (
+                        <>
+                            <Info>
+                                <img
+                                    src="/images/Fetched-car-Green.png"
+                                    alt="Trash"
+                                    height={98}
+                                    width={98}
+                                />
+                                <Typography
+                                    variant="h6"
+                                    style={{marginTop: 48, marginBottom: 16}}
+                                >
+                                    Upload Vehicle Info
+                                </Typography>
+                                <Typography
+                                    variant="subtitle2"
+                                    style={{maxWidth: 206, marginBottom: 39}}
+                                >
+                                    Kindly provide the registration number (VIN) of the car below
+                                </Typography>
+                                <TextField fullWidth placeholder={'Enter VIN number'}/>
+                                <Button
+                                    text="Fetch Car Information"
+                                    width={372}
+                                    marginTop={30}
+                                    onClick={() => showModal('fetchedCarProfile', 'Fetched Car Profile')}
+                                />
+                            </Info>
+                        </>
+                    )}
                 </ModalBody>
             </Modal>
         </Container>
@@ -553,4 +584,10 @@ const ModalSplitContainer = styled.div`
       margin-bottom: 10px;
     }
   }
+`
+const Info = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 `
