@@ -1002,7 +1002,7 @@ function CarProfilePage() {
                                         text="Go to Car Profile"
                                         width={150}
                                         outlined={true}
-                                        onClick={() => handleNavigation(`/inventory/car-profile/1?status=Available For Trade`)}
+                                        onClick={() => setModalState(false)}
                                     />
                                 </Grid>
                             </InfoSection>
