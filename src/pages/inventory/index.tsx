@@ -17,6 +17,7 @@ function InventoryPage() {
     const [transmissionType, setTransmissionType] = useState('')
     const [seatNumber, setSeatNumber] = useState(4)
     const [fuelType, setFuelType] = useState('')
+    const [brandModel, setBrandModel] = useState('')
 
     const hiddenFileInput = useRef(null);
 
@@ -67,6 +68,7 @@ function InventoryPage() {
                         outlined={true}
                         marginLeft="18px"
                         bgColor={t.primaryBlue}
+                        onClick={() => showModal('createBrand', 'Create Brand', 'Add a vehicle brand')}
                     />
                     <Button
                         text="Create Trade"
@@ -196,6 +198,114 @@ function InventoryPage() {
                             : ''}{' '}
                         &nbsp;
                     </Typography>
+                    {modalView === 'createBrand' && (
+                        <>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Upload Brand Image"
+                                />
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Model"
+                                />
+                            </InputGrid>
+                            <InputGrid>
+                                <FormControl fullWidth>
+                                    <Select
+                                        value={brandModel}
+                                        onChange={(event) =>
+                                            setBrandModel(String(event.target.value))
+                                        }
+                                        displayEmpty
+                                        inputProps={{'aria-label': 'Without label'}}
+                                        style={{height: 40}}
+                                    >
+                                        <option value="" disabled>
+                                            Transmission Type
+                                        </option>
+                                        <option value={''}>&nbsp;</option>
+                                    </Select>
+                                </FormControl>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Body Type"
+                                />
+                            </InputGrid>
+                            <InputGrid>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder="Year"
+                                />
+                            </InputGrid>
+                            <Button
+                                text="Proceed"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={40}
+                                onClick={() => showModal('viewBrandSummary', 'Proceed', 'Vehicle brand summary')}
+                            />
+                        </>
+                    )}
+                    {modalView === 'viewBrandSummary' && (
+                        <>
+                            <FlexRow style={{justifyContent: 'space-between', alignItems: 'start', marginTop: 8}}>
+                                <img
+                                    src="/images/Big-Default-Car.png"
+                                    width={185}
+                                    height={135}
+                                    style={{borderRadius: '8px'}}
+                                />
+                                <img
+                                    src="/images/Toyota-Full.png"
+                                    width={80}
+                                    height={22}
+                                    style={{}}
+                                />
+                            </FlexRow>
+                            <Statistic>
+                                <div className='key'>Make</div>
+                                <div className='value'>Toyota</div>
+                            </Statistic>
+                            <Statistic>
+                                <div className='key'>Model</div>
+                                <div className='value'>Rav4</div>
+                            </Statistic>
+                            <Statistic>
+                                <div className='key'>Year</div>
+                                <div className='value'>2018</div>
+                            </Statistic>
+                            <Statistic>
+                                <div className='key'>Body Type</div>
+                                <div className='value'>Saloon</div>
+                            </Statistic>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: 12,
+                                fontWeight: 'bold',
+                                color: t.lightGrey
+                            }}>
+                                <img src='/icons/Caution-Yellow.svg' alt='caution' height={20} width={20}
+                                     style={{marginRight: 4}}/>
+                                <span>There’s no current UI for managing created brands, If you wish to delete contact the development team</span>
+                            </div>
+                            <Button
+                                text="Create & Save Brand"
+                                width={516}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={40}
+                                onClick={() => setModalState(false)}
+                            />
+                        </>
+                    )}
                     {modalView === 'createTrade' && (
                         <>
                             <HeaderText variant="inherit" style={{marginTop: '40px'}}>

@@ -23,7 +23,7 @@ import ToggleSwitch from "../../../../components/shared/ToggleSwitch";
 import {usePagination} from "@material-ui/lab/Pagination";
 import {toast} from "react-hot-toast";
 
-function SingleUnderInspectionPage() {
+function CarProfilePage() {
     const router = useRouter()
     const pageId = router.query.id || 'NA'
     const status = String(router.query.status).toLowerCase() || 'NA'
@@ -1108,9 +1108,9 @@ function SingleUnderInspectionPage() {
     )
 }
 
-export default SingleUnderInspectionPage
+export default CarProfilePage
 
-SingleUnderInspectionPage.getLayout = function getLayout(page) {
+CarProfilePage.getLayout = function getLayout(page) {
     return <MainLayout>{page}</MainLayout>
 }
 
