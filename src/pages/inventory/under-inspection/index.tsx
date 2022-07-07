@@ -168,7 +168,7 @@ function UnderInspectionPage() {
                                                 text="View"
                                                 width={66}
                                                 outlined={true}
-                                                onClick={() => handleNavigation(`/inventory/under-inspection/${row.vin}`)}
+                                                onClick={() => handleNavigation(`/inventory/car-profile/${row.vin}?status=under inspection`)}
                                             />
                                         </TableCell>
                                     </TableRow>

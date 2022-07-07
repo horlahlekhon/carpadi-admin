@@ -1,12 +1,24 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {FormControl, Grid, Modal, Paper, Select, TextField, Typography, withStyles} from '@material-ui/core'
+import {
+    FormControl,
+    Grid, IconButton,
+    Input, InputAdornment,
+    InputLabel,
+    Modal,
+    Paper,
+    Select,
+    TextField,
+    Typography,
+    withStyles
+} from '@material-ui/core'
 import Button from '../../components/shared/Button'
 import {t} from '../../styles/theme'
 import {useRef, useState} from 'react'
 import {useRouter} from 'next/router'
 import Image from "next/image";
 import {toast} from "react-hot-toast";
+import {Visibility, VisibilityOff} from "@material-ui/icons";
 
 function InventoryPage() {
     const router = useRouter()
@@ -201,11 +213,38 @@ function InventoryPage() {
                     {modalView === 'createBrand' && (
                         <>
                             <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Upload Brand Image"
+                                <input
+                                    type='file'
+                                    accept='image/*'
+                                    ref={hiddenFileInput}
+                                    onChange={handleFileChange}
+                                    style={{display: 'none'}}
                                 />
+                                <FormControl
+                                    fullWidth
+                                    variant="standard"
+                                >
+                                    <InputLabel htmlFor="standard-adornment-password">
+                                        Upload Vehicle Image
+                                    </InputLabel>
+                                    <Input
+                                        id="custom-file"
+                                        type={'text'}
+                                        readOnly={true}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={handleFileClick}
+                                                >
+                                                    <img src='/images/Upload.png' height={20} width={22}/>
+                                                    <Typography variant='subtitle2' color='primary'
+                                                                style={{marginLeft: 2}}>Upload</Typography>
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }
+                                    />
+                                </FormControl>
                                 <TextField
                                     className="text-field"
                                     fullWidth
@@ -224,7 +263,7 @@ function InventoryPage() {
                                         style={{height: 40}}
                                     >
                                         <option value="" disabled>
-                                            Transmission Type
+                                            Brand Model
                                         </option>
                                         <option value={''}>&nbsp;</option>
                                     </Select>
