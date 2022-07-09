@@ -21,7 +21,7 @@ import Checkbox from "../../../../components/shared/Checkbox";
 import {Add, SearchOutlined} from "@material-ui/icons";
 import ToggleSwitch from "../../../../components/shared/ToggleSwitch";
 import {usePagination} from "@material-ui/lab/Pagination";
-import {toast} from "react-hot-toast";
+import {toast, Toaster} from "react-hot-toast";
 
 function CarProfilePage() {
     const router = useRouter()
@@ -126,8 +126,41 @@ function CarProfilePage() {
         toast.success('Trade Created')
     }
 
+    const saveEditedDetails = () => {
+        setModalState(false)
+        toast.success('Saved Successfully!')
+    }
+
+    function saveImages() {
+        setModalState(false)
+        toast.success('Saved Images Successfully!')
+    }
+
+    function deleteCarProfile() {
+        setModalState(false)
+        toast.success('Deleted Successfully!')
+        handleNavigation(`/inventory`)
+    }
+
     return (
         <Container>
+            <div>
+                <Toaster
+                    position="top-right"
+                    toastOptions={{
+                        style: {
+                            border: '1px solid #243773',
+                            padding: '16px',
+                            fontWeight: 'bold',
+                            color: '#243773'
+                        },
+                        iconTheme: {
+                            primary: '#243773',
+                            secondary: '#FFFAEE'
+                        }
+                    }}
+                />
+            </div>
             <Header>
                 <Typography variant="h4">
                     <b>{pageId}</b>
@@ -224,7 +257,8 @@ function CarProfilePage() {
                             <Button text="Create Sales Profile" width='100%' outlined={true}
                                     onClick={() => showModal('addCar', "Add Car To Sales Platform")}/>
                             <Button text="Maintenance Record" width='100%' outlined={true} marginTop={16}
-                                    marginBottom={30} onClick={() => handleNavigation(`/inventory/car-profile/VID-110/maintenance-record?status=${status}`)}/>
+                                    marginBottom={30}
+                                    onClick={() => handleNavigation(`/inventory/car-profile/VID-110/maintenance-record?status=${status}`)}/>
                             <CheckItem style={{background: status === 'car listings' ? t.alertSuccessLite : ''}}>
                                 <span>Car Listings</span>
                                 <Checkbox color='primary'/>
@@ -314,7 +348,8 @@ function CarProfilePage() {
                             <div className="value">3 Years</div>
                         </Detail>
                         {['car listings'].includes(status) && (
-                            <Button text='Create Trade' width='100%' marginTop={30} onClick={() => showModal('createTrade', 'Create Trade')}
+                            <Button text='Create Trade' width='100%' marginTop={30}
+                                    onClick={() => showModal('createTrade', 'Create Trade')}
                             />
                         )}
                         {['available for trade', 'ongoing trade', 'sold'].includes(status) && (
@@ -438,7 +473,7 @@ function CarProfilePage() {
                                 marginLeft="auto"
                                 marginRight="auto"
                                 marginTop={40}
-                                onClick={() => setModalState(false)}
+                                onClick={() => saveEditedDetails()}
                             />
                         </>
                     )}
@@ -489,6 +524,7 @@ function CarProfilePage() {
                                 marginLeft="auto"
                                 marginRight="auto"
                                 marginTop={50}
+                                onClick={() => saveImages()}
                             />
                         </>
                     )}
@@ -516,7 +552,7 @@ function CarProfilePage() {
                                 <Button
                                     text="Yes, Delete"
                                     width={174}
-                                    onClick={() => setModalState(false)}
+                                    onClick={() => deleteCarProfile()}
                                 />
                             </Info>
                         </>
