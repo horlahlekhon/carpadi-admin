@@ -35,7 +35,7 @@ const Btn = ({
                 marginRight: marginRight,
                 backgroundColor: `${outlined ? 'transparent' : disabled ? t.liteGrey : bgColor}`,
                 border: `2px solid ${outlined ? (disabled ? t.liteGrey : bgColor) : 'transparent'}`,
-                color: `${outlined ? bgColor : color}`,
+                color: `${outlined ?  (disabled ? t.lightGrey : bgColor)  : color}`,
                 borderRadius: borderRadius,
                 fontSize: fontSize,
                 cursor: `${disabled ? 'not-allowed' : 'pointer'}`

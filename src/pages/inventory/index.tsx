@@ -18,7 +18,6 @@ import {useRef, useState} from 'react'
 import {useRouter} from 'next/router'
 import Image from "next/image";
 import {toast} from "react-hot-toast";
-import {Visibility, VisibilityOff} from "@material-ui/icons";
 
 function InventoryPage() {
     const router = useRouter()
@@ -80,6 +79,7 @@ function InventoryPage() {
                         outlined={true}
                         marginLeft="18px"
                         bgColor={t.primaryBlue}
+                        disabled={true}
                         onClick={() => showModal('createBrand', 'Create Brand', 'Add a vehicle brand')}
                     />
                     <Button
