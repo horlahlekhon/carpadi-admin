@@ -204,6 +204,7 @@ function CarProfilePage() {
                             width={210}
                             outlined={true}
                             marginRight="16px"
+                            onClick={() => showModal('vehicleInspectionReport', 'Vehicle Inspection Report', 'An overview of the information gathered.')}
                         />
                         <Button
                             text="Delete Car Profile"
@@ -1136,6 +1137,80 @@ function CarProfilePage() {
                                 marginTop="40px"
                                 onClick={() => saveTrade()}
                             />
+                        </div>
+                    )}
+                    {modalView === 'vehicleInspectionReport' && (
+                        <div style={{maxWidth: 980}}>
+                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                Inspection Report for
+                            </HeaderText>
+                            <InfoSection container spacing={3}>
+                                <Grid item xs={12} style={{display: 'flex'}}>
+                                    <VehicleDetails style={{width: 700}}>
+                                        <img
+                                            src="/images/Big-Default-Car.png"
+                                            width={185}
+                                            height={135}
+                                            style={{borderRadius: '8px'}}
+                                        />
+                                        <div className="stats">
+                                            <img
+                                                src="/images/Toyota-Full.png"
+                                                width={80}
+                                                height={22}
+                                                style={{marginBottom: -15}}
+                                            />
+                                            <Typography variant="h5" className="trade">
+                                                Trade ID 09890
+                                            </Typography>
+                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                        </div>
+                                    </VehicleDetails>
+                                    <Button
+                                        text="View Full Report"
+                                        width={150}
+                                        outlined={true}
+                                        onClick={() => handleNavigation('/')}
+                                    />
+                                </Grid>
+                            </InfoSection>
+                            <ModalSplitContainer>
+                                <div className="right">
+                                    <div className="title">Inspection Summary</div>
+                                    <div className="content">
+                                        <Grid item xs={12} style={{marginTop: -10}}>
+                                            <Statistic>
+                                                <div className="key">Inspector’s Name</div>
+                                                <div className="value">Jhon Do Smith</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Inspection Date</div>
+                                                <div className="value">June 12 | 2020</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Year</div>
+                                                <div className="value">2015</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Brand</div>
+                                                <div className="value">Toyota</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Model</div>
+                                                <div className="value">Camry</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Mileage</div>
+                                                <div className="value">18,000</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">VIN</div>
+                                                <div className="value">BC83891899837</div>
+                                            </Statistic>
+                                        </Grid>
+                                    </div>
+                                </div>
+                            </ModalSplitContainer>
                         </div>
                     )}
                 </ModalBody>
