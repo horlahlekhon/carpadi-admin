@@ -17,7 +17,7 @@ import {t} from '../../styles/theme'
 import {useRef, useState} from 'react'
 import {useRouter} from 'next/router'
 import Image from "next/image";
-import {toast} from "react-hot-toast";
+import {toast, Toaster} from "react-hot-toast";
 import {SearchOutlined} from "@material-ui/icons";
 import {usePagination} from "@material-ui/lab/Pagination";
 
@@ -119,8 +119,30 @@ function InventoryPage() {
         onChange: handleChangePage
     })
 
+    function saveCarProfile() {
+        setModalState(false)
+        toast.success('Created Successfully!')
+    }
+
     return (
         <Container>
+            <div>
+                <Toaster
+                    position="top-right"
+                    toastOptions={{
+                        style: {
+                            border: '1px solid #243773',
+                            padding: '16px',
+                            fontWeight: 'bold',
+                            color: '#243773'
+                        },
+                        iconTheme: {
+                            primary: '#243773',
+                            secondary: '#FFFAEE'
+                        }
+                    }}
+                />
+            </div>
             <Header>
                 <Typography variant="h4">
                     <b>Inventory</b>
@@ -817,7 +839,7 @@ function InventoryPage() {
                                 marginLeft="auto"
                                 marginRight="auto"
                                 marginTop={50}
-                                onClick={() => setModalState(false)}
+                                onClick={() => saveCarProfile()}
                             />
                         </>
                     )}
