@@ -7,7 +7,7 @@ import {
     InputLabel,
     Modal,
     Paper,
-    Select,
+    Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     TextField,
     Typography,
     withStyles
@@ -18,9 +18,12 @@ import {useRef, useState} from 'react'
 import {useRouter} from 'next/router'
 import Image from "next/image";
 import {toast} from "react-hot-toast";
+import {SearchOutlined} from "@material-ui/icons";
+import {usePagination} from "@material-ui/lab/Pagination";
 
 function InventoryPage() {
     const router = useRouter()
+    const rowsPerPage = 10
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
@@ -29,6 +32,8 @@ function InventoryPage() {
     const [seatNumber, setSeatNumber] = useState(4)
     const [fuelType, setFuelType] = useState('')
     const [brandModel, setBrandModel] = useState('')
+    const [selectedCarId, setSelectedCar] = useState(null)
+    const [page, setPage] = useState(0)
 
     const hiddenFileInput = useRef(null);
 
@@ -64,6 +69,56 @@ function InventoryPage() {
         toast.success('Trade Created')
     }
 
+    function createData(
+        idx: number,
+        imageUrl: string,
+        vin: string,
+        make: string,
+        model: string,
+        year: number,
+        fuelType: string,
+        sellingPrice: number,
+        dateListed: string,
+        tradeStatus: string
+    ) {
+        return {
+            idx,
+            imageUrl,
+            vin,
+            make,
+            model,
+            year,
+            fuelType,
+            sellingPrice,
+            dateListed,
+            tradeStatus
+        }
+    }
+
+    const rows = Array.from(Array(300).keys()).map((i) => {
+        return createData(
+            i + 1,
+            '/images/Default-Car.png',
+            `VID-11${i}`,
+            'Toyota',
+            'Rav 4',
+            2004,
+            'Petrol',
+            10000000,
+            new Date().toISOString().split('T')[0],
+            'Ongoing'
+        )
+    })
+
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage - 1)
+    }
+
+    const {items} = usePagination({
+        count: rows.length / rowsPerPage,
+        onChange: handleChangePage
+    })
+
     return (
         <Container>
             <Header>
@@ -87,7 +142,7 @@ function InventoryPage() {
                         width={150}
                         outlined={true}
                         marginLeft="18px"
-                        onClick={() => showModal('createTrade', 'Create Trade')}
+                        onClick={() => showModal('addCar', 'Select Car')}
                     />
                 </ActionBar>
             </Header>
@@ -210,6 +265,102 @@ function InventoryPage() {
                             : ''}{' '}
                         &nbsp;
                     </Typography>
+                    {modalView === 'addCar' && (
+                        <>
+                            <Typography variant="inherit">
+                                Select Car From Created Trade
+                            </Typography>
+                            <FormControl
+                                style={{
+                                    width: '794px',
+                                    display: 'flex',
+                                    marginTop: '20px',
+                                    marginBottom: '10px'
+                                }}
+                                variant="standard"
+                            >
+                                <InputLabel htmlFor="standard-adornment-password">
+                                    Search
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password"
+                                    type="text"
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton aria-label="toggle password visibility">
+                                                <SearchOutlined/>
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                            <TableCard style={{height: 480, overflowY: 'auto'}}>
+                                <TableContainer>
+                                    <Table style={{minWidth: 650}} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell align="left">Image</TableCell>
+                                                <TableCell align="left">Car</TableCell>
+                                                <TableCell align="left">Trade ID</TableCell>
+                                                <TableCell align="left">VIN</TableCell>
+                                                <TableCell align="left">Date Created</TableCell>
+                                                <TableCell align="left">Trade Status</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {rows
+                                                .slice(
+                                                    page * rowsPerPage,
+                                                    page * rowsPerPage + rowsPerPage
+                                                )
+                                                .map((row) => (
+                                                    <TableRow
+                                                        key={row.idx}
+                                                        style={{
+                                                            cursor: 'pointer',
+                                                            background:
+                                                                selectedCarId === row.idx
+                                                                    ? t.primaryExtraLite
+                                                                    : 'white'
+                                                        }}
+                                                        onClick={() => setSelectedCar(row.idx)}
+                                                    >
+                                                        <TableCell component="th" scope="row">
+                                                            <img
+                                                                src={row.imageUrl}
+                                                                width={48}
+                                                                height={48}
+                                                                alt="car"
+                                                                style={{borderRadius: '8px'}}
+                                                            />
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {row.model} {row.make} {row.year}
+                                                        </TableCell>
+                                                        <TableCell align="left">{row.idx}</TableCell>
+                                                        <TableCell align="left">{row.vin}</TableCell>
+                                                        <TableCell align="left">{row.dateListed}</TableCell>
+                                                        <TableCell align="left">
+                                                            {row.tradeStatus}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </TableCard>
+                            <div style={{display: 'flex', marginTop: 20}}>
+                                <Button
+                                    text="Proceed"
+                                    width={510}
+                                    marginLeft="auto"
+                                    marginRight="auto"
+                                    onClick={() => showModal('createTrade', 'Create Trade')}
+                                    disabled={selectedCarId === null}
+                                />
+                            </div>
+                        </>
+                    )}
                     {modalView === 'createBrand' && (
                         <>
                             <InputGrid>
@@ -999,3 +1150,7 @@ const ImageUpload = styled.div`
     justify-content: center;
   }
 `
+
+const TableCard = withStyles({
+    elevation1: {boxShadow: 'none'}
+})(Paper)
