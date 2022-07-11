@@ -25,7 +25,7 @@ function TradeProfilePage() {
   }
 
   const handleNavigation = (action: string) => {
-    router.replace(`${action}`)
+    router.push(`${action}`)
   }
 
   const saveSoldPrice = () => {
