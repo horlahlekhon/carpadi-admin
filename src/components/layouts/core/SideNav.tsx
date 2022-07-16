@@ -3,10 +3,10 @@ import styles from '../../../styles/SideNav.module.css'
 import styled from 'styled-components'
 import { t } from '../../../styles/theme'
 import { Typography } from '@material-ui/core'
-import { MenuOpen } from '@material-ui/icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
+import {authService} from "../../../services/auth"
 
 function SideNav() {
   const router = useRouter()
@@ -27,6 +27,10 @@ function SideNav() {
   useEffect(() => {
     window.addEventListener('resize', handleResize)
   })
+  
+  const logout = () => {
+    authService.logout();
+  }
 
   const Hambuger = styled.p`
     width: ${isFullNav ? '100%' : 'fit-content'};
@@ -203,7 +207,7 @@ function SideNav() {
             )}
           </NavItem>
         </Link>
-        <Logout>
+        <Logout onClick={logout}>
           <NavItem>
             <Image src="/icons/Logout-White.svg" width={18} height={21.5} />
             <p
