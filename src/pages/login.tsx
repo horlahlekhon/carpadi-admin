@@ -1,124 +1,169 @@
 import styled from 'styled-components'
-import { t } from '../styles/theme'
+import {t} from '../styles/theme'
 import {
-  Card,
-  FormControl,
-  IconButton,
-  InputLabel,
-  Input,
-  InputAdornment,
-  CardContent,
-  Checkbox,
-  TextField,
-  Typography
+    Card,
+    FormControl,
+    IconButton,
+    InputLabel,
+    Input,
+    InputAdornment,
+    CardContent,
+    Checkbox,
+    TextField,
+    Typography
 } from '@material-ui/core'
-import { Visibility, VisibilityOff } from '@material-ui/icons'
+import {Visibility, VisibilityOff} from '@material-ui/icons'
 import Image from 'next/image'
 import classes from '../styles/Auth.module.css'
 import ReCAPTCHA from 'react-google-recaptcha'
-import { useState } from 'react'
+import {useState} from 'react'
 import Button from '../components/shared/Button'
+import {authService} from '../services/auth'
+import {useRouter} from "next/router";
+import {Toaster, toast} from "react-hot-toast";
 
 function LoginPage() {
-  const [values, setValues] = useState({
-    showPassword: false,
-    password: null
-  })
-
-  const handleChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
-
-  const handleClickShowPassword = () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword
+    const router = useRouter();
+    const [values, setValues] = useState({
+        showPassword: false,
+        password: null,
+        username: null,
+        isLoading: false
     })
-  }
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault()
-  }
+    const handleChange = (prop) => (event) => {
+        setValues({...values, [prop]: event.target.value})
+    }
 
-  const onCaptchaChange = (value) => {
-    console.log('Captcha value:', value)
-  }
+    const handleClickShowPassword = () => {
+        setValues({
+            ...values,
+            showPassword: !values.showPassword
+        })
+    }
 
-  return (
-    <Container>
-      <ImageBg>
-        <PhoneImage src={'/auth/phone.png'}></PhoneImage>
-      </ImageBg>
-      <FormContainer>
-        <div>
-          <Typography className={classes.title}>
-            Admin Portal
-          </Typography>
-          <Card
-            variant="outlined"
-            className={classes.card}
-          >
-            <CardContent className={classes.centered}>
-              <Image
-                src={'/logos/blue-full.png'}
-                width="300px"
-                height="114px"
-              ></Image>
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault()
+    }
 
-              <TextField
-                id="standard-basic"
-                label="Email Address"
-                variant="standard"
-                type="email"
-                fullWidth
-                style={ { marginTop: '20px', width: '372px' } }
-              />
+    const onCaptchaChange = (value) => {
+        console.log('Captcha value:', value)
+    }
 
-              <FormControl
-                style={{ width: '372px', marginTop: '41px' }}
-                variant="standard"
-              >
-                <InputLabel htmlFor="standard-adornment-password">
-                  Password
-                </InputLabel>
-                <Input
-                  id="standard-adornment-password"
-                  type={values.showPassword ? 'text' : 'password'}
-                  value={values.password}
-                  onChange={handleChange('password')}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                      >
-                        {values.showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
-              <RememberMe>
-                <Checkbox></Checkbox>
-                <Typography>Remember Me</Typography>
-              </RememberMe>
-              <ReCAPTCHA
-                sitekey="6LcIFiAgAAAAAO5J1kPxk306OqFVPaUUiDesLsG5"
-                onChange={onCaptchaChange}
-                size="normal"
-              />
-              <Button width="372px" marginTop="32px" text="Login"/>
-            </CardContent>
-          </Card>
-        </div>
-      </FormContainer>
-    </Container>
-  )
+    const loginUser = () => {
+        setValues({...values, "isLoading": true})
+        return authService.login(values.username, values.password)
+            .then((data) => {
+                if (data.status) {
+                    const returnUrl = router.query.returnUrl || '/';
+                    // @ts-ignore
+                    router.push(returnUrl);
+                } else {
+                    toast.error(data?.data || "An error occurred")
+                }
+                setValues({...values, "isLoading": false})
+            })
+            .catch(error => {
+                toast.error(error)
+                setValues({...values, "isLoading": false})
+            });
+    }
+
+    return (
+        <Container>
+            <ImageBg>
+                <PhoneImage src={'/auth/phone.png'}></PhoneImage>
+            </ImageBg>
+            <FormContainer>
+                <div>
+                    <Toaster
+                        position="top-right"
+                        toastOptions={{
+                            style: {
+                                border: '1px solid #243773',
+                                padding: '16px',
+                                fontWeight: 'bold',
+                                color: '#243773'
+                            },
+                            iconTheme: {
+                                primary: '#243773',
+                                secondary: '#FFFAEE'
+                            }
+                        }}
+                    />
+                </div>
+                <div>
+                    <Typography className={classes.title}>
+                        Admin Portal
+                    </Typography>
+                    <Card
+                        variant="outlined"
+                        className={classes.card}
+                    >
+                        <CardContent className={classes.centered}>
+                            <Image
+                                src={'/logos/blue-full.png'}
+                                width="300px"
+                                height="114px"
+                            ></Image>
+
+                            <TextField
+                                id="standard-basic"
+                                label="Email Address"
+                                variant="standard"
+                                type="email"
+                                fullWidth
+                                value={values.username}
+                                onChange={handleChange('username')}
+                                style={{marginTop: '20px', width: '372px'}}
+                            />
+
+                            <FormControl
+                                style={{width: '372px', marginTop: '41px'}}
+                                variant="standard"
+                            >
+                                <InputLabel htmlFor="standard-adornment-password">
+                                    Password
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password"
+                                    type={values.showPassword ? 'text' : 'password'}
+                                    value={values.password}
+                                    onChange={handleChange('password')}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {values.showPassword ? (
+                                                    <VisibilityOff/>
+                                                ) : (
+                                                    <Visibility/>
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                            <RememberMe>
+                                <Checkbox></Checkbox>
+                                <Typography>Remember Me</Typography>
+                            </RememberMe>
+                            <ReCAPTCHA
+                                sitekey="6LcIFiAgAAAAAO5J1kPxk306OqFVPaUUiDesLsG5"
+                                onChange={onCaptchaChange}
+                                size="normal"
+                            />
+                            <Button width="372px" marginTop="32px" text={values.isLoading ? "Loading..." : "Login"}
+                                    onClick={loginUser}/>
+                        </CardContent>
+                    </Card>
+                </div>
+            </FormContainer>
+        </Container>
+    )
 }
 
 export default LoginPage
