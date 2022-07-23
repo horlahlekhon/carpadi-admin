@@ -32,7 +32,7 @@ function SideNav() {
     authService.logout();
   }
 
-  const Hambuger = styled.p`
+  const Hamburger = styled.p`
     width: ${isFullNav ? '100%' : 'fit-content'};
     height: 48px;
     padding: 16px 25px;
@@ -70,7 +70,7 @@ function SideNav() {
           <Typography component={'span'}>Super Admin</Typography>
         </Pill>
       )}
-      <Hambuger>
+      <Hamburger>
         <Image
           src={
             isFullNav ? '/icons/Collapse-White.svg' : '/icons/Extend-White.svg'
@@ -80,7 +80,7 @@ function SideNav() {
           className={styles.pointer}
           onClick={toggleNav}
         />
-      </Hambuger>
+      </Hamburger>
       <Nav>
         <Link href="/">
           <NavItem className={router.pathname == '/' ? 'active' : ''}>
