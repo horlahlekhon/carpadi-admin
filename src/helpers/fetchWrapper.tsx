@@ -6,6 +6,7 @@ export const fetchWrapper = {
     get,
     post,
     put,
+    patch,
     delete: _delete
 };
 
@@ -27,10 +28,21 @@ function post(url, body, contentType = 'application/json') {
     return fetch(url, requestOptions).then(handleResponse);
 }
 
-function put(url, body) {
+function put(url, body, contentType = 'application/json') {
     const requestOptions = {
+        crossDomain: true,
         method: 'PUT',
-        headers: {'Content-Type': 'application/json', ...authHeader(url)},
+        headers: {'Content-Type': contentType, ...authHeader(url)},
+        body: JSON.stringify(body)
+    };
+    return fetch(url, requestOptions).then(handleResponse);
+}
+
+function patch(url, body, contentType = 'application/json') {
+    const requestOptions = {
+        crossDomain: true,
+        method: 'PATCH',
+        headers: {'Content-Type': contentType, ...authHeader(url)},
         body: JSON.stringify(body)
     };
     return fetch(url, requestOptions).then(handleResponse);
@@ -49,9 +61,9 @@ function _delete(url) {
 
 function authHeader(url) {
     // return auth header with basic auth credentials if user is logged in and request is to the api url
-    const token = String(localStorage.getItem('token'))
     const isApiUrl = url.startsWith(publicRuntimeConfig.apiUrl);
-    if (isApiUrl) {
+    if (isApiUrl && process.browser) {
+        const token = JSON.parse(localStorage.getItem('token'))
         return {Authorization: `Bearer ${token}`};
     } else {
         return {};
@@ -61,9 +73,8 @@ function authHeader(url) {
 function handleResponse(response) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
-
         if (!response.ok) {
-            const error = (data && data.message) || response.statusText;
+            const error = (data && data.detail) || (data && data.messages && data.messages[0]) || (data && data.car && data.car[0]) || response.statusText;
             return Promise.reject(error);
         }
 
