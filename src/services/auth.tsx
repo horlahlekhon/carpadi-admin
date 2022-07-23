@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs';
 import getConfig from 'next/config';
-import Router from 'next/router'
+import router from 'next/router'
 import {fetchWrapper} from '../helpers/fetchWrapper';
 import jwt_decode from "jwt-decode"
 
@@ -52,7 +52,7 @@ function logout() {
     localStorage.removeItem('refreshToken');
     userSubject.next(null);
     authSubject.next(false);
-    Router.push('/login');
+    router.push('/login');
 }
 
 /**
@@ -64,7 +64,7 @@ function autoAuthenticate() {
         const decodedToken = jwt_decode(token)
         const currentTimestamp = Date.now();
         // @ts-ignore
-        if (decodedToken?.exp < currentTimestamp) {
+        if ((decodedToken?.exp * 1000) > currentTimestamp) {
             authSubject.next(true);
         } else {
             logout()
