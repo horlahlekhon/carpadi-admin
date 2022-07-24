@@ -17,6 +17,9 @@ export const authService = {
     get userValue() {
         return userSubject.value
     },
+    get authValue() {
+        return authSubject.value
+    },
     login,
     logout,
     autoAuthenticate
@@ -59,18 +62,22 @@ function logout() {
  * Tries auto authenticating user if token exists
  */
 function autoAuthenticate() {
-    const token = localStorage.getItem('token');
-    if (token) {
-        const decodedToken = jwt_decode(token)
-        const currentTimestamp = Date.now();
-        // @ts-ignore
-        if ((decodedToken?.exp * 1000) > currentTimestamp) {
-            authSubject.next(true);
-        } else {
-            logout()
+    if (process.browser) {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decodedToken = jwt_decode(token)
+            const currentTimestamp = Date.now();
+            // @ts-ignore
+            if ((decodedToken?.exp * 1000) > currentTimestamp) {
+                authSubject.next(true);
+            }
+            // else {
+            //     logout()
+            // }
         }
-    } else {
-        logout()
+        // else {
+        //     logout()
+        // }
     }
 }
 
