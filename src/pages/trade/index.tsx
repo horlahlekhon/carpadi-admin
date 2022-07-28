@@ -20,6 +20,7 @@ import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
 import {tradeService} from '../../services/trade'
 import {toast, Toaster} from "react-hot-toast";
+import Moment from 'moment';
 
 function TradesPage({response}) {
     enum Trades {
@@ -129,6 +130,8 @@ function TradesPage({response}) {
         count: Math.ceil(paginationKeys.count/rowsPerPage),
         onChange: handleChangePage
     })
+
+    const formatDate = (date) => Moment(date).format('DD-MM-YYYY')
 
     return (
         <Container>
@@ -316,7 +319,7 @@ function TradesPage({response}) {
                                                     selectedTrade === Trades.CLOSED ? 'red' : 'inherit'
                                             }}
                                         >
-                                            {row.date_of_sale || 'NA'}
+                                            {formatDate(row.created) || 'NA'}
                                         </TableCell>
                                         <TableCell align="left">
                                             <Button
