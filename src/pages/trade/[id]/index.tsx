@@ -9,6 +9,7 @@ import { withStyles } from '@material-ui/styles'
 import { useEffect, useState } from 'react'
 import { toast, Toaster } from 'react-hot-toast'
 import { tradeService } from '../../../services/trade'
+import trade from "../index";
 
 function TradeProfilePage() {
   const router = useRouter()
@@ -618,6 +619,7 @@ function TradeProfilePage() {
                     <TextField
                       placeholder="Price per slot"
                       fullWidth
+                      disabled
                       value={tradeData.price_per_slot}
                       onChange={handleTradeChange('price_per_slot')}
                     ></TextField>
@@ -627,6 +629,7 @@ function TradeProfilePage() {
                     <TextField
                       placeholder="Estimated ROT per slot"
                       fullWidth
+                      disabled
                       value={tradeData.return_on_trade_per_unit}
                       onChange={handleTradeChange('return_on_trade_per_unit')}
                     ></TextField>
@@ -645,7 +648,7 @@ function TradeProfilePage() {
                   </div>
                   <FlexRow className="input">
                     <div className="currency-box">&#8358;</div>
-                    <TextField placeholder="Bought price" fullWidth></TextField>
+                    <TextField placeholder="Bought price" fullWidth disabled value={tradeData.car.bought_price}></TextField>
                   </FlexRow>
                   <FlexRow className="input">
                     <div className="currency-box">&#8358;</div>
@@ -676,20 +679,20 @@ function TradeProfilePage() {
                         </Typography>
                         <Typography variant="h5">
                           &#8358;{' '}
-                          {(
+                          {formatNumber(
                             Number(tradeData.price_per_slot) *
-                              tradeData.slots_available +
-                            tradeData.return_on_trade
-                          ).toLocaleString()}
+                              Number(tradeData.slots_available) +
+                            Number(tradeData.return_on_trade)
+                          )}
                         </Typography>
                       </PriceCard>
                       <Statistic>
                         <div className="key">Initial + ROT</div>
-                        <div className="value">&#8358; NA</div>
+                        <div className="value">&#8358; {formatNumber(tradeData.car.bought_price+tradeData.return_on_trade)}</div>
                       </Statistic>
                       <Statistic>
                         <div className="key">Sold Slot Price</div>
-                        <div className="value">&#8358; NA</div>
+                        <div className="value">&#8358; {formatNumber(tradeData.sold_slots_price+tradeData.return_on_trade)}</div>
                       </Statistic>
                       <PriceCard style={{ marginTop: 40 }}>
                         <Typography variant="body1">
