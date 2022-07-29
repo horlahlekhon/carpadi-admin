@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs';
 import getConfig from 'next/config';
-import Router from 'next/router'
+import router from 'next/router'
 import {fetchWrapper} from '../helpers/fetchWrapper';
 import jwt_decode from "jwt-decode"
 
@@ -16,6 +16,9 @@ export const authService = {
     isAuthenticated: authSubject.asObservable(),
     get userValue() {
         return userSubject.value
+    },
+    get authValue() {
+        return authSubject.value
     },
     login,
     logout,
@@ -52,25 +55,29 @@ function logout() {
     localStorage.removeItem('refreshToken');
     userSubject.next(null);
     authSubject.next(false);
-    Router.push('/login');
+    router.push('/login');
 }
 
 /**
  * Tries auto authenticating user if token exists
  */
 function autoAuthenticate() {
-    const token = localStorage.getItem('token');
-    if (token) {
-        const decodedToken = jwt_decode(token)
-        const currentTimestamp = Date.now();
-        // @ts-ignore
-        if (decodedToken?.exp < currentTimestamp) {
-            authSubject.next(true);
-        } else {
-            logout()
+    if (process.browser) {
+        const token = localStorage.getItem('token');
+        if (token) {
+            const decodedToken = jwt_decode(token)
+            const currentTimestamp = Date.now();
+            // @ts-ignore
+            if ((decodedToken?.exp * 1000) > currentTimestamp) {
+                authSubject.next(true);
+            }
+            // else {
+            //     logout()
+            // }
         }
-    } else {
-        logout()
+        // else {
+        //     logout()
+        // }
     }
 }
 
