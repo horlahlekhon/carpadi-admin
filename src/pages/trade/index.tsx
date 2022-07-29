@@ -302,7 +302,7 @@ function TradesPage({response}) {
                                         <TableCell component="th" scope="row">
                                             <img src={row.car.image} width={48} height={48}/>
                                         </TableCell>
-                                        <TableCell align="left">{row.id}</TableCell>
+                                        <TableCell align="left">{row.id.substring(row.id.length - 7)}</TableCell>
                                         <TableCell align="left">{row.slots_available}</TableCell>
                                         <TableCell align="left">{row.slots_available - row.remaining_slots}</TableCell>
                                         <TableCell align="left">{row.remaining_slots}</TableCell>

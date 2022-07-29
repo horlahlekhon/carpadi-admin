@@ -45,7 +45,7 @@ function ManageTradePage() {
 
     useEffect(() => {
         retrieveTradeUnits()
-    })
+    }, [])
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
@@ -177,7 +177,9 @@ function ManageTradePage() {
                     <span className="text">Trade</span>
                     <span className="separator"></span>
                 </div>
-                <div>
+                <div onClick={() => {
+                    handleNavigation('/trade')
+                }}>
                     <span className="text">{selectedTrade}</span>
                     <span className="separator"></span>
                 </div>
@@ -238,8 +240,10 @@ function ManageTradePage() {
                                                 alt={`${row.merchant.name}-profile-picture`}
                                             />
                                         </TableCell>
-                                        <TableCell align="left">{row.merchant.name}</TableCell>
-                                        <TableCell align="left">{row.merchant.id}</TableCell>
+                                        <TableCell align="left"
+                                                   style={{textTransform: 'capitalize'}}>{row.merchant.name}</TableCell>
+                                        <TableCell
+                                            align="left">{row.merchant.id.substring(row.merchant.id.length - 9)}</TableCell>
                                         <TableCell align="left">{row.slots_quantity}</TableCell>
                                         <TableCell align="left">
                                             &#8358; {row.unit_value.toLocaleString()}
