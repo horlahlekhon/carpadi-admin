@@ -56,9 +56,29 @@ const updateSingleTrade = (id, data) => {
         })
 }
 
+const createSingleTrade = (data) => {
+    return fetchWrapper.post(`${baseUrl}/trades/`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
 
 const deleteSingleTrade = (id) => {
     return fetchWrapper.delete(`${baseUrl}/trades/${id}/`)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
+const retrieveUserTrades = (merchantId, status = 'purchased') => {
+    return fetchWrapper.get(`${baseUrl}/trades?limit=${50}&offset=${0}&merchant=${merchantId}&trade_status=${status}`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -73,5 +93,7 @@ export const tradeService = {
     retrieveTradeStats,
     retrieveTradeUnits,
     updateSingleTrade,
-    deleteSingleTrade
+    deleteSingleTrade,
+    createSingleTrade,
+    retrieveUserTrades
 }

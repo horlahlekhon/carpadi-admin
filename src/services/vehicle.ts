@@ -6,8 +6,8 @@ import {fetchWrapper} from '../helpers/fetchWrapper';
 const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
-const retrieveMerchants = (limit = 10, offset = 1, tradeStatus = "", user = "", status = "") => {
-    return fetchWrapper.get(`${baseUrl}/merchants?limit=${limit}&offset=${offset}&trading_status=${tradeStatus}&user=${user}&status=${status}`)
+const retrieveVehicles = (limit = 10, offset = 0) => {
+    return fetchWrapper.get(`${baseUrl}/vehicles?limit=${limit}&offset=${offset}`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -16,8 +16,8 @@ const retrieveMerchants = (limit = 10, offset = 1, tradeStatus = "", user = "", 
         })
 }
 
-const retrieveSingleMerchant = (id) => {
-    return fetchWrapper.get(`${baseUrl}/merchants/${id}/`)
+const retrieveSingleVehicle = (id) => {
+    return fetchWrapper.get(`${baseUrl}/vehicles/${id}`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -26,8 +26,8 @@ const retrieveSingleMerchant = (id) => {
         })
 }
 
-const retrieveMerchantStats = () => {
-    return fetchWrapper.get(`${baseUrl}/dashboards/merchants`)
+const retrieveVINDetails = (vin, data) => {
+    return fetchWrapper.post(`${baseUrl}/vehicles/`, data)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -36,8 +36,8 @@ const retrieveMerchantStats = () => {
         })
 }
 
-const updateSingleMerchant = (id, data) => {
-    return fetchWrapper.put(`${baseUrl}/users/${id}/`, data)
+const updateVehicle = (id, data) => {
+    return fetchWrapper.patch(`${baseUrl}/vehicles/${id}/`, data)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -46,21 +46,9 @@ const updateSingleMerchant = (id, data) => {
         })
 }
 
-
-const deleteSingleTrade = (id) => {
-    return fetchWrapper.delete(`${baseUrl}/merchants/${id}/`)
-        .then((response) => {
-            return {status: true, data: response}
-        })
-        .catch((error) => {
-            return {status: false, data: error};
-        })
-}
-
-export const merchantService = {
-    retrieveMerchants,
-    retrieveSingleMerchant,
-    retrieveMerchantStats,
-    updateSingleMerchant,
-    deleteSingleTrade
+export {
+    retrieveVehicles,
+    retrieveSingleVehicle,
+    retrieveVINDetails,
+    updateVehicle
 }
