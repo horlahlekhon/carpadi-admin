@@ -111,7 +111,7 @@ function SideNav() {
             >
               <Typography component={'span'}>Notification</Typography>
             </p>
-            <NotificationCount>5</NotificationCount>
+            {/*<NotificationCount>5</NotificationCount>*/}
             {router.pathname.startsWith('/notifications') && (
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
