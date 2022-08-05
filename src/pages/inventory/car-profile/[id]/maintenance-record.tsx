@@ -7,16 +7,76 @@ import {
 import {t} from '../../../../styles/theme'
 import {useRouter} from 'next/router'
 import Image from 'next/image'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import Button from "../../../../components/shared/Button";
 import {withStyles} from "@material-ui/styles";
-import {Add} from "@material-ui/icons";
+import {Add, Spa} from "@material-ui/icons";
+import {retrieveSingleCar} from "../../../../services/car";
+import {toast} from "react-hot-toast";
+import {formatNumber, trimString} from "../../../../helpers/formatters";
+import {createSparePart} from "../../../../services/spare-part";
+import {createMaintenance, retrieveMaintenances} from "../../../../services/maintenance";
+import CPToast from "../../../../components/shared/CPToast";
 
 function SingleUnderInspectionMaintenancePage() {
+    const refSparePart = {
+        "name": '',
+        "partPrice": 0,
+        "repairCost": 0,
+        "carBrand": ''
+    };
+    const refExpense = {
+        "expense": '',
+        "cost": 0,
+    };
     const router = useRouter()
-    const pageId = router.query.id || 'NA'
+    const [carId, setCarId] = useState(null)
     const status = String(router.query.status).toLowerCase() || 'NA'
     const [isPageEmpty, setPageState] = useState(true)
+    const [spareParts, setSpareParts] = useState([])
+    const [expenses, setExpenses] = useState([])
+    const [maintenances, setMaintenances] = useState([])
+    const [description, setDescription] = useState('')
+    const [sparePart, setSparePart] = useState(refSparePart)
+    const [expense, setExpense] = useState(refExpense)
+    const [car, setCarData] = useState({
+        "id": null,
+        "maintenance_cost": 0,
+        "total_cost": 0,
+        "pictures": [],
+        "vin": null,
+        "information": {
+            "id": null,
+            "engine": null,
+            "transmission": null,
+            "car_type": null,
+            "fuel_type": null,
+            "mileage": null,
+            "age": null,
+            "description": null,
+            "trim": null,
+            "year": null,
+            "model": null,
+            "manufacturer": null,
+            "make": null,
+            "vin": null,
+            "created": null,
+            "modified": null
+        },
+        "status": null,
+        "bought_price": null,
+        "created": null,
+        "modified": null,
+        "colour": null,
+        "cost_of_repairs": null,
+        "resale_price": null,
+        "inspection_report": null,
+        "margin": null,
+        "name": null,
+        "description": null,
+        "licence_plate": null,
+        "car_inspector": null
+    })
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
@@ -35,16 +95,148 @@ function SingleUnderInspectionMaintenancePage() {
         router.push(`${action}`)
     }
 
+    const handleChange = (prop) => (event) => {
+        setSparePart({...sparePart, [prop]: event.target.value})
+    }
+
     const saveMaintenanceRecord = () => {
         setModalState(false)
         setPageState(false)
     }
 
+    const saveSparePartRecord = () => {
+        spareParts.forEach((spareP) => {
+            createSparePart({
+                "name": spareP.name,
+                "estimated_price": spareP.repairCost + spareP.partPrice,
+                "car_brand": carId
+            })
+                .then((res) => {
+                    if (res.status) {
+                        createMaintenance(
+                            {
+                                "spare_part_id": res.data?.id,
+                                "cost": res.data?.estimated_price,
+                                "description": description,
+                                "name": res.data?.name,
+                                "type": "spare_part",
+                                "car": carId
+                            }
+                        )
+                            .then((res) => {
+                                if (!res.status) {
+                                    toast.error(res.data)
+                                }
+                            })
+                            .catch((error) => {
+                                toast.error(error)
+                            })
+                    } else {
+                        toast.error(res.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+            setModalState(false)
+        })
+    }
+
+    const saveExpenseRecord = () => {
+        expenses.forEach((ex) => {
+            createMaintenance({
+                "name": ex.expense,
+                "cost": ex.cost,
+                "car": carId,
+                "type": 'expense',
+                "description": description,
+            })
+                .then((res) => {
+                    if (res.status) {
+                        toast.success(`Created expense: ${ex.expense}`)
+                    } else {
+                        toast.error(res.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+        })
+
+    }
+
+    const addSparePart = () => {
+        const arr = [...spareParts, sparePart];
+        setSpareParts(arr)
+        setSparePart(refSparePart)
+    }
+
+    const deleteSparePart = (name) => {
+        const arr = spareParts.filter(a => a.name !== name);
+        setSpareParts(arr)
+    }
+
+    const addExpense = () => {
+        const arr = [...expenses, expense];
+        setExpenses(arr)
+        setExpense(refExpense)
+    }
+
+    const deleteExpense = (idx) => {
+        const arr = expenses.filter((a, i) => i !== idx);
+        setExpenses(arr)
+    }
+
+    const updateExpense = (idx, field, value) => {
+        const arr = [...expenses]
+        arr[idx][field] = value;
+        setExpenses(arr)
+    }
+
+    const retrieveCarMaintenance = (id) => {
+        if (id !== null && id !== undefined && id !== '') {
+            retrieveMaintenances(50, 0, id)
+                .then((response) => {
+                    if (response.status) {
+                        setMaintenances(response.data.results)
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
+    const retrieveCar = (id) => {
+        if (id !== null && id !== undefined && id !== '') {
+            retrieveSingleCar(id)
+                .then((response) => {
+                    if (response.status) {
+                        setCarData(response.data)
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
+    useEffect(() => {
+        setCarId(String(router.query.id))
+        retrieveCar(String(router.query.id))
+        retrieveCarMaintenance(String(router.query.id))
+    }, [])
+
     return (
         <Container>
+            <CPToast/>
             <Header>
                 <Typography variant="h4">
-                    <b>{pageId}</b>
+                    <b>{trimString(carId)}</b>
                 </Typography>
             </Header>
             <Breadcrumbs>
@@ -67,18 +259,19 @@ function SingleUnderInspectionMaintenancePage() {
                     <span className="separator"></span>
                 </div>
                 <div>
-                    <span className="text">{pageId}</span>
+                    <span className="text">{trimString(carId)}</span>
                     <span className="separator"></span>
                 </div>
             </Breadcrumbs>
             <Body>
                 <TopTab>
                     <VehicleDetails>
-                        <Image
-                            src="/images/Big-Default-Car.png"
+                        <img
+                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
                             height={91}
                             width={125}
                             style={{borderRadius: '8px'}}
+                            alt={car?.information?.manufacturer}
                         />
                         <div className="stats">
                             <img
@@ -88,45 +281,40 @@ function SingleUnderInspectionMaintenancePage() {
                                 style={{marginBottom: -10}}
                             />
                             <Typography variant="h6" className="trade">
-                                Trade ID 09890
+                                Trade ID {trimString(car?.information?.id)}
                             </Typography>
-                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                            <Typography variant="h6">{car?.name}</Typography>
                         </div>
                     </VehicleDetails>
                     <div className='flex'>
-                        {!isPageEmpty && (<>
+                        {maintenances.length > 0 && (<>
                             <Button text="Manage Maintenance" width={160} outlined={true} marginRight={10}
                                     onClick={() => showModal("createSparePart", "Manage Maintenance Record")}/>
                         </>)}
-                        <Button text="Go to Car Profile" width={150} outlined={true} marginRight={10} onClick={() => handleNavigation(`/inventory/car-profile/1?status=${status}`)}/>
-                        {!isPageEmpty && (
+                        <Button text="Go to Car Profile" width={150} outlined={true} marginRight={10}
+                                onClick={() => handleNavigation(`/inventory/car-profile/${carId}?status=${status}`)}/>
+                        {maintenances.length > 0 && (
                             <>
                                 <PriceCard>
                                     <Typography variant="body1">Total Maintenance Cost</Typography>
-                                    <Typography variant="h5">₦37,000.00</Typography>
+                                    <Typography variant="h5">₦ NA</Typography>
                                 </PriceCard>
                             </>
                         )}
                     </div>
                 </TopTab>
-                {!isPageEmpty && (
+                {maintenances.length > 0 && (
                     <>
                         <Typography variant='h5' style={{
                             marginTop: 24,
                             borderBottom: `1px solid ${t.extraLiteGrey}`
                         }}>Description</Typography>
                         <p>
-                            Nulla cursus est ut libero maximus, at cursus ex aliquet. Pellentesque gravida malesuada
-                            pretium. In
-                            vehicula lectus vitae tincidunt iaculis. Nunc ullamcorper auctor mauris. Nunc fringilla ut
-                            neque
-                            quis fringilla. Fusce dapibus nisi sed sodales faucibus. Maecenas nulla sapien, porta ut
-                            tristique
-                            eget, vestibulum et mi. Nulla viverra aliquet cursus.
+                            NA
                         </p>
                     </>
                 )}
-                {isPageEmpty && (
+                {maintenances.length < 1 && (
                     <>
                         <CenteredFlex style={{height: 'calc(100vh - 400px)'}}>
                             <div className='content'>
@@ -141,7 +329,7 @@ function SingleUnderInspectionMaintenancePage() {
                     </>
                 )}
             </Body>
-            {!isPageEmpty && (
+            {maintenances.length > 0 && (
                 <>
                     <Grid container style={{marginTop: 4}} spacing={3}>
                         <Grid item xs={7}>
@@ -163,25 +351,25 @@ function SingleUnderInspectionMaintenancePage() {
                                     <Grid item xs={6}>
                                         <PriceCard style={{width: '100%', background: t.primaryLite}}>
                                             <Typography variant="body1">Spare Part Cost</Typography>
-                                            <Typography variant="h5">₦12,000.00</Typography>
+                                            <Typography variant="h5">₦ NA</Typography>
                                         </PriceCard>
                                     </Grid>
                                     <Grid item xs={6}>
                                         <PriceCard style={{width: '100%', background: t.primaryLite}}>
                                             <Typography variant="body1">Spare Part Cost</Typography>
-                                            <Typography variant="h5">₦12,000.00</Typography>
+                                            <Typography variant="h5">₦ NA</Typography>
                                         </PriceCard>
                                     </Grid>
                                     <Grid item xs={6}>
                                         <PriceCard style={{width: '100%', background: t.extraLiteGrey}}>
                                             <Typography variant="body1">Repair Cost</Typography>
-                                            <Typography variant="h5">₦12,000.00</Typography>
+                                            <Typography variant="h5">₦ NA</Typography>
                                         </PriceCard>
                                     </Grid>
                                     <Grid item xs={6}>
                                         <PriceCard style={{width: '100%', background: t.extraLiteGrey}}>
                                             <Typography variant="body1">Repair Cost</Typography>
-                                            <Typography variant="h5">₦12,000.00</Typography>
+                                            <Typography variant="h5">₦ NA</Typography>
                                         </PriceCard>
                                     </Grid>
                                 </Grid>
@@ -190,14 +378,12 @@ function SingleUnderInspectionMaintenancePage() {
                         <Grid item xs={5}>
                             <Body style={{padding: 15}}>
                                 <Typography variant='h6'>Expenses</Typography>
-                                <Expense>
-                                    <div className="key">Fueling</div>
-                                    <div className="value">&#8358; 3,000.00</div>
-                                </Expense>
-                                <Expense>
-                                    <div className="key">Engine Oil</div>
-                                    <div className="value">&#8358; 5,000.00</div>
-                                </Expense>
+                                {maintenances.map((ex, i) => (
+                                    <Expense key={i}>
+                                        <div className="key">NA</div>
+                                        <div className="value">&#8358; {formatNumber(ex.cost)}</div>
+                                    </Expense>
+                                ))}
                             </Body>
                         </Grid>
                     </Grid></>
@@ -284,10 +470,11 @@ function SingleUnderInspectionMaintenancePage() {
                                 <Grid item xs={12}>
                                     <VehicleDetails2 style={{width: 700}}>
                                         <img
-                                            src="/images/Big-Default-Car.png"
+                                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                             width={185}
                                             height={135}
                                             style={{borderRadius: '8px'}}
+                                            alt={car?.information?.make}
                                         />
                                         <div className="stats">
                                             <img
@@ -297,9 +484,9 @@ function SingleUnderInspectionMaintenancePage() {
                                                 style={{marginBottom: -15}}
                                             />
                                             <Typography variant="h5" className="trade">
-                                                VID 09890
+                                                {trimString(car?.id)}
                                             </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                            <Typography variant="h6">{car?.name}</Typography>
                                         </div>
                                     </VehicleDetails2>
                                 </Grid>
@@ -311,10 +498,12 @@ function SingleUnderInspectionMaintenancePage() {
                                 fullWidth
                                 placeholder="Damaged brakes and clutch, needing replacement..."
                                 style={{marginBottom: 18}}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                             ></TextField>
                             <FlexRow style={{marginBottom: 20}}>
                                 <HeaderText>Spare Part</HeaderText>
-                                <IconPill>
+                                <IconPill onClick={addSparePart}>
                                     Add Spare Part
                                     <Add className="icon"/>
                                 </IconPill>
@@ -324,6 +513,8 @@ function SingleUnderInspectionMaintenancePage() {
                                     className="text-field"
                                     fullWidth
                                     placeholder="Spare Part"
+                                    value={sparePart.name}
+                                    onChange={handleChange('name')}
                                 />
                                 <div className="input">
                                     <div className="text">Upload Image</div>
@@ -346,6 +537,9 @@ function SingleUnderInspectionMaintenancePage() {
                                         <TextField
                                             placeholder="Enter spare part price"
                                             style={{width: 400}}
+                                            value={sparePart.partPrice}
+                                            onChange={handleChange('partPrice')}
+                                            type={'number'}
                                         ></TextField>
                                     </FlexRow>
                                     <FlexRow>
@@ -353,49 +547,64 @@ function SingleUnderInspectionMaintenancePage() {
                                         <TextField
                                             placeholder="Enter repair cost"
                                             style={{width: 400}}
+                                            value={sparePart.repairCost}
+                                            onChange={handleChange('repairCost')}
+                                            type={'number'}
                                         ></TextField>
                                     </FlexRow>
                                 </InputGrid>
                             </div>
-                            <InputGrid style={{marginTop: 14}}>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Spare Part"
-                                />
-                                <div className="input">
-                                    <div className="text">engine indlmor.png</div>
-                                    <Button
-                                        text="Delete"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        bgColor={t.alertError}
-                                        borderRadius="8px"
-                                    />
+                            {spareParts.map((sp, id) => (
+                                <div key={id}>
+                                    <InputGrid style={{marginTop: 14}}>
+                                        <TextField
+                                            className="text-field"
+                                            fullWidth
+                                            placeholder="Spare Part"
+                                            variant='standard'
+                                            disabled
+                                            value={sp.name}
+                                        />
+                                        <div className="input">
+                                            <div className="text">NA.png</div>
+                                            <Button
+                                                text="Delete"
+                                                outlined={true}
+                                                width={71}
+                                                height={28}
+                                                bgColor={t.alertError}
+                                                borderRadius="8px"
+                                                onClick={() => deleteSparePart(sp.name)}
+                                            />
+                                        </div>
+                                    </InputGrid>
+                                    <div style={{display: 'flex', flexDirection: 'column'}}>
+                                        <HeaderText variant="inherit" style={{marginBottom: 8}}>
+                                            Costing
+                                        </HeaderText>
+                                        <InputGrid style={{background: 'white'}}>
+                                            <FlexRow>
+                                                <div className="currency-box">&#8358;</div>
+                                                <TextField
+                                                    placeholder="Enter spare part price"
+                                                    style={{width: 400}} variant='standard'
+                                                    disabled
+                                                    value={sp.partPrice}
+                                                ></TextField>
+                                            </FlexRow>
+                                            <FlexRow>
+                                                <div className="currency-box">&#8358;</div>
+                                                <TextField
+                                                    placeholder="Enter repair cost"
+                                                    style={{width: 400}} variant='standard'
+                                                    disabled
+                                                    value={sp.repairCost}
+                                                ></TextField>
+                                            </FlexRow>
+                                        </InputGrid>
+                                    </div>
                                 </div>
-                            </InputGrid>
-                            <div style={{display: 'flex', flexDirection: 'column'}}>
-                                <HeaderText variant="inherit" style={{marginBottom: 8}}>
-                                    Costing
-                                </HeaderText>
-                                <InputGrid style={{background: 'white'}}>
-                                    <FlexRow>
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Enter spare part price"
-                                            style={{width: 400}}
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow>
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Enter repair cost"
-                                            style={{width: 400}}
-                                        ></TextField>
-                                    </FlexRow>
-                                </InputGrid>
-                            </div>
+                            ))}
                             <Button
                                 text="Create Maintenance Record"
                                 width={510}
@@ -403,7 +612,7 @@ function SingleUnderInspectionMaintenancePage() {
                                 marginRight="auto"
                                 marginTop={50}
                                 onClick={() =>
-                                    saveMaintenanceRecord()
+                                    saveSparePartRecord()
                                 }
                             />
                         </>
@@ -417,10 +626,11 @@ function SingleUnderInspectionMaintenancePage() {
                                 <Grid item xs={12}>
                                     <VehicleDetails2 style={{width: 700}}>
                                         <img
-                                            src="/images/Big-Default-Car.png"
+                                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                             width={185}
                                             height={135}
                                             style={{borderRadius: '8px'}}
+                                            alt={car?.information?.make}
                                         />
                                         <div className="stats">
                                             <img
@@ -430,9 +640,9 @@ function SingleUnderInspectionMaintenancePage() {
                                                 style={{marginBottom: -15}}
                                             />
                                             <Typography variant="h5" className="trade">
-                                                VID 09890
+                                                {trimString(carId)}
                                             </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                            <Typography variant="h6">{car?.name}</Typography>
                                         </div>
                                     </VehicleDetails2>
                                 </Grid>
@@ -444,48 +654,50 @@ function SingleUnderInspectionMaintenancePage() {
                                 fullWidth
                                 placeholder="Damaged brakes and clutch, needing replacement..."
                                 style={{marginBottom: 18}}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                             ></TextField>
                             <FlexRow style={{marginBottom: 20}}>
                                 <HeaderText>Expenses</HeaderText>
-                                <IconPill>
+                                <IconPill onClick={addExpense}>
                                     Add Expense
                                     <Add className="icon"/>
                                 </IconPill>
                             </FlexRow>
                             <div style={{display: 'flex', flexDirection: 'column'}}>
-                                <InputGrid style={{background: 'white'}}>
-                                    <FlexRow className='reverse'>
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Expense"
-                                            style={{width: 400}}
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className='reverse'>
-                                        <div className="currency-box"
-                                             style={{color: t.alertError, background: 'white'}}>&#215;</div>
-                                        <TextField
-                                            placeholder="Cost"
-                                            style={{width: 400}}
-                                        ></TextField>
-                                    </FlexRow>
-                                </InputGrid> <InputGrid style={{background: 'white'}}>
-                                <FlexRow className='reverse'>
-                                    <div className="currency-box">&#8358;</div>
-                                    <TextField
-                                        placeholder="Expense"
-                                        style={{width: 400}}
-                                    ></TextField>
-                                </FlexRow>
-                                <FlexRow className='reverse'>
-                                    <div className="currency-box"
-                                         style={{color: t.alertError, background: 'white'}}>&#215;</div>
-                                    <TextField
-                                        placeholder="Cost"
-                                        style={{width: 400}}
-                                    ></TextField>
-                                </FlexRow>
-                            </InputGrid>
+                                {expenses.map((exp, idx) => (
+                                    <InputGrid style={{background: 'white'}} key={idx}>
+                                        <FlexRow className='reverse'>
+                                            <div className="currency-box">&#8358;</div>
+                                            <TextField
+                                                placeholder="Expense"
+                                                label="Expense"
+                                                variant='standard'
+                                                style={{width: 400}}
+                                                type={'text'}
+                                                value={expenses[idx].expense}
+                                                onChange={(e) => updateExpense(idx, 'expense', e.target.value)}
+                                            ></TextField>
+                                        </FlexRow>
+                                        <FlexRow className='reverse'>
+                                            <div className="currency-box" onClick={() => deleteExpense(idx)}
+                                                 style={{
+                                                     color: t.alertError,
+                                                     background: 'white',
+                                                     cursor: 'pointer'
+                                                 }}>&#10006;</div>
+                                            <TextField
+                                                placeholder="Cost"
+                                                label="Cost"
+                                                variant='standard'
+                                                style={{width: 400}}
+                                                type={'number'}
+                                                value={expenses[idx].cost}
+                                                onChange={(e) => updateExpense(idx, 'cost', e.target.value)}
+                                            ></TextField>
+                                        </FlexRow>
+                                    </InputGrid>
+                                ))}
                             </div>
                             <Button
                                 text="Create Maintenance Record"
@@ -494,7 +706,7 @@ function SingleUnderInspectionMaintenancePage() {
                                 marginRight="auto"
                                 marginTop={50}
                                 onClick={() =>
-                                    saveMaintenanceRecord()
+                                    saveExpenseRecord()
                                 }
                             />
                         </>
