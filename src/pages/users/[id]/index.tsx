@@ -6,17 +6,52 @@ import {useRouter} from 'next/router'
 import Button from '../../../components/shared/Button'
 import Image from 'next/image'
 import {withStyles} from '@material-ui/styles'
-import {useState} from 'react'
-import {toast, Toaster} from 'react-hot-toast'
+import {useEffect, useState} from 'react'
+import {toast} from 'react-hot-toast'
 import {ArrowBack, Check} from '@material-ui/icons'
+import CPToast from "../../../components/shared/CPToast";
+import {merchantService} from "../../../services/merchant";
+import {walletService} from "../../../services/wallet";
+import {formatDate, formatNumber} from "../../../helpers/formatters";
+import {transactionService} from "../../../services/transaction";
+
 
 function UserProfilePage() {
     const router = useRouter()
-    const userId = router.query.id || 'NA'
+    const userId = String(router.query.id) || 'NA'
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
     const [viewAllTransactions, setViewAllTransactions] = useState(false)
+    const [user, setUserData] = useState({
+        "id": "0",
+        "user": {
+            "id": "0",
+            "username": "NA",
+            "first_name": "NA",
+            "last_name": "NA",
+            "profile_picture": "NA",
+            "email": "NA",
+            "phone": "NA",
+            "is_active": false
+        },
+        "created": "2022-06-17T09:11:56.000265Z",
+        "modified": "2022-06-17T09:11:56.000265Z",
+        "bvn": "3568302072"
+    })
+    const [wallet, setWalletData] = useState({
+        "id": "NA",
+        "bank_accounts": [],
+        "created": "NA",
+        "modified": "NA",
+        "balance": "0.00",
+        "trading_cash": "0.00",
+        "withdrawable_cash": "0.00",
+        "unsettled_cash": "0.00",
+        "total_cash": "0.00",
+        "merchant": userId
+    })
+    const [transactions, setTransactions] = useState([])
 
     const showModal = (viewName: string, title: string) => {
         setModalView(viewName)
@@ -33,29 +68,94 @@ function UserProfilePage() {
         toast.success('User Account Deleted')
     }
     const suspendAccount = () => {
-        setModalState(false)
-        toast.success('User Account Suspended')
+        updateUser({is_active: false})
     }
+
+    const retrieveUser = () => {
+        if (userId !== 'NA' && userId !== undefined) {
+            merchantService
+                .retrieveSingleMerchant(userId)
+                .then((response) => {
+                    if (response.status) {
+                        setUserData(response.data)
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
+    const retrieveUserWallet = () => {
+        if (userId !== 'NA' && userId !== undefined) {
+            walletService
+                .retrieveWallets(1, 0, userId)
+                .then((response) => {
+                    if (response.status) {
+                        if (response.data.results && response.data.results.length > 0) {
+                            setWalletData(response.data.results[0])
+                        }
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
+    const retrieveUserWalletTransactions = (id) => {
+        if (id !== 'NA' && id !== undefined) {
+            transactionService
+                .retrieveTransaction(50, 0, id)
+                .then((response) => {
+                    if (response.status) {
+                        setTransactions(response.data.results)
+                        setViewAllTransactions(true)
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        } else {
+            toast.error('No wallet to retrieve transactions from!')
+        }
+    }
+
+    const updateUser = (data) => {
+        if (data && userId !== 'NA' && userId !== undefined) {
+            merchantService
+                .updateSingleMerchant(userId, {...user.user, ...data})
+                .then((response) => {
+                    if (response.status) {
+                        retrieveUser()
+                        toast.success('User Account Suspended')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+                .finally(() => {
+                    setModalState(false)
+                })
+        }
+    }
+
+    useEffect(() => {
+        retrieveUser()
+        retrieveUserWallet()
+    }, [])
 
     return (
         <Container>
-            <div>
-                <Toaster
-                    position="top-right"
-                    toastOptions={{
-                        style: {
-                            border: '1px solid #243773',
-                            padding: '16px',
-                            fontWeight: 'bold',
-                            color: '#243773'
-                        },
-                        iconTheme: {
-                            primary: '#243773',
-                            secondary: '#FFFAEE'
-                        }
-                    }}
-                />
-            </div>
+            <CPToast/>
             <Header>
                 <Typography variant="h4">
                     <b>Users</b>
@@ -67,41 +167,41 @@ function UserProfilePage() {
                         <div className="user-info">
                             <div className="profile">
                                 <ProfileImage style={{borderRadius: '50%'}}>
-                                    <img src="/icons/Users-Blue.svg" width={47} height={62}/>
+                                    <img src={user?.user?.profile_picture || "/icons/Users-Blue.svg"} width={'100%'}
+                                         height={'100%'} style={{borderRadius: '50%'}}/>
                                 </ProfileImage>
-                                <span className="full-name">John Do Smith</span>
-                                <span>TRADING NAME: @james_run4deno</span>
+                                <span className="full-name">{user?.user?.first_name} {user?.user?.last_name}</span>
+                                <span>TRADING NAME: @{user?.user?.username}</span>
                                 <ActivityTab
                                     style={{
                                         background:
-                                            'active' === 'active'
+                                            user?.user?.is_active === true
                                                 ? t.alertSuccessLite
                                                 : t.extraLiteGrey
                                     }}
                                 >
-                                    active
+                                    {user?.user?.is_active ? 'Active' : 'Inactive'}
                                 </ActivityTab>
                             </div>
                             <Statistic>
                                 <div className="key">Date Of Birth</div>
-                                <div className="value">March 20, 1989</div>
+                                <div className="value">NA</div>
                             </Statistic>
                             <Statistic>
                                 <div className="key">Country Of Origin</div>
-                                <div className="value">Nigeria</div>
+                                <div className="value">NA</div>
                             </Statistic>
                             <Statistic>
                                 <div className="key">Email Address</div>
-                                <div className="value">james_rundeno47@gmail.com</div>
+                                <div className="value">{user?.user?.email}</div>
                             </Statistic>
-                            <div className="user-status">Email Verified</div>
+                            <div
+                                className={user?.user?.is_active ? "user-status" : "user-status-error"}>Email {user?.user?.is_active ? 'Verified' : 'Unverified'}</div>
                             <Statistic style={{fontWeight: 600}}>
                                 <div className="key">Address</div>
                             </Statistic>
                             <p>
-                                Phasellus ultrices, velit a feugiat placerat, massa odio
-                                efficitur orci, porttitor varius ligula ipsum in arcu. Praesent
-                                tempus mi nisi, ut tempus libero porta eget.
+                                NA
                             </p>
                         </div>
                     </div>
@@ -119,198 +219,27 @@ function UserProfilePage() {
                                 </div>
                                 <Grid container spacing={3}>
                                     <Grid item xs={12}>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Deposit-Green.svg"
-                                                    alt="Deposit"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Deposit</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertSuccess}}>
-                                                +&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Withdraw-Red.svg"
-                                                    alt="Withdraw"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Withdraw</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertError}}>
-                                                -&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Deposit-Green.svg"
-                                                    alt="Deposit"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Deposit</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertSuccess}}>
-                                                +&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Withdraw-Red.svg"
-                                                    alt="Withdraw"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Withdraw</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertError}}>
-                                                -&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Deposit-Green.svg"
-                                                    alt="Deposit"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Deposit</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertSuccess}}>
-                                                +&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Withdraw-Red.svg"
-                                                    alt="Withdraw"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Withdraw</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertError}}>
-                                                -&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Deposit-Green.svg"
-                                                    alt="Deposit"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Deposit</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertSuccess}}>
-                                                +&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Withdraw-Red.svg"
-                                                    alt="Withdraw"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Withdraw</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertError}}>
-                                                -&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Deposit-Green.svg"
-                                                    alt="Deposit"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Deposit</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertSuccess}}>
-                                                +&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Withdraw-Red.svg"
-                                                    alt="Withdraw"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Withdraw</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertError}}>
-                                                -&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Deposit-Green.svg"
-                                                    alt="Deposit"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Deposit</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertSuccess}}>
-                                                +&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
-                                        <Transaction>
-                                            <div className="left">
-                                                <img
-                                                    className="icon"
-                                                    src="/icons/Withdraw-Red.svg"
-                                                    alt="Withdraw"
-                                                />
-                                                <div className="stacked">
-                                                    <div>Withdraw</div>
-                                                    <div className="date">Jan 23, 2022</div>
-                                                </div>
-                                            </div>
-                                            <div className="value" style={{color: t.alertError}}>
-                                                -&#8358;5,000.00
-                                            </div>
-                                        </Transaction>
+                                        {transactions
+                                            .map((tr, idx) => (
+                                                <Transaction key={idx}>
+                                                    <div className="left">
+                                                        <img
+                                                            className="icon"
+                                                            src={tr?.transaction_type === 'credit' ? "/icons/Deposit-Green.svg" : "/icons/Withdraw-Red.svg"}
+                                                            alt="Deposit"
+                                                        />
+                                                        <div className="stacked">
+                                                            <div
+                                                                style={{textTransform: "capitalize"}}>{tr?.transaction_description || tr?.transaction_type || tr?.transaction_kind || 'NA'}</div>
+                                                            <div className="date">{formatDate(tr?.created)}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="value"
+                                                         style={{color: tr?.transaction_type === 'credit' ? t.alertSuccess : t.alertError}}>
+                                                        {tr?.transaction_type === 'credit' ? '+' : '-'}&#8358;{formatNumber(tr?.amount)}
+                                                    </div>
+                                                </Transaction>
+                                            ))}
                                     </Grid>
                                 </Grid>
                             </div>
@@ -328,6 +257,7 @@ function UserProfilePage() {
                                             marginRight="16px"
                                             marginTop={4}
                                             bgColor={t.alertValidation}
+                                            disabled={!user.user.is_active}
                                             onClick={() => showModal('suspendAccount', '')}
                                         />
                                         <Button
@@ -337,6 +267,7 @@ function UserProfilePage() {
                                             marginRight="16px"
                                             marginTop={4}
                                             bgColor={t.alertError}
+                                            disabled={true}
                                             onClick={() => {
                                                 showModal('deleteAccount', '')
                                             }}
@@ -355,21 +286,23 @@ function UserProfilePage() {
                                     <Grid item xs={12}>
                                         <PriceCard style={{background: t.alertSuccessLite}}>
                                             <Typography variant="body1">Total Asset</Typography>
-                                            <Typography variant="h5">&#8358; 10,000.00</Typography>
+                                            <Typography
+                                                variant="h5">&#8358; {formatNumber(wallet?.balance)}</Typography>
                                         </PriceCard>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Statistic>
                                             <div className="key">Trading Cash</div>
-                                            <div className="value">&#8358; 5,000.00</div>
+                                            <div className="value">&#8358; {formatNumber(wallet?.trading_cash)}</div>
                                         </Statistic>
                                         <Statistic>
                                             <div className="key">Withdrawable Cash</div>
-                                            <div className="value">&#8358; 3,000.00</div>
+                                            <div
+                                                className="value">&#8358; {formatNumber(wallet?.withdrawable_cash)}</div>
                                         </Statistic>
                                         <Statistic>
                                             <div className="key">Unsettled Cash</div>
-                                            <div className="value">&#8358; 2,000.00</div>
+                                            <div className="value">&#8358; {formatNumber(wallet?.unsettled_cash)}</div>
                                         </Statistic>
                                     </Grid>
                                     <Button
@@ -380,7 +313,7 @@ function UserProfilePage() {
                                         marginBottom="40px"
                                         marginTop={40}
                                         onClick={() => {
-                                            setViewAllTransactions(true)
+                                            retrieveUserWalletTransactions(wallet?.id)
                                         }}
                                     />
                                     <Grid container spacing={3}>
@@ -390,10 +323,10 @@ function UserProfilePage() {
                                             </Statistic>
                                             <Statistic>
                                                 <div className="key stacked">
-                                                    <div className="account-number">0320090101</div>
-                                                    <div className="bank-name">WEMA Bank Plc</div>
+                                                    <div className="account-number">Acct NA</div>
+                                                    <div className="bank-name">Bank NA</div>
                                                     <div className="account-name">
-                                                        Maxwell Samuel Anthony
+                                                        Acct Name NA
                                                     </div>
                                                 </div>
                                                 <div className="value">
@@ -648,6 +581,13 @@ const SplitContainer = styled.div`
         text-align: center;
         font-weight: bold;
         color: ${t.alertSuccess};
+        margin: 44px 0;
+      }
+
+      .user-status-error {
+        text-align: center;
+        font-weight: bold;
+        color: ${t.alertError};
         margin: 44px 0;
       }
     }
