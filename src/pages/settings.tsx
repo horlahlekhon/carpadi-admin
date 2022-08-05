@@ -1,395 +1,409 @@
 import MainLayout from '../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
-  FormControl,
-  IconButton,
-  Input,
-  InputAdornment,
-  InputLabel,
-  Select,
-  TextField,
-  Typography
+    FormControl,
+    IconButton,
+    Input,
+    InputAdornment,
+    InputLabel,
+    Select,
+    TextField,
+    Typography
 } from '@material-ui/core'
 import Button from '../components/shared/Button'
-import { t } from '../styles/theme'
+import {t} from '../styles/theme'
 import {
-  ChevronRight,
-  CreditCard,
-  Visibility,
-  VisibilityOff,
-  MonetizationOn,
-  Lock
+    ChevronRight,
+    CreditCard,
+    Visibility,
+    VisibilityOff,
+    MonetizationOn,
+    Lock
 } from '@material-ui/icons'
-import { useState } from 'react'
-import { useRouter } from 'next/router'
-import { toast, Toaster } from 'react-hot-toast'
+import {useState} from 'react'
+import {useRouter} from 'next/router'
+import {toast, Toaster} from 'react-hot-toast'
+import CPToast from "../components/shared/CPToast";
+import {updateUserPassword} from "../services/user";
 
 function SettingsPage() {
-  const router = useRouter()
-  const [currentTab, setCurrentTab] = useState('payment-setup')
-  const [bankAccount, setBankAccount] = useState('')
-  const [values, setValues] = useState({
-    showPassword: false,
-    password: null
-  })
-
-  const handleNavigation = (action: string) => {
-    router.push(`${action}`)
-  }
-
-  const saveChanges = () => {
-    toast.success('Changes Saved')
-    if (currentTab === 'payment-setup') {
-      return
-    } else if (currentTab === 'fee-management') {
-      return
-    } else if (currentTab === 'security') {
-      return
-    } else {
-      return
-    }
-  }
-
-  const handlePasswordChange = (prop) => (event) => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
-
-  const handleClickShowPassword = () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword
+    const router = useRouter()
+    const [currentTab, setCurrentTab] = useState('payment-setup')
+    const [bankAccount, setBankAccount] = useState('')
+    const [isLoading, setLoading] = useState(false)
+    const [values, setValues] = useState({
+        showOldPassword: false,
+        showConfirmPassword: false,
+        showPassword: false,
+        password: '',
+        oldPassword: '',
+        confirmPassword: '',
     })
-  }
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault()
-  }
+    const saveChanges = () => {
+        setLoading(true)
+        if (currentTab === 'payment-setup') {
+            return
+        } else if (currentTab === 'fee-management') {
+            return
+        } else if (currentTab === 'security') {
+            updateUserPassword({old_password: values.oldPassword, new_password: values.password})
+                .then((res) => {
+                    if (res.status) {
+                        toast.success('Saved!')
+                    } else {
+                        toast.error(res.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+                .finally(() => {
+                    setLoading(false)
+                })
+        } else {
+            return
+            setLoading(false)
+        }
+    }
 
-  return (
-    <Container>
-      <div>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              border: '1px solid #243773',
-              padding: '16px',
-              fontWeight: 'bold',
-              color: '#243773'
-            },
-            iconTheme: {
-              primary: '#243773',
-              secondary: '#FFFAEE'
-            }
-          }}
-        />
-      </div>
-      <Header>
-        <Typography variant="h4">
-          <b>Settings</b>
-        </Typography>
-      </Header>
-      <MainCard>
-        <div className="nav">
-          <NavTab
-            className={currentTab === 'payment-setup' ? 'active' : ''}
-            onClick={() => setCurrentTab('payment-setup')}
-          >
-            <div className="main">
-              <div className="top">
-                <div className="icon">
-                  <CreditCard />
+    const handlePasswordChange = (prop) => (event) => {
+        setValues({...values, [prop]: event.target.value})
+    }
+
+    const handleClickShowPassword = () => {
+        setValues({
+            ...values,
+            showPassword: !values.showPassword
+        })
+    }
+    const handleClickShowOldPassword = () => {
+        setValues({
+            ...values,
+            showOldPassword: !values.showOldPassword
+        })
+    }
+    const handleClickShowConfirmPassword = () => {
+        setValues({
+            ...values,
+            showConfirmPassword: !values.showConfirmPassword
+        })
+    }
+
+    const handleMouseDownPassword = (event) => {
+        event.preventDefault()
+    }
+
+    return (
+        <Container>
+            <CPToast/>
+            <Header>
+                <Typography variant="h4">
+                    <b>Settings</b>
+                </Typography>
+            </Header>
+            <MainCard>
+                <div className="nav">
+                    <NavTab
+                        className={currentTab === 'payment-setup' ? 'active' : ''}
+                        onClick={() => setCurrentTab('payment-setup')}
+                    >
+                        <div className="main">
+                            <div className="top">
+                                <div className="icon">
+                                    <CreditCard/>
+                                </div>
+                                <div className="text">Payment Setup</div>
+                            </div>
+                            <div className="bottom">Carpadi bank account details</div>
+                        </div>
+                        <div className="arrow">
+                            <ChevronRight/>
+                        </div>
+                    </NavTab>
+                    <NavTab
+                        className={currentTab === 'fee-management' ? 'active' : ''}
+                        onClick={() => setCurrentTab('fee-management')}
+                    >
+                        <div className="main">
+                            <div className="top">
+                                <div className="icon">
+                                    <MonetizationOn/>
+                                </div>
+                                <div className="text">Fee Management</div>
+                            </div>
+                            <div className="bottom">Manage user fees</div>
+                        </div>
+                        <div className="arrow">
+                            <ChevronRight/>
+                        </div>
+                    </NavTab>
+                    <NavTab
+                        className={currentTab === 'security' ? 'active' : ''}
+                        onClick={() => setCurrentTab('security')}
+                    >
+                        <div className="main">
+                            <div className="top">
+                                <div className="icon">
+                                    <Lock/>
+                                </div>
+                                <div className="text">Security</div>
+                            </div>
+                            <div className="bottom">Update password</div>
+                        </div>
+                        <div className="arrow">
+                            <ChevronRight/>
+                        </div>
+                    </NavTab>
                 </div>
-                <div className="text">Payment Setup</div>
-              </div>
-              <div className="bottom">Carpadi bank account details</div>
-            </div>
-            <div className="arrow">
-              <ChevronRight />
-            </div>
-          </NavTab>
-          <NavTab
-            className={currentTab === 'fee-management' ? 'active' : ''}
-            onClick={() => setCurrentTab('fee-management')}
-          >
-            <div className="main">
-              <div className="top">
-                <div className="icon">
-                  <MonetizationOn />
+                <div className="content">
+                    {currentTab === 'payment-setup' && (
+                        <>
+                            <Typography variant="h6">Payment Setup</Typography>
+                            <Typography variant="body1" color="secondary">
+                                Carpadi bank account details
+                            </Typography>
+                            <FormControl style={{width: 370, marginTop: 30}}>
+                                <Select
+                                    value={bankAccount}
+                                    onChange={(event) =>
+                                        setBankAccount(String(event.target.value))
+                                    }
+                                    displayEmpty
+                                    inputProps={{'aria-label': 'Without label'}}
+                                >
+                                    <option value="" disabled>
+                                        Bank Account
+                                    </option>
+                                    <option value={'One'}>One</option>
+                                    <option value={'Two'}>Two</option>
+                                    <option value={'Three'}>Three</option>
+                                </Select>
+                            </FormControl>
+                            <TextField
+                                label="Account Number"
+                                style={{width: 370, marginTop: 24}}
+                            />
+                            <TextField
+                                label="Account Name"
+                                style={{width: 370, marginTop: 24}}
+                            />
+
+                            <Typography
+                                variant="body1"
+                                style={{color: t.lightGrey, marginTop: 40}}
+                            >
+                                Approve Changes
+                            </Typography>
+                            <FormControl
+                                style={{width: 370, marginTop: 20}}
+                                variant="standard"
+                            >
+                                <InputLabel htmlFor="standard-adornment-password">
+                                    Enter Password
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password"
+                                    type={values.showPassword ? 'text' : 'password'}
+                                    value={values.password}
+                                    onChange={handlePasswordChange('password')}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {values.showPassword ? (
+                                                    <VisibilityOff/>
+                                                ) : (
+                                                    <Visibility/>
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                        </>
+                    )}
+                    {currentTab === 'fee-management' && (
+                        <>
+                            <Typography variant="h6">Fee Management</Typography>
+                            <Typography variant="body1" color="secondary">
+                                Manage users fees
+                            </Typography>
+                            <FlexRow style={{marginTop: 30}}>
+                                <span>Transfer Fee</span>
+                                <FlexRow style={{width: 220}}>
+                                    <div className="box">%</div>
+                                    <TextField
+                                        placeholder="Enter Fee"
+                                        style={{width: 400}}
+                                    ></TextField>
+                                </FlexRow>
+                            </FlexRow>
+                            <FlexRow style={{marginTop: 30}}>
+                                <span>Close Trade Fee</span>
+                                <FlexRow style={{width: 220}}>
+                                    <div className="box">%</div>
+                                    <TextField
+                                        placeholder="Enter Fee"
+                                        style={{width: 400}}
+                                    ></TextField>
+                                </FlexRow>
+                            </FlexRow>
+
+                            <Typography
+                                variant="body1"
+                                style={{color: t.lightGrey, marginTop: 40}}
+                            >
+                                Approve Changes
+                            </Typography>
+                            <FormControl
+                                style={{width: 370, marginTop: 20}}
+                                variant="standard"
+                            >
+                                <InputLabel htmlFor="standard-adornment-password">
+                                    Enter Password
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password"
+                                    type={values.showPassword ? 'text' : 'password'}
+                                    value={values.password}
+                                    onChange={handlePasswordChange('password')}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {values.showPassword ? (
+                                                    <VisibilityOff/>
+                                                ) : (
+                                                    <Visibility/>
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                        </>
+                    )}
+                    {currentTab === 'security' && (
+                        <>
+                            <Typography variant="h6">Security</Typography>
+                            <Typography variant="body1" color="secondary">
+                                Update Password
+                            </Typography>
+
+                            <FormControl
+                                style={{width: 370, marginTop: 20}}
+                                variant="standard"
+                            >
+                                <InputLabel htmlFor="standard-adornment-password">
+                                    Current Password
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password"
+                                    type={values.showOldPassword ? 'text' : 'password'}
+                                    value={values.oldPassword}
+                                    onChange={handlePasswordChange('oldPassword')}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowOldPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {values.showOldPassword ? (
+                                                    <VisibilityOff/>
+                                                ) : (
+                                                    <Visibility/>
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                            <FormControl
+                                style={{width: 370, marginTop: 20}}
+                                variant="standard"
+                            >
+                                <InputLabel htmlFor="standard-adornment-password">
+                                    New Password
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password"
+                                    type={values.showPassword ? 'text' : 'password'}
+                                    value={values.password}
+                                    onChange={handlePasswordChange('password')}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {values.showPassword ? (
+                                                    <VisibilityOff/>
+                                                ) : (
+                                                    <Visibility/>
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                            <FormControl
+                                style={{width: 370, marginTop: 20}}
+                                variant="standard"
+                            >
+                                <InputLabel htmlFor="standard-adornment-password">
+                                    Confirm Password
+                                </InputLabel>
+                                <Input
+                                    id="standard-adornment-password"
+                                    type={values.showConfirmPassword ? 'text' : 'password'}
+                                    value={values.confirmPassword}
+                                    onChange={handlePasswordChange('confirmPassword')}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowConfirmPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {values.showConfirmPassword ? (
+                                                    <VisibilityOff/>
+                                                ) : (
+                                                    <Visibility/>
+                                                )}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                />
+                            </FormControl>
+                        </>
+                    )}
+                    <div className="submit">
+                        <Button
+                            text={isLoading ? "Saving ..." : "Save Changes"}
+                            width={372}
+                            disabled={(values.password !== values.confirmPassword) || (values.password === values.oldPassword) || isLoading}
+                            onClick={() => saveChanges()}
+                        />
+                    </div>
                 </div>
-                <div className="text">Fee Management</div>
-              </div>
-              <div className="bottom">Manage user fees</div>
-            </div>
-            <div className="arrow">
-              <ChevronRight />
-            </div>
-          </NavTab>
-          <NavTab
-            className={currentTab === 'security' ? 'active' : ''}
-            onClick={() => setCurrentTab('security')}
-          >
-            <div className="main">
-              <div className="top">
-                <div className="icon">
-                  <Lock />
-                </div>
-                <div className="text">Security</div>
-              </div>
-              <div className="bottom">Update password</div>
-            </div>
-            <div className="arrow">
-              <ChevronRight />
-            </div>
-          </NavTab>
-        </div>
-        <div className="content">
-          {currentTab === 'payment-setup' && (
-            <>
-              <Typography variant="h6">Payment Setup</Typography>
-              <Typography variant="body1" color="secondary">
-                Carpadi bank account details
-              </Typography>
-              <FormControl style={{ width: 370, marginTop: 30 }}>
-                <Select
-                  value={bankAccount}
-                  onChange={(event) =>
-                    setBankAccount(String(event.target.value))
-                  }
-                  displayEmpty
-                  inputProps={{ 'aria-label': 'Without label' }}
-                >
-                  <option value="" disabled>
-                    Bank Account
-                  </option>
-                  <option value={'One'}>One</option>
-                  <option value={'Two'}>Two</option>
-                  <option value={'Three'}>Three</option>
-                </Select>
-              </FormControl>
-              <TextField
-                label="Account Number"
-                style={{ width: 370, marginTop: 24 }}
-              />
-              <TextField
-                label="Account Name"
-                style={{ width: 370, marginTop: 24 }}
-              />
-
-              <Typography
-                variant="body1"
-                style={{ color: t.lightGrey, marginTop: 40 }}
-              >
-                Approve Changes
-              </Typography>
-              <FormControl
-                style={{ width: 370, marginTop: 20 }}
-                variant="standard"
-              >
-                <InputLabel htmlFor="standard-adornment-password">
-                  Enter Password
-                </InputLabel>
-                <Input
-                  id="standard-adornment-password"
-                  type={values.showPassword ? 'text' : 'password'}
-                  value={values.password}
-                  onChange={handlePasswordChange('password')}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                      >
-                        {values.showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
-            </>
-          )}
-          {currentTab === 'fee-management' && (
-            <>
-              <Typography variant="h6">Fee Management</Typography>
-              <Typography variant="body1" color="secondary">
-                Manage users fees
-              </Typography>
-              <FlexRow style={{ marginTop: 30 }}>
-                <span>Transfer Fee</span>
-                <FlexRow style={{ width: 220 }}>
-                  <div className="box">%</div>
-                  <TextField
-                    placeholder="Enter Fee"
-                    style={{ width: 400 }}
-                  ></TextField>
-                </FlexRow>
-              </FlexRow>
-              <FlexRow style={{ marginTop: 30 }}>
-                <span>Close Trade Fee</span>
-                <FlexRow style={{ width: 220 }}>
-                  <div className="box">%</div>
-                  <TextField
-                    placeholder="Enter Fee"
-                    style={{ width: 400 }}
-                  ></TextField>
-                </FlexRow>
-              </FlexRow>
-
-              <Typography
-                variant="body1"
-                style={{ color: t.lightGrey, marginTop: 40 }}
-              >
-                Approve Changes
-              </Typography>
-              <FormControl
-                style={{ width: 370, marginTop: 20 }}
-                variant="standard"
-              >
-                <InputLabel htmlFor="standard-adornment-password">
-                  Enter Password
-                </InputLabel>
-                <Input
-                  id="standard-adornment-password"
-                  type={values.showPassword ? 'text' : 'password'}
-                  value={values.password}
-                  onChange={handlePasswordChange('password')}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                      >
-                        {values.showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
-            </>
-          )}
-          {currentTab === 'security' && (
-            <>
-              <Typography variant="h6">Security</Typography>
-              <Typography variant="body1" color="secondary">
-                Update Password
-              </Typography>
-
-              <FormControl
-                style={{ width: 370, marginTop: 20 }}
-                variant="standard"
-              >
-                <InputLabel htmlFor="standard-adornment-password">
-                  Current Password
-                </InputLabel>
-                <Input
-                  id="standard-adornment-password"
-                  type={values.showPassword ? 'text' : 'password'}
-                  value={values.password}
-                  onChange={handlePasswordChange('password')}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                      >
-                        {values.showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
-              <FormControl
-                style={{ width: 370, marginTop: 20 }}
-                variant="standard"
-              >
-                <InputLabel htmlFor="standard-adornment-password">
-                  New Password
-                </InputLabel>
-                <Input
-                  id="standard-adornment-password"
-                  type={values.showPassword ? 'text' : 'password'}
-                  value={values.password}
-                  onChange={handlePasswordChange('password')}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                      >
-                        {values.showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
-              <FormControl
-                style={{ width: 370, marginTop: 20 }}
-                variant="standard"
-              >
-                <InputLabel htmlFor="standard-adornment-password">
-                  Confirm Password
-                </InputLabel>
-                <Input
-                  id="standard-adornment-password"
-                  type={values.showPassword ? 'text' : 'password'}
-                  value={values.password}
-                  onChange={handlePasswordChange('password')}
-                  endAdornment={
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onClick={handleClickShowPassword}
-                        onMouseDown={handleMouseDownPassword}
-                      >
-                        {values.showPassword ? (
-                          <VisibilityOff />
-                        ) : (
-                          <Visibility />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  }
-                />
-              </FormControl>
-            </>
-          )}
-          <div className="submit">
-            <Button
-              text="Save Changes"
-              width={372}
-              onClick={() => saveChanges()}
-            />
-          </div>
-        </div>
-      </MainCard>
-    </Container>
-  )
+            </MainCard>
+        </Container>
+    )
 }
 
 export default SettingsPage
 
 SettingsPage.getLayout = function getLayout(page) {
-  return <MainLayout>{page}</MainLayout>
+    return <MainLayout>{page}</MainLayout>
 }
 
 const Container = styled.div`
@@ -417,6 +431,7 @@ const MainCard = styled.div`
   .nav {
     width: 40%;
   }
+
   .content {
     width: 60%;
     height: 100%;
@@ -456,16 +471,19 @@ const NavTab = styled.div`
       display: flex;
       flex-direction: row;
       align-items: center;
+
       .icon {
         height: 20px;
         width: 20px;
         margin-right: 16px;
       }
+
       .text {
         font-size: 18px;
         font-weight: 700;
       }
     }
+
     .bottom {
       margin-left: 35px;
       margin-top: 6px;
