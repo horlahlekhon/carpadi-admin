@@ -6,35 +6,39 @@ import {
     Input, InputAdornment,
     InputLabel,
     Modal,
-    Paper,
-    Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Select, 
     TextField,
     Typography,
-    withStyles
 } from '@material-ui/core'
 import Button from '../../components/shared/Button'
 import {t} from '../../styles/theme'
-import {useRef, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {useRouter} from 'next/router'
 import Image from "next/image";
-import {toast, Toaster} from "react-hot-toast";
-import {SearchOutlined} from "@material-ui/icons";
-import {usePagination} from "@material-ui/lab/Pagination";
+import {toast} from "react-hot-toast";
+import CPToast from "../../components/shared/CPToast";
+import CreateTrade from "../../components/shared/CreateTrade";
+import AddCarProfile from "../../components/shared/AddCarProfile";
+import {retrieveInventoryStats} from "../../services/inventory";
+import {formatNumber} from "../../helpers/formatters";
 
 function InventoryPage() {
     const router = useRouter()
-    const rowsPerPage = 10
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
     const [modalTagline, setModalTagline] = useState(' Kindly provide the following information below.')
-    const [transmissionType, setTransmissionType] = useState('')
-    const [seatNumber, setSeatNumber] = useState(4)
-    const [fuelType, setFuelType] = useState('')
     const [brandModel, setBrandModel] = useState('')
-    const [selectedCarId, setSelectedCar] = useState(null)
-    const [page, setPage] = useState(0)
-
+    const [createTrade, setCreateTrade] = useState(false)
+    const [addCarProfile, setAddCarProfile] = useState(false)
+    const [tradeStats, setTradeStats] = useState({
+        "car_listing": 0,
+        "under_inspection": 0,
+        "passed_for_trade": 0,
+        "ongoing_trade": 0,
+        "sold": 0,
+        "archived": 0
+    })
     const hiddenFileInput = useRef(null);
 
     const handleNavigation = (action: string) => {
@@ -64,92 +68,36 @@ function InventoryPage() {
         setModalState(true)
     }
 
-    const saveTrade = () => {
-        setModalState(false)
-        toast.success('Trade Created')
+    const retrieveInventoryStatistics = () => {
+        retrieveInventoryStats()
+            .then((response) => {
+                if (response.status) {
+                    setTradeStats(response.data)
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
     }
 
-    function createData(
-        idx: number,
-        imageUrl: string,
-        vin: string,
-        make: string,
-        model: string,
-        year: number,
-        fuelType: string,
-        sellingPrice: number,
-        dateListed: string,
-        tradeStatus: string
-    ) {
-        return {
-            idx,
-            imageUrl,
-            vin,
-            make,
-            model,
-            year,
-            fuelType,
-            sellingPrice,
-            dateListed,
-            tradeStatus
-        }
-    }
-
-    const rows = Array.from(Array(300).keys()).map((i) => {
-        return createData(
-            i + 1,
-            '/images/Default-Car.png',
-            `VID-11${i}`,
-            'Toyota',
-            'Rav 4',
-            2004,
-            'Petrol',
-            10000000,
-            new Date().toISOString().split('T')[0],
-            'Ongoing'
-        )
-    })
-
-    const handleChangePage = (event: unknown, newPage: number) => {
-        setPage(newPage - 1)
-    }
-
-    const {items} = usePagination({
-        count: rows.length / rowsPerPage,
-        onChange: handleChangePage
-    })
-
-    function saveCarProfile() {
-        setModalState(false)
-        toast.success('Created Successfully!')
-    }
+    useEffect(() => {
+        retrieveInventoryStatistics()
+    }, [])
 
     return (
         <Container>
-            <div>
-                <Toaster
-                    position="top-right"
-                    toastOptions={{
-                        style: {
-                            border: '1px solid #243773',
-                            padding: '16px',
-                            fontWeight: 'bold',
-                            color: '#243773'
-                        },
-                        iconTheme: {
-                            primary: '#243773',
-                            secondary: '#FFFAEE'
-                        }
-                    }}
-                />
-            </div>
+            <CPToast/>
+            {createTrade && <CreateTrade modalOpen={createTrade} onClick={() => setCreateTrade(false)}/>}
+            {addCarProfile && <AddCarProfile modalOpen={addCarProfile} onClick={() => setAddCarProfile(false)}/>}
             <Header>
                 <Typography variant="h4">
                     <b>Inventory</b>
                 </Typography>
                 <ActionBar>
                     <Button text="Add Car Profile" width={150} marginLeft="18px"
-                            onClick={() => showModal('createCarProfile', '')}/>
+                            onClick={() => setAddCarProfile(true)}/>
                     <Button
                         text="Create Brand"
                         width={150}
@@ -164,7 +112,7 @@ function InventoryPage() {
                         width={150}
                         outlined={true}
                         marginLeft="18px"
-                        onClick={() => showModal('addCar', 'Select Car')}
+                        onClick={() => setCreateTrade(true)}
                     />
                 </ActionBar>
             </Header>
@@ -190,7 +138,7 @@ function InventoryPage() {
                     <Card>
                         <Typography variant="h6">Car Listings</Typography>
                         <div className="bottom">
-                            <div className="count">800</div>
+                            <div className="count">{formatNumber(tradeStats.car_listing)}</div>
                             <Button text="View All" width="84px" onClick={() => {
                                 handleNavigation('/inventory/car-listings')
                             }}/>
@@ -201,7 +149,7 @@ function InventoryPage() {
                     <Card>
                         <Typography variant="h6">Under Inspection</Typography>
                         <div className="bottom">
-                            <div className="count">1,200</div>
+                            <div className="count">{formatNumber(tradeStats.under_inspection)}</div>
                             <Button text="View All" width="84px" onClick={() => {
                                 handleNavigation('/inventory/under-inspection')
                             }}/>
@@ -215,7 +163,7 @@ function InventoryPage() {
                             <div className='success'>controlled by created trade</div>
                         </div>
                         <div className="bottom">
-                            <div className="count">300</div>
+                            <div className="count">{formatNumber(tradeStats.passed_for_trade)}</div>
                             <Button text="View All" width="84px" onClick={() => {
                                 handleNavigation('/inventory/available-for-trade')
                             }}/>
@@ -229,7 +177,7 @@ function InventoryPage() {
                             <div className='danger'>system controlled</div>
                         </div>
                         <div className="bottom">
-                            <div className="count">250</div>
+                            <div className="count">{formatNumber(tradeStats.ongoing_trade)}</div>
                             <Button text="View All" width="84px" onClick={() => {
                                 handleNavigation('/inventory/ongoing-trade')
                             }}/>
@@ -243,7 +191,7 @@ function InventoryPage() {
                             <div className='danger'>system controlled</div>
                         </div>
                         <div className="bottom">
-                            <div className="count">150</div>
+                            <div className="count">{formatNumber(tradeStats.sold)}</div>
                             <Button text="View All" width="84px" onClick={() => {
                                 handleNavigation('/inventory/sold')
                             }}/>
@@ -254,7 +202,7 @@ function InventoryPage() {
                     <Card>
                         <Typography variant="h6">Archived</Typography>
                         <div className="bottom">
-                            <div className="count">20</div>
+                            <div className="count">{formatNumber(tradeStats.archived)}</div>
                             <Button text="View All" width="84px" onClick={() => {
                                 handleNavigation('/inventory/archived')
                             }}/>
@@ -287,102 +235,6 @@ function InventoryPage() {
                             : ''}{' '}
                         &nbsp;
                     </Typography>
-                    {modalView === 'addCar' && (
-                        <>
-                            <Typography variant="inherit">
-                                Select Car From Created Trade
-                            </Typography>
-                            <FormControl
-                                style={{
-                                    width: '794px',
-                                    display: 'flex',
-                                    marginTop: '20px',
-                                    marginBottom: '10px'
-                                }}
-                                variant="standard"
-                            >
-                                <InputLabel htmlFor="standard-adornment-password">
-                                    Search
-                                </InputLabel>
-                                <Input
-                                    id="standard-adornment-password"
-                                    type="text"
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton aria-label="toggle password visibility">
-                                                <SearchOutlined/>
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                />
-                            </FormControl>
-                            <TableCard style={{height: 480, overflowY: 'auto'}}>
-                                <TableContainer>
-                                    <Table style={{minWidth: 650}} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell align="left">Image</TableCell>
-                                                <TableCell align="left">Car</TableCell>
-                                                <TableCell align="left">Trade ID</TableCell>
-                                                <TableCell align="left">VIN</TableCell>
-                                                <TableCell align="left">Date Created</TableCell>
-                                                <TableCell align="left">Trade Status</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {rows
-                                                .slice(
-                                                    page * rowsPerPage,
-                                                    page * rowsPerPage + rowsPerPage
-                                                )
-                                                .map((row) => (
-                                                    <TableRow
-                                                        key={row.idx}
-                                                        style={{
-                                                            cursor: 'pointer',
-                                                            background:
-                                                                selectedCarId === row.idx
-                                                                    ? t.primaryExtraLite
-                                                                    : 'white'
-                                                        }}
-                                                        onClick={() => setSelectedCar(row.idx)}
-                                                    >
-                                                        <TableCell component="th" scope="row">
-                                                            <img
-                                                                src={row.imageUrl}
-                                                                width={48}
-                                                                height={48}
-                                                                alt="car"
-                                                                style={{borderRadius: '8px'}}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell align="left">
-                                                            {row.model} {row.make} {row.year}
-                                                        </TableCell>
-                                                        <TableCell align="left">{row.idx}</TableCell>
-                                                        <TableCell align="left">{row.vin}</TableCell>
-                                                        <TableCell align="left">{row.dateListed}</TableCell>
-                                                        <TableCell align="left">
-                                                            {row.tradeStatus}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </TableCard>
-                            <div style={{display: 'flex', marginTop: 20}}>
-                                <Button
-                                    text="Proceed"
-                                    width={510}
-                                    marginLeft="auto"
-                                    marginRight="auto"
-                                    onClick={() => showModal('createTrade', 'Create Trade')}
-                                    disabled={selectedCarId === null}
-                                />
-                            </div>
-                        </>
-                    )}
                     {modalView === 'createBrand' && (
                         <>
                             <InputGrid>
@@ -518,331 +370,6 @@ function InventoryPage() {
                             />
                         </>
                     )}
-                    {modalView === 'createTrade' && (
-                        <>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Creating Trade for
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12} style={{display: 'flex'}}>
-                                    <VehicleDetails style={{width: 700}}>
-                                        <img
-                                            src="/images/Big-Default-Car.png"
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                Trade ID 09890
-                                            </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
-                                        </div>
-                                    </VehicleDetails>
-                                    <Button
-                                        text="Go to Car Profile"
-                                        width={150}
-                                        outlined={true}
-                                        onClick={() => handleNavigation(`/inventory/car-profile/1?status=Available For Trade`)}
-                                    />
-                                </Grid>
-                            </InfoSection>
-                            <ModalSplitContainer>
-                                <div className="left">
-                                    <div className="title">Trade Information</div>
-                                    <TextField className="input" placeholder="Slot Quantity"/>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Price per slot"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">%</div>
-                                        <TextField
-                                            placeholder="Estimated ROT per slot"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                    <TextField
-                                        className="input"
-                                        placeholder="Trading Duration in Months"
-                                    />
-                                    <div
-                                        className="title"
-                                        style={{marginBottom: 20, marginTop: 40}}
-                                    >
-                                        Carpadi Commission
-                                    </div>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField placeholder="Bought price" fullWidth></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Maximum selling price"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Maximum selling price"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                </div>
-                                <div className="right">
-                                    <div className="title">Trade Summary</div>
-                                    <div className="content">
-                                        <Grid item xs={12}>
-                                            <PriceCard style={{background: t.alertSuccessLite}}>
-                                                <Typography variant="body1">
-                                                    Total Slot Price + Total ROT
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
-                                            </PriceCard>
-                                            <Statistic>
-                                                <div className="key">Initial + ROT</div>
-                                                <div className="value">&#8358; 0.00</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Sold Slot Price</div>
-                                                <div className="value">&#8358; 0.00</div>
-                                            </Statistic>
-                                            <PriceCard style={{marginTop: 40}}>
-                                                <Typography variant="body1">
-                                                    Estimated Carpadi minimum Profit on Sales
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
-                                            </PriceCard>
-                                            <PriceCard
-                                                style={{
-                                                    background: t.alertSuccessLite,
-                                                    marginTop: 20
-                                                }}
-                                            >
-                                                <Typography variant="body1">
-                                                    Estimated Carpadi maximum Profit on Sales
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
-                                            </PriceCard>
-                                        </Grid>
-                                    </div>
-                                </div>
-                            </ModalSplitContainer>
-                            <Button
-                                text={modalTitle}
-                                width={590}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop="40px"
-                                onClick={() => saveTrade()}
-                            />
-                        </>
-                    )}
-                    {modalView === 'createCarProfile' && (
-                        <>
-                            <Info>
-                                <img
-                                    src="/images/Fetched-car-Green.png"
-                                    alt="Trash"
-                                    height={98}
-                                    width={98}
-                                />
-                                <Typography
-                                    variant="h6"
-                                    style={{marginTop: 48, marginBottom: 16}}
-                                >
-                                    Upload Vehicle Info
-                                </Typography>
-                                <Typography
-                                    variant="subtitle2"
-                                    style={{maxWidth: 206, marginBottom: 39}}
-                                >
-                                    Kindly provide the registration number (VIN) of the car below
-                                </Typography>
-                                <TextField fullWidth placeholder={'Enter VIN number'}/>
-                                <Button
-                                    text="Fetch Car Information"
-                                    width={372}
-                                    marginTop={30}
-                                    onClick={() => showModal('fetchedCarProfile', 'Fetched Car Profile')}
-                                />
-                            </Info>
-                        </>
-                    )}
-                    {modalView === 'fetchedCarProfile' && (
-                        <>
-                            <HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>
-                            <TextField placeholder='VIN (Number Plate)' style={{width: 330, marginBottom: 30}}/>
-                            <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Info</HeaderText>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="VIN"
-                                />
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Color"
-                                    type='color'
-                                />
-                            </InputGrid>
-                            <InputGrid>
-                                <FormControl fullWidth>
-                                    <Select
-                                        value={transmissionType}
-                                        onChange={(event) =>
-                                            setTransmissionType(String(event.target.value))
-                                        }
-                                        displayEmpty
-                                        inputProps={{'aria-label': 'Without label'}}
-                                    >
-                                        <option value="" disabled>
-                                            Transmission Type
-                                        </option>
-                                        <option value={'Manual'}>Manual</option>
-                                        <option value={'Automatic'}>Automatic</option>
-                                    </Select>
-                                </FormControl>
-                                <FormControl fullWidth>
-                                    <Select
-                                        value={fuelType}
-                                        onChange={(event) =>
-                                            setFuelType(String(event.target.value))
-                                        }
-                                        displayEmpty
-                                        inputProps={{'aria-label': 'Without label'}}
-                                    >
-                                        <option value="" disabled>
-                                            Fuel Type
-                                        </option>
-                                        <option value={'Petrol'}>Petrol</option>
-                                        <option value={'Diesel'}>Diesel</option>
-                                    </Select>
-                                </FormControl>
-                            </InputGrid>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Vehicle Age"
-                                />
-                                <FormControl fullWidth>
-                                    <Select
-                                        value={seatNumber}
-                                        onChange={(event) =>
-                                            setSeatNumber(Number(event.target.value))
-                                        }
-                                        displayEmpty
-                                        inputProps={{'aria-label': 'Without label'}}
-                                    >
-                                        <option value="" disabled>
-                                            Number of Setas
-                                        </option>
-                                        <option value={'4'}>4</option>
-                                        <option value={'5'}>5</option>
-                                        <option value={'6'}>6</option>
-                                        <option value={'7'}>7</option>
-                                        <option value={'8'}>8</option>
-                                    </Select>
-                                </FormControl>
-                            </InputGrid>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Make"
-                                />
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Current Mileage"
-                                />
-                            </InputGrid>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Year"
-                                />
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Model"
-                                />
-                            </InputGrid>
-                            <Button
-                                text="Proceed"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={40}
-                                onClick={() => showModal('uploadCarImages', 'Upload Car Images', 'Upload minimum of 5 images to complete profile')}
-                            />
-                        </>
-                    )}
-                    {modalView === 'uploadCarImages' && (
-                        <>
-                            <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                            </ImageGrid>
-                            <ImageUpload>
-                                <div className='content'>
-                                    <Image src='/images/Upload.png' alt='Upload' height={38} width={44}/>
-                                    <div style={{marginTop: 10}}>
-                                        Upload Vehicle Image
-                                    </div>
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        ref={hiddenFileInput}
-                                        onChange={handleFileChange}
-                                        style={{display: 'none'}}
-                                    />
-                                    <Button text='Upload' width={128} marginTop={40}
-                                            onClick={() => handleFileClick(event)}/>
-                                </div>
-                            </ImageUpload>
-                            <Button
-                                text="Create Car Profile"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={50}
-                                onClick={() => saveCarProfile()}
-                            />
-                        </>
-                    )}
                 </ModalBody>
             </Modal>
         </Container>
@@ -881,34 +408,6 @@ const ModalBodyHeader = styled.div`
   justify-content: space-between;
   align-items: center;
 `
-const HeaderText = withStyles({
-    root: {
-        color: t.lightGrey,
-        fontWeight: 'bold',
-        display: 'block'
-    }
-})(Typography)
-const PriceCard = withStyles({
-    elevation1: {boxShadow: 'none'},
-    root: {
-        height: '100px',
-        width: '100%',
-        padding: '13px 19px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        background: `${t.primaryExtraLite}`
-    }
-})(Paper)
-const InfoSection = withStyles({
-    root: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: '20px',
-        marginTop: '8px'
-    }
-})(Grid)
 const Card = styled.div`
   min-width: 356px;
   height: 235px;
@@ -1010,26 +509,6 @@ const FlexRow = styled.div`
     margin-right: 10px;
   }
 `
-const VehicleDetails = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: end;
-  margin-bottom: 27px;
-
-  .stats {
-    height: 100%;
-    margin-left: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    .trade {
-      color: ${t.primaryBlue};
-      margin-top: 36px;
-      margin-bottom: 17px;
-    }
-  }
-`
 const Statistic = styled.div`
   display: flex;
   flex-direction: row;
@@ -1045,58 +524,6 @@ const Statistic = styled.div`
   .value {
     font-weight: bold;
   }
-`
-const ModalSplitContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin-top: 20px;
-  min-width: 800px;
-
-  .left,
-  .right {
-    display: flex;
-    flex-direction: column;
-
-    .title {
-      font-weight: bold;
-      color: ${t.grey};
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-  }
-
-  .left {
-    width: 45%;
-    margin-right: 24px;
-    display: flex;
-    flex-direction: column;
-
-    .input {
-      margin-bottom: 30px;
-    }
-  }
-
-  .right {
-    width: 55%;
-
-    .content {
-      border: 2px solid ${t.extraLiteGrey};
-      border-radius: 12px;
-      padding: 20px;
-    }
-
-    .title {
-      font-weight: bold;
-      color: ${t.grey};
-      margin-bottom: 10px;
-    }
-  }
-`
-const Info = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
 `
 const InputGrid = styled.div`
   display: grid;
@@ -1129,50 +556,3 @@ const InputGrid = styled.div`
     margin: auto;
   }
 `
-const ImageGrid = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  justify-content: space-between;
-
-  .image {
-    margin-bottom: 14px;
-    object-fit: cover;
-    border-radius: 14px;
-    height: 130px;
-    width: 135px;
-    position: relative;
-
-    .delete {
-      position: absolute;
-      right: 8px;
-      top: 8px;
-      cursor: pointer;
-    }
-
-    &:not(:last-child) {
-      margin-right: 14px;
-    }
-  }
-`
-const ImageUpload = styled.div`
-  border: 2px solid ${t.extraLiteGrey};
-  border-radius: 14px;
-  padding: 31px;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-
-  .content {
-    display: inherit;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-`
-
-const TableCard = withStyles({
-    elevation1: {boxShadow: 'none'}
-})(Paper)
