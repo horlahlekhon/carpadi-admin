@@ -37,6 +37,7 @@ function UsersPage() {
     const [selectedUsers, setSelected] = useState(Users.TOTAL)
     const [page, setPage] = useState(0)
     const [users, setUsers] = useState([])
+    const [status, setStatus] = useState('active')
     const [paginationKeys, setPagination] = useState({
         "count": 0,
         "next": null,
@@ -64,8 +65,8 @@ function UsersPage() {
             })
     }
 
-    const retrieveUsers = (tradeStatus = '', page = 0) => {
-        merchantService.retrieveMerchants(rowsPerPage, page, tradeStatus)
+    const retrieveUsers = ({tradeStatus = '', page = 0, status = ''}) => {
+        merchantService.retrieveMerchants(rowsPerPage, page, tradeStatus, '', status)
             .then((response) => {
                 if (response.status) {
                     setUsers(response.data.results)
@@ -86,12 +87,15 @@ function UsersPage() {
 
     useEffect(() => {
         retrieveUserStats();
-        retrieveUsers()
+        retrieveUsers({})
     }, [])
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
-        retrieveUsers(selectedUsers === Users.ACTIVE ? 'actively_trading' : selectedUsers === Users.NO_TRADING ? 'not_actively_trading' : '', newPage - 1)
+        retrieveUsers({
+            tradeStatus: selectedUsers === Users.ACTIVE ? 'actively_trading' : selectedUsers === Users.NO_TRADING ? 'not_actively_trading' : '',
+            page: newPage - 1
+        })
     }
 
     const handleNavigation = (action: string) => {
@@ -125,6 +129,18 @@ function UsersPage() {
         count: Math.ceil(paginationKeys.count / rowsPerPage),
         onChange: handleChangePage
     })
+
+    const filterByStatus = () => {
+        if (status === 'active') {
+            retrieveUsers({status: 'inactive'})
+            setStatus('inactive')
+        } else if (status === 'inactive') {
+            retrieveUsers({status: 'active'})
+            setStatus('active')
+        } else {
+            retrieveUsers({})
+        }
+    }
 
     return (
         <Container>
@@ -160,7 +176,7 @@ function UsersPage() {
                         onClick={() => {
                             setSelected(Users.TOTAL)
                             setPage(0);
-                            retrieveUsers('')
+                            retrieveUsers({tradeStatus: ''})
                         }}
                         style={{
                             border:
@@ -186,7 +202,7 @@ function UsersPage() {
                         onClick={() => {
                             setSelected(Users.ACTIVE)
                             setPage(0);
-                            retrieveUsers('actively_trading')
+                            retrieveUsers({tradeStatus: 'actively_trading'})
                         }}
                         style={{
                             border:
@@ -212,7 +228,7 @@ function UsersPage() {
                         onClick={() => {
                             setSelected(Users.NO_TRADING)
                             setPage(0);
-                            retrieveUsers('not_actively_trading')
+                            retrieveUsers({tradeStatus: 'not_actively_trading'})
                         }}
                         style={{
                             border:
@@ -240,7 +256,7 @@ function UsersPage() {
                         onClick={() => {
                             setSelected(Users.INACTIVE)
                             setPage(0);
-                            retrieveUsers('')
+                            retrieveUsers({tradeStatus: ''})
                         }}
                         style={{
                             border:
@@ -256,7 +272,7 @@ function UsersPage() {
             </Grid>
             <TableCard>
                 <TableFilters>
-                    <div className="filter">Filter by Status</div>
+                    <div className="filter" onClick={() => filterByStatus()}>Filter by Status</div>
                     <div className="filter">Filter by Date</div>
                 </TableFilters>
                 <TableContainer>
@@ -277,12 +293,12 @@ function UsersPage() {
                         <TableBody>
                             {users
                                 .map((row, idx) => (
-                                    <TableRow key={row.idx}>
+                                    <TableRow key={idx}>
                                         <TableCell component="th" scope="row">
                                             {idx}
                                         </TableCell>
                                         <TableCell component="th" scope="row">
-                                            <img alt={row.user.username} src={row.user.profile_picture} width={40}
+                                            <img alt={row.user?.first_name} src={row.user.profile_picture} width={40}
                                                  height={40}
                                                  style={{borderRadius: '50%'}}/>
 
@@ -318,7 +334,7 @@ function UsersPage() {
                                                 text="View"
                                                 width={66}
                                                 outlined={true}
-                                                onClick={() => handleNavigation(`users/${row.user.id}`)}
+                                                onClick={() => handleNavigation(`users/${row.id}`)}
                                             />
                                         </TableCell>
                                     </TableRow>
