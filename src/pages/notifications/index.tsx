@@ -1,260 +1,298 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import { Grid, Paper, Typography, withStyles } from '@material-ui/core'
-import { t } from '../../styles/theme'
-import { useState } from 'react'
-import { useRouter } from 'next/router'
+import {CircularProgress, Grid, Paper, Typography, withStyles} from '@material-ui/core'
+import {t} from '../../styles/theme'
+import {useEffect, useState} from 'react'
+import {useRouter} from 'next/router'
 import Image from 'next/image'
 import Button from '../../components/shared/Button'
+import {retrieveActivities} from "../../services/activity";
+import {toast} from "react-hot-toast";
+import CPToast from "../../components/shared/CPToast";
 
 function NotificationsPage() {
-  const router = useRouter()
-  enum NotificationType {
-    TRADING,
-    USERS,
-    GENERAL
-  }
-  const [notificationTab, setNotificationTab] = useState(
-    NotificationType.TRADING
-  )
+    const router = useRouter()
 
-  const updateNotificationType = (type: NotificationType) => {
-    setNotificationTab(type)
-  }
+    enum NotificationType {
+        TRADING = 'trade_unit',
+        USERS = 'new_user',
+        GENERAL = ''
+    }
 
-  const handleNavigation = (action: string) => {
-    router.replace(`${action}`)
-  }
+    const [notificationTab, setNotificationTab] = useState(
+        NotificationType.TRADING
+    )
+    const [activities, setActivities] = useState([])
+    const [isLoading, setLoading] = useState(false)
 
-  return (
-    <Container>
-      <Header>
-        <Typography variant="h4">
-          <b>Notifications</b>
-        </Typography>
-      </Header>
-      <Grid container spacing={4}>
-        <Grid item xs={6}>
-          <Activities>
-            <CardHeader style={{ justifyContent: 'start' }}>
-              <ActivityTab
-                className={`${
-                  notificationTab === NotificationType.TRADING ? 'active' : ''
-                }`}
-                onClick={() => updateNotificationType(NotificationType.TRADING)}
-              >
-                Trading
-                <NotificationCount>3</NotificationCount>
-              </ActivityTab>
-              <ActivityTab
-                className={`${
-                  notificationTab === NotificationType.USERS ? 'active' : ''
-                }`}
-                onClick={() => updateNotificationType(NotificationType.USERS)}
-              >
-                Users
-              </ActivityTab>
-              <ActivityTab
-                className={`${
-                  notificationTab === NotificationType.GENERAL ? 'active' : ''
-                }`}
-                onClick={() => updateNotificationType(NotificationType.GENERAL)}
-              >
-                General
-              </ActivityTab>
-            </CardHeader>
-            <ActivitiesBody>
-              <Typography
-                variant="h6"
-                style={{ fontWeight: 600, marginBottom: 24 }}
-              >
-                All Trade Activities
-              </Typography>
-              {notificationTab === NotificationType.TRADING &&
-                [...Array.from({ length: 8 })].map((_, i) => (
-                  <ActivityItem
-                    key={i}
-                    onClick={() => {
-                      handleNavigation(`/users/${i}/trade-activities`)
-                    }}
-                  >
-                    <ActivityImage>
-                      <Image
-                        src="/icons/Users-Blue.svg"
-                        width={16}
-                        height={21}
-                      />
-                    </ActivityImage>
-                    <ActivityItemText>
-                      <div>
-                        <b>James Lee</b> bought 3 shares of
-                        <b> 2018 Carmy model</b> with <b> ID 093290</b>
-                      </div>
-                    </ActivityItemText>
-                  </ActivityItem>
-                ))}
-              {notificationTab === NotificationType.USERS &&
-                [...Array.from({ length: 8 })].map((_, i) => (
-                  <ActivityItem
-                    key={i}
-                    onClick={() => {
-                      handleNavigation(`/users/${i}/trade-activities`)
-                    }}
-                  >
-                    <ActivityImage style={{ borderRadius: '50%' }}>
-                      <Image
-                        src="/icons/Users-Blue.svg"
-                        width={16}
-                        height={21}
-                      />
-                    </ActivityImage>
-                    <ActivityItemText>
-                      <div>
-                        <b>James Lee</b> joined Carpadi
-                      </div>
-                      <ActivityItemDate>
-                        <div>11/03/2022</div>
-                        <div>12:30</div>
-                      </ActivityItemDate>
-                    </ActivityItemText>
-                  </ActivityItem>
-                ))}
-              {notificationTab === NotificationType.GENERAL &&
-                [...Array.from({ length: 10 })].map((_, i) => (
-                  <ActivityItem
-                    key={i}
-                    onClick={() => {
-                      handleNavigation(`/users/${i}/trade-activities`)
-                    }}
-                  >
-                    <ActivityImage>
-                      <Image
-                        src="/icons/Users-Blue.svg"
-                        width={16}
-                        height={21}
-                      />
-                    </ActivityImage>
-                    <ActivityItemText>
-                      <div>
-                        <b>2018 Carmy model</b> with <b>ID 093290</b> was added
-                        to listing
-                      </div>
-                    </ActivityItemText>
-                  </ActivityItem>
-                ))}
-            </ActivitiesBody>
-          </Activities>
-        </Grid>
-        <Grid item xs={6}>
-          <Chat>
-            <CardHeader style={{ paddingBottom: '14px' }}>
-              <Typography variant="h6" style={{ fontWeight: 600 }}>
-                Help Center Chat System
-              </Typography>
-              <ChatCTA>
-                <NotificationCount>2</NotificationCount>
-                <Button width={150} marginLeft="16px" text="Select User Chat" />
-              </ChatCTA>
-            </CardHeader>
-            <UserInfo>
-              <ActivityImage
-                style={{ borderRadius: '50%', height: 64, width: 64 }}
-              >
-                <Image src="/icons/Users-Blue.svg" width={16} height={21} />
-              </ActivityImage>
-              <Typography
-                variant="body1"
-                style={{ fontWeight: 600, marginLeft: 16 }}
-              >
-                James Lee <br />
-                <Typography variant="caption">Online</Typography>
-              </Typography>
-            </UserInfo>
-            <Messages>
-              <Message>
-                <MessageContent>
-                  I Did not recieve return on my recent trade,please what is
-                  wrong?
-                </MessageContent>
-                <div className="timestamp">3:45 PM</div>
-              </Message>
-              <Message className="self">
-                <MessageContent className="self">
-                  Sorry to hear that James.Kindly provide me your trading share
-                  Id number to run a check
-                </MessageContent>
-                <div className="timestamp">3:45 PM</div>
-              </Message>
-              <Message>
-                <MessageContent>
-                  I Did not recieve return on my recent trade,please what is
-                  wrong?
-                </MessageContent>
-                <div className="timestamp">3:45 PM</div>
-              </Message>
-              <Message className="self">
-                <MessageContent className="self">
-                  Sorry to hear that James.Kindly provide me your trading share
-                  Id number to run a check
-                </MessageContent>
-                <div className="timestamp">3:45 PM</div>
-              </Message>
-            </Messages>
-            <ChatInput>
-              <input type="text" placeholder="Start a conversation ..." />
-              <div className="actionbar">
-                <div className="attachments">
-                  <img
-                    src="/icons/Typography-Dark-Blue.svg"
-                    width={22}
-                    height={16}
-                    className="attachments-icon"
-                  />
-                  <img
-                    src="/icons/Image-Grey.svg"
-                    width={22}
-                    height={20}
-                    className="attachments-icon"
-                  />
-                </div>
-                <Image
-                  src="/icons/Send-Message-Dark-Blue.svg"
-                  width={29}
-                  height={28}
-                  style={{ cursor: 'pointer' }}
-                />
-              </div>
-              <div className="powered-by">Powered by XYZ</div>
-            </ChatInput>
-          </Chat>
-        </Grid>
-      </Grid>
-    </Container>
-  )
+    const updateNotificationType = (type: NotificationType) => {
+        setActivities([])
+        setNotificationTab(type)
+        retrieveActivityList(type.valueOf())
+    }
+
+    const handleNavigation = (action: string) => {
+        router.push(`${action}`)
+    }
+
+    const retrieveActivityList = (type = notificationTab.valueOf()) => {
+        setLoading(true)
+        retrieveActivities({activityType: type, limit: 50})
+            .then((response) => {
+                if (response.status) {
+                    setActivities(response.data.results)
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }
+
+    useEffect(() => {
+        retrieveActivityList()
+    }, [])
+
+    return (
+        <Container>
+            <CPToast/>
+            <Header>
+                <Typography variant="h4">
+                    <b>Notifications</b>
+                </Typography>
+            </Header>
+            <Grid container spacing={4}>
+                <Grid item xs={6}>
+                    <Activities>
+                        <CardHeader style={{justifyContent: 'start'}}>
+                            <ActivityTab
+                                className={`${
+                                    notificationTab === NotificationType.TRADING ? 'active' : ''
+                                }`}
+                                onClick={() => updateNotificationType(NotificationType.TRADING)}
+                            >
+                                Trading
+                                <NotificationCount>{notificationTab === NotificationType.TRADING ? activities.length : 0}</NotificationCount>
+                            </ActivityTab>
+                            <ActivityTab
+                                className={`${
+                                    notificationTab === NotificationType.USERS ? 'active' : ''
+                                }`}
+                                onClick={() => updateNotificationType(NotificationType.USERS)}
+                            >
+                                Users
+                            </ActivityTab>
+                            <ActivityTab
+                                className={`${
+                                    notificationTab === NotificationType.GENERAL ? 'active' : ''
+                                }`}
+                                onClick={() => updateNotificationType(NotificationType.GENERAL)}
+                            >
+                                General
+                            </ActivityTab>
+                        </CardHeader>
+                        <ActivitiesBody>
+                            <Typography
+                                variant="h6"
+                                style={{fontWeight: 600, marginBottom: 24}}
+                            >
+                                All {notificationTab === NotificationType.TRADING ? 'Trade' : notificationTab === NotificationType.USERS ? 'User' : ''} Activities
+                            </Typography>
+                            {activities.length < 1 && (<div style={{textAlign: 'center'}}>
+                                {isLoading && <CircularProgress/>}
+                                {!isLoading && 'No activities yet'}
+                            </div>)}
+                            {activities.length > 0 && (
+                                <>
+                                    {notificationTab === NotificationType.TRADING &&
+                                        activities.map((activity, i) => (
+                                            <ActivityItem
+                                                key={i}
+                                                onClick={() => {
+                                                    handleNavigation(`/users/${activity?.merchant}/trading-activities`)
+                                                }}
+                                            >
+                                                <ActivityImage>
+                                                    <Image
+                                                        src="/icons/Users-Blue.svg"
+                                                        width={16}
+                                                        height={21}
+                                                    />
+                                                </ActivityImage>
+                                                <ActivityItemText>
+                                                    <div>
+                                                        {activity?.description.replace('Activity Type:', '')}
+                                                    </div>
+                                                </ActivityItemText>
+                                            </ActivityItem>
+                                        ))}
+                                    {notificationTab === NotificationType.USERS &&
+                                        activities.map((activity, i) => (
+                                            <ActivityItem
+                                                key={i}
+                                                onClick={() => {
+                                                    handleNavigation(`/users/${activity?.merchant}`)
+                                                }}
+                                            >
+                                                <ActivityImage style={{borderRadius: '50%'}}>
+                                                    <Image
+                                                        src="/icons/Users-Blue.svg"
+                                                        width={16}
+                                                        height={21}
+                                                    />
+                                                </ActivityImage>
+                                                <ActivityItemText>
+                                                    <div>
+                                                        {activity?.description.replace('Activity Type:', '')}
+                                                    </div>
+                                                    <ActivityItemDate>
+                                                        <div>11/03/2022</div>
+                                                        <div>12:30</div>
+                                                    </ActivityItemDate>
+                                                </ActivityItemText>
+                                            </ActivityItem>
+                                        ))}
+                                    {notificationTab === NotificationType.GENERAL &&
+                                        activities.map((activity, i) => (
+                                            <ActivityItem
+                                                key={i}
+                                                onClick={() => {
+                                                    handleNavigation(`/users/${activity?.merchant}/trading-activities`)
+                                                }}
+                                            >
+                                                <ActivityImage>
+                                                    <Image
+                                                        src="/icons/Users-Blue.svg"
+                                                        width={16}
+                                                        height={21}
+                                                    />
+                                                </ActivityImage>
+                                                <ActivityItemText>
+                                                    <div>
+                                                        {activity?.description.replace('Activity Type:', '')}
+                                                    </div>
+                                                </ActivityItemText>
+                                            </ActivityItem>
+                                        ))}
+                                </>
+                            )}
+                        </ActivitiesBody>
+                    </Activities>
+                </Grid>
+                <Grid item xs={6}>
+                    <Chat>
+                        <CardHeader style={{paddingBottom: '14px'}}>
+                            <Typography variant="h6" style={{fontWeight: 600}}>
+                                Help Center Chat System
+                            </Typography>
+                            <ChatCTA>
+                                <NotificationCount>2</NotificationCount>
+                                <Button width={150} marginLeft="16px" text="Select User Chat"/>
+                            </ChatCTA>
+                        </CardHeader>
+                        <UserInfo>
+                            <ActivityImage
+                                style={{borderRadius: '50%', height: 64, width: 64}}
+                            >
+                                <Image src="/icons/Users-Blue.svg" width={16} height={21}/>
+                            </ActivityImage>
+                            <Typography
+                                variant="body1"
+                                style={{fontWeight: 600, marginLeft: 16}}
+                            >
+                                James Lee <br/>
+                                <Typography variant="caption">Online</Typography>
+                            </Typography>
+                        </UserInfo>
+                        <Messages>
+                            <Message>
+                                <MessageContent>
+                                    I Did not recieve return on my recent trade,please what is
+                                    wrong?
+                                </MessageContent>
+                                <div className="timestamp">3:45 PM</div>
+                            </Message>
+                            <Message className="self">
+                                <MessageContent className="self">
+                                    Sorry to hear that James.Kindly provide me your trading share
+                                    Id number to run a check
+                                </MessageContent>
+                                <div className="timestamp">3:45 PM</div>
+                            </Message>
+                            <Message>
+                                <MessageContent>
+                                    I Did not recieve return on my recent trade,please what is
+                                    wrong?
+                                </MessageContent>
+                                <div className="timestamp">3:45 PM</div>
+                            </Message>
+                            <Message className="self">
+                                <MessageContent className="self">
+                                    Sorry to hear that James.Kindly provide me your trading share
+                                    Id number to run a check
+                                </MessageContent>
+                                <div className="timestamp">3:45 PM</div>
+                            </Message>
+                        </Messages>
+                        <ChatInput>
+                            <input type="text" placeholder="Start a conversation ..."/>
+                            <div className="actionbar">
+                                <div className="attachments">
+                                    <img
+                                        src="/icons/Typography-Dark-Blue.svg"
+                                        width={22}
+                                        height={16}
+                                        className="attachments-icon"
+                                    />
+                                    <img
+                                        src="/icons/Image-Grey.svg"
+                                        width={22}
+                                        height={20}
+                                        className="attachments-icon"
+                                    />
+                                </div>
+                                <Image
+                                    src="/icons/Send-Message-Dark-Blue.svg"
+                                    width={29}
+                                    height={28}
+                                    style={{cursor: 'pointer'}}
+                                />
+                            </div>
+                            <div className="powered-by">Powered by XYZ</div>
+                        </ChatInput>
+                    </Chat>
+                </Grid>
+            </Grid>
+        </Container>
+    )
 }
 
 export default NotificationsPage
 
 NotificationsPage.getLayout = function getLayout(page) {
-  return <MainLayout>{page}</MainLayout>
+    return <MainLayout>{page}</MainLayout>
 }
 
 const Activities = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    height: 'calc(100vh - 200px)',
-    display: 'flex',
-    flexDirection: 'column'
-  }
+    elevation1: {boxShadow: 'none'},
+    root: {
+        height: 'calc(100vh - 200px)',
+        display: 'flex',
+        flexDirection: 'column'
+    }
 })(Paper)
 
 const Chat = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    height: 'calc(100vh - 200px)',
-    display: 'flex',
-    flexDirection: 'column'
-  }
+    elevation1: {boxShadow: 'none'},
+    root: {
+        height: 'calc(100vh - 200px)',
+        display: 'flex',
+        flexDirection: 'column'
+    }
 })(Paper)
 
 const Messages = styled.div`
@@ -270,6 +308,7 @@ const Message = styled.div`
   display: flex;
   flex-direction: column;
   margin-bottom: 20px;
+
   .timestamp {
     font-size: 12px;
     color: ${t.lightGrey};
@@ -318,6 +357,7 @@ const ChatInput = styled.div`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+
     .attachments {
       width: 100%;
       display: flex;
