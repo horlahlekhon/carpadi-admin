@@ -12,19 +12,31 @@ import {
     withStyles
 } from '@material-ui/core'
 import {t} from '../../../styles/theme'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
 import Button from '../../../components/shared/Button'
 import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
+import {retrieveCars} from "../../../services/car";
+import {toast} from "react-hot-toast";
+import {CarStatus} from "../../../lib/enums";
+import {formatDate} from "../../../helpers/formatters";
 
 function CarListingsPage() {
     const rowsPerPage = 10
     const router = useRouter()
     const [page, setPage] = useState(0)
+    const [cars, setCars] = useState([])
+    const [refCars, setRefCars] = useState([])
+    const [paginationKeys, setPagination] = useState({
+        "count": 0,
+        "next": null,
+        "previous": null,
+    })
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
+        retrieveCarList(newPage - 1)
     }
 
     const handleNavigation = (action: string) => {
@@ -54,46 +66,32 @@ function CarListingsPage() {
 
     const classes = useStyles()
 
-    function createData(
-        idx: number,
-        imageUrl: string,
-        vin: string,
-        make: string,
-        model: string,
-        year: number,
-        fuelType: string,
-        transmissionType: string,
-        dateListed: string
-    ) {
-        return {
-            idx,
-            imageUrl,
-            vin,
-            make,
-            model,
-            year,
-            fuelType,
-            transmissionType,
-            dateListed
-        }
+    const retrieveCarList = (page = 0) => {
+        retrieveCars(rowsPerPage, page, CarStatus.ALL)
+            .then((response) => {
+                if (response.status) {
+                    setPagination({
+                        "count": response.data.count,
+                        "next": response.data.next,
+                        "previous": response.data.previous,
+                    })
+                    setCars(response.data.results)
+                    setRefCars(response.data.results)
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
     }
 
-    const rows = Array.from(Array(300).keys()).map((i) => {
-        return createData(
-            i + 1,
-            '/images/Default-Car.png',
-            `VID-11${i}`,
-            'Toyota',
-            'Rav 4',
-            2004,
-            'Petrol',
-            'Automatic',
-            new Date().toISOString().split('T')[0]
-        )
-    })
+    useEffect(() => {
+        retrieveCarList(0)
+    }, [])
 
     const {items} = usePagination({
-        count: rows.length / rowsPerPage,
+        count: Math.ceil(paginationKeys.count / rowsPerPage),
         onChange: handleChangePage
     })
 
@@ -142,33 +140,33 @@ function CarListingsPage() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row) => (
+                            {cars
+                                .map((row, idx) => (
                                     <TableRow
-                                        key={row.idx}
+                                        key={idx}
                                     >
                                         <TableCell component="th" scope="row">
-                                            {row.idx}
+                                            {idx}
                                         </TableCell>
                                         <TableCell component="th" scope="row">
-                                            <img src={row.imageUrl} width={48} height={48}/>
+                                            <img src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
+                                                 height={48}/>
                                         </TableCell>
                                         <TableCell align="left">{row.vin}</TableCell>
-                                        <TableCell align="left">{row.make}</TableCell>
-                                        <TableCell align="left">{row.model}</TableCell>
-                                        <TableCell align="left">{row.year}</TableCell>
-                                        <TableCell align="left">{row.fuelType}</TableCell>
+                                        <TableCell align="left">{row?.information?.make}</TableCell>
+                                        <TableCell align="left">{row?.information?.model}</TableCell>
+                                        <TableCell align="left">{row?.information?.year}</TableCell>
+                                        <TableCell align="left">{row?.information?.fuel_type}</TableCell>
                                         <TableCell align="left">
-                                            {row.transmissionType}
+                                            {row?.information?.transmission}
                                         </TableCell>
-                                        <TableCell align="left">{row.dateListed}</TableCell>
+                                        <TableCell align="left">{formatDate(row?.information?.created)}</TableCell>
                                         <TableCell align="left">
                                             <Button
                                                 text="View"
                                                 width={66}
                                                 outlined={true}
-                                                onClick={() => handleNavigation(`/inventory/car-profile/${row.vin}?status=car listings`)}
+                                                onClick={() => handleNavigation(`/inventory/car-profile/${row.id}?status=car listings`)}
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -178,8 +176,8 @@ function CarListingsPage() {
                 </TableContainer>
                 <TableFooter>
                     <div>
-                        Showing page {page + 1} of {Math.ceil(rows.length / rowsPerPage)}/{' '}
-                        {rows.length} Total Items
+                        Showing page {page + 1} of {Math.ceil(paginationKeys.count / rowsPerPage)}/{' '}
+                        {paginationKeys.count} Total Items
                     </div>
 
                     <nav>
