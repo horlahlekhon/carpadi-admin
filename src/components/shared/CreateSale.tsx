@@ -16,16 +16,27 @@ import Button from "./Button";
 import {Add, SearchOutlined} from "@material-ui/icons";
 import ToggleSwitch from "./ToggleSwitch";
 import {useRouter} from "next/router";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {retrieveCars} from "../../services/car";
 import {toast} from "react-hot-toast";
-import {formatDate, trimString} from "../../helpers/formatters";
+import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "./CPToast";
+import {createSale} from "../../services/sale";
+import {uploadFile} from "../../services/upload";
 
 const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     const router = useRouter()
+    const refKeyFeature = {
+        name: '',
+        feature_images: []
+    }
     const rowsPerPage = 50
     const [modalView, setModalView] = useState('addCar')
+    const [sellingPrice, setSellingPrice] = useState(0)
+    const [highlight, setHighlight] = useState('')
+    const [keyFeatures, setKeyFeatures] = useState([])
+    const [keyFeature, setKeyFeature] = useState(refKeyFeature)
+    const [kfIdx, setKFIdx] = useState(0)
     const [selectedCar, setSelectedCar] = useState(null)
     const [isLoading, setLoading] = useState(false)
     const [state, setState] = useState({
@@ -34,6 +45,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     const [cars, setCars] = useState([])
     const [refCars, setRefCars] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
+    const [uploadedPictures, setUploadedPictures] = useState([]);
     const options = {
         addCar: {
             title: 'Select Car',
@@ -49,9 +61,61 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
         },
     }
 
+    const hiddenFileInput = useRef(null);
+    const hiddenFileInput2 = useRef(null);
+
     const handleNavigation = (action: string) => {
         router.push(`${action}`)
             .then(() => {
+            })
+    }
+
+    const handleFileClick = event => {
+        hiddenFileInput.current.click();
+    };
+
+    const handleFileChange = event => {
+        const fileUploaded = event.target.files[0];
+        handleFile(fileUploaded);
+    };
+
+    const handleFileChange2 = event => {
+        const fileUploaded = event.target.files[0];
+        uploadFile(fileUploaded)
+            .then((res) => {
+                if (res.status) {
+                    const url = res.data.secure_url;
+                    const arr = [...keyFeatures];
+                    arr[kfIdx].feature_images.push(url)
+                    setKeyFeatures(arr)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    };
+
+    const handleFile = (file) => {
+        setLoading(true)
+        uploadFile(file)
+            .then((res) => {
+                if (res.status) {
+                    const arr = [...uploadedPictures, res.data];
+                    setUploadedPictures(arr)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setLoading(false)
             })
     }
 
@@ -93,8 +157,64 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
         }
     }, [car])
 
+    const addKeyfeature = () => {
+        const arr = [...keyFeatures, keyFeature];
+        setKeyFeatures(arr)
+        setKeyFeature(refKeyFeature)
+    }
+
+    function saveSale() {
+        setLoading(true)
+        const sale = {
+            "images": selectedCar?.pictures,
+            "features": keyFeatures,
+            "highlight": highlight,
+            "selling_price": sellingPrice,
+            "status": state.saleActive ? 'active' : 'inactive',
+            "car": selectedCar.information.id,
+        }
+        return createSale(sale)
+            .then((data) => {
+                if (data.status) {
+                    toast.success('Sale Created')
+                    onClick()
+                    handleNavigation(`/sales/${data.data.id}`)
+                } else {
+                    toast.error(data?.data || "An error occurred")
+                }
+                setLoading(false)
+            })
+            .catch(error => {
+                toast.error(error)
+                setLoading(false)
+            });
+    }
+
+    function deleteKfImage(idx, url) {
+        const arr = keyFeatures[idx].feature_images.filter(a => a !== url);
+        setKeyFeatures(arr)
+    }
+
+    function addKfImage(idx) {
+        setKFIdx(idx)
+        hiddenFileInput2.current.click();
+    }
+
+    function updateKeyFeature(idx: number, field: string, value: string) {
+        const arr = [...keyFeatures]
+        arr[idx][field] = value;
+        setKeyFeatures(arr)
+    }
+
     return (<>
         <CPToast/>
+        <input
+            type="file"
+            accept="image/*"
+            ref={hiddenFileInput2}
+            onChange={handleFileChange2}
+            style={{display: 'none'}}
+        />
         <Modal
             open={modalOpen}
             onClose={() => {
@@ -244,10 +364,11 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             <Grid item xs={6}>
                                 <VehicleDetails>
                                     <img
-                                        src="/images/Big-Default-Car.png"
+                                        src={selectedCar?.pictures.length > 0 ? selectedCar?.pictures[0] : null}
                                         width={185}
                                         height={135}
                                         style={{borderRadius: '8px'}}
+                                        alt={selectedCar?.name}
                                     />
                                     <div className="stats">
                                         <img
@@ -257,9 +378,9 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                             style={{marginBottom: -15}}
                                         />
                                         <Typography variant="h5" className="trade">
-                                            Trade ID 09890
+                                            Trade ID {trimString(selectedCar?.id)}
                                         </Typography>
-                                        <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                        <Typography variant="h6">{selectedCar?.name}</Typography>
                                     </div>
                                 </VehicleDetails>
                             </Grid>
@@ -279,6 +400,8 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                         <TextField
                             fullWidth
                             placeholder="Accident free | full customs duty paid | good history report ..."
+                            value={highlight}
+                            onChange={(e) => setHighlight(e.target.value)}
                         ></TextField>
                         <HeaderText
                             variant="inherit"
@@ -290,125 +413,75 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             <div className="currency-box">&#8358;</div>
                             <TextField
                                 placeholder="Enter price"
+                                label="Enter price"
                                 style={{width: 400}}
+                                value={sellingPrice}
+                                type='number'
+                                onChange={(e) => setSellingPrice(Number(e.target.value))}
                             ></TextField>
                         </FlexRow>
                         <FlexRow style={{marginBottom: 20}}>
                             <HeaderText>Key Features</HeaderText>
-                            <IconPill>
+                            <IconPill onClick={() => addKeyfeature()}>
                                 Add key feature
                                 <Add className="icon"/>
                             </IconPill>
                         </FlexRow>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                placeholder="Key Feature 1"
-                            />
-                            <div className="input">
-                                <div className="text">Upload Image</div>
-                                <Button
-                                    text="Upload"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    borderRadius="8px"
+                        {keyFeatures.map((kf, idx) => (
+                            <InputGrid key={idx}>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    placeholder={"Key Feature " + idx}
+                                    label={"Key Feature " + idx}
+                                    variant='standard'
+                                    value={keyFeatures[idx].name}
+                                    onChange={(e) => updateKeyFeature(idx, 'name', e.target.value)}
                                 />
-                            </div>
-                        </InputGrid>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                placeholder="Key Feature 2"
-                            />
-                            <div className="input">
-                                <div className="text">engine indlmor.png</div>
-                                <Button
-                                    text="Delete"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    bgColor={t.alertError}
-                                    borderRadius="8px"
-                                />
-                            </div>
-                        </InputGrid>
-                        <FlexRow style={{marginBottom: 20, marginTop: 60}}>
-                            <HeaderText>Car Sales Image</HeaderText>
-                            <IconPill>
-                                Add Image
-                                <Add className="icon"/>
-                            </IconPill>
-                        </FlexRow>
-                        <InputGrid>
-                            <div className="input">
-                                <div className="text">Upload Image</div>
-                                <Button
-                                    text="Upload"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    borderRadius="8px"
-                                />
-                            </div>
-                            <div className="input">
-                                <div className="text">Upload Image</div>
-                                <Button
-                                    text="Upload"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    borderRadius="8px"
-                                />
-                            </div>
-                        </InputGrid>
-                        <InputGrid>
-                            <div className="input">
-                                <div className="text">Upload Image</div>
-                                <Button
-                                    text="Upload"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    borderRadius="8px"
-                                />
-                            </div>
-                            <div className="input">
-                                <div className="text">Upload Image</div>
-                                <Button
-                                    text="Upload"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    borderRadius="8px"
-                                />
-                            </div>
-                        </InputGrid>
-                        <InputGrid>
-                            <div className="input">
-                                <div className="text">Upload Image</div>
-                                <Button
-                                    text="Upload"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    borderRadius="8px"
-                                />
-                            </div>
-                            <div className="input">
-                                <div className="text">engine indlmor.png</div>
-                                <Button
-                                    text="Delete"
-                                    outlined={true}
-                                    width={71}
-                                    height={28}
-                                    bgColor={t.alertError}
-                                    borderRadius="8px"
-                                />
-                            </div>
-                        </InputGrid>
+                                <div className="input">
+                                    <div
+                                        className="text"> {kf.feature_images.length > 0 ? 'Uploaded Image' : 'Upload Image'}</div>
+                                    <Button
+                                        text={kf.feature_images.length > 0 ? "Delete" : "Upload"}
+                                        outlined={true}
+                                        width={71}
+                                        height={28}
+                                        borderRadius="8px"
+                                        bgColor={kf.feature_images.length > 0 ? t.alertError : ''}
+                                        onClick={() => kf.feature_images.length > 0 ? deleteKfImage(idx, kf.feature_images[0]) : addKfImage(idx)}
+                                    />
+                                </div>
+                            </InputGrid>))}
+                        {/*<FlexRow style={{marginBottom: 20, marginTop: 60}}>*/}
+                        {/*    <HeaderText>Car Sales Image</HeaderText>*/}
+                        {/*    <IconPill>*/}
+                        {/*        Add Image*/}
+                        {/*        <Add className="icon"/>*/}
+                        {/*    </IconPill>*/}
+                        {/*</FlexRow>*/}
+                        {/*<InputGrid>*/}
+                        {/*    <div className="input">*/}
+                        {/*        <div className="text">Upload Image</div>*/}
+                        {/*        <Button*/}
+                        {/*            text="Upload"*/}
+                        {/*            outlined={true}*/}
+                        {/*            width={71}*/}
+                        {/*            height={28}*/}
+                        {/*            borderRadius="8px"*/}
+                        {/*        />*/}
+                        {/*    </div>*/}
+                        {/*    <div className="input">*/}
+                        {/*        <div className="text">engine indlmor.png</div>*/}
+                        {/*        <Button*/}
+                        {/*            text="Delete"*/}
+                        {/*            outlined={true}*/}
+                        {/*            width={71}*/}
+                        {/*            height={28}*/}
+                        {/*            bgColor={t.alertError}*/}
+                        {/*            borderRadius="8px"*/}
+                        {/*        />*/}
+                        {/*    </div>*/}
+                        {/*</InputGrid>*/}
                         <div style={{display: 'flex', marginTop: 70}}>
                             <Button
                                 text="Proceed"
@@ -429,8 +502,8 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             <PriceSection container spacing={3}>
                                 <Grid item xs={6}>
                                     <VehicleDetail>
-                                        <Image
-                                            src="/images/Big-Default-Car.png"
+                                        <img
+                                            src={selectedCar?.pictures.length > 0 ? selectedCar?.pictures[0] : null}
                                             height={135}
                                             width={185}
                                             style={{borderRadius: '8px'}}
@@ -443,9 +516,9 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                                 style={{marginBottom: -15}}
                                             />
                                             <Typography variant="h5" className="trade">
-                                                Trade ID 09890
+                                                Trade ID {trimString(selectedCar?.id)}
                                             </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                            <Typography variant="h6">{selectedCar?.name}</Typography>
                                         </div>
                                     </VehicleDetail>
                                 </Grid>
@@ -453,7 +526,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                     <PriceCard>
                                         <div>Selling Price</div>
                                         <Typography variant="h5">
-                                            &#8358; 12,500,000.00
+                                            &#8358; {formatNumber(sellingPrice)}
                                         </Typography>
                                     </PriceCard>
                                 </Grid>
@@ -462,63 +535,20 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 Car Sales Highlight
                             </Typography>
                             <p style={{marginBottom: 40}}>
-                                Interdum et malesuada fames ac ante ipsum primis in faucibus.
-                                Aenean nulla neque, facilisis eget sem in, porttitor porttitor
-                                diam. Maecenas vitae nisi pharetra, dapibus nisl sit amet,
-                                pulvinar erat.
+                                {highlight}
                             </p>
                             <Typography variant="h6" color="secondary">
                                 Key Features
                             </Typography>
                             <Features>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
-                                <div className="key-features">
-                                    <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                    <Typography variant="subtitle1" className="text">
-                                        Leather Seats
-                                    </Typography>
-                                </div>
+                                {keyFeatures.map((kf, idx) => (
+                                    <div className="key-features" key={idx}>
+                                        <img src={kf.feature_images[0]} alt="Feature"/>
+                                        <Typography variant="subtitle1" className="text">
+                                            {kf.name}
+                                        </Typography>
+                                    </div>
+                                ))}
                             </Features>
                             <Typography variant="h6" color="secondary">
                                 Car Sales Image
@@ -526,38 +556,13 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             <Flex>
                                 <div className="gallery">
                                     <ImageGrid>
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
-                                        <img
-                                            src="/images/FullSize-Default-Car.png"
-                                            className="image"
-                                        />
+                                        {selectedCar.pictures.map((im, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={im}
+                                                className="image"
+                                            />
+                                        ))}
                                     </ImageGrid>
                                 </div>
                             </Flex>
@@ -576,11 +581,12 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             </SalesStatus>
                             <div style={{display: 'flex', marginTop: 70}}>
                                 <Button
-                                    text="Create Sales Profile"
+                                    text={isLoading ? "Loading..." : "Create Sales Profile"}
                                     width={510}
                                     marginLeft="auto"
                                     marginRight="auto"
-                                    onClick={() => handleNavigation('/sales/VID-123')}
+                                    disabled={isLoading}
+                                    onClick={() => saveSale()}
                                 />
                             </div>
                         </Body>
