@@ -79,12 +79,12 @@ function HomePage() {
         "end_date": "2022-08-04",
         "filter_year_only": false
     })
-    const [pieChartData, setPieData] = useState([[
-        {name: 'Inspection', value: 10},
-        {name: 'Available', value: 40},
-        {name: 'Trading', value: 35},
-        {name: 'Sold', value: 25}
-    ]])
+    const [pieChartData, setPieData] = useState([
+        {name: 'Inspection', value: 0},
+        {name: 'Available', value: 0},
+        {name: 'Trading', value: 0},
+        {name: 'Sold', value: 0}
+    ])
     const COLORS = ['black', t.primaryDeepBlue, t.primaryBlue, t.primaryLite, t.primaryAshBlue]
 
     const updateYear = (action: string) => {
