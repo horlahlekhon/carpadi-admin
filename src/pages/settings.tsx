@@ -20,11 +20,13 @@ import {
     MonetizationOn,
     Lock
 } from '@material-ui/icons'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
-import {toast, Toaster} from 'react-hot-toast'
+import {toast} from 'react-hot-toast'
 import CPToast from "../components/shared/CPToast";
 import {updateUserPassword} from "../services/user";
+import {retrieveSettings, updateSetting} from "../services/setting";
+
 
 function SettingsPage() {
     const router = useRouter()
@@ -40,13 +42,48 @@ function SettingsPage() {
         confirmPassword: '',
     })
 
+    const [fees, setFees] = useState({
+        "id": null,
+        "created": null,
+        "modified": null,
+        "carpadi_trade_rot_percentage": 0,
+        "merchant_trade_rot_percentage": 0,
+        "transfer_fee": 0,
+        "close_trade_fee": 0
+    })
+
+
     const saveChanges = () => {
         setLoading(true)
         if (currentTab === 'payment-setup') {
             return
         } else if (currentTab === 'fee-management') {
-            return
+            if (fees.merchant_trade_rot_percentage > 0 && fees.carpadi_trade_rot_percentage > 0 && fees.transfer_fee > 0 && fees.close_trade_fee > 0) {
+                updateSetting(fees.id, fees)
+                    .then((res) => {
+                        if (res.status) {
+                            toast.success('Saved!')
+                        } else {
+                            toast.error(res.data)
+                        }
+                    })
+                    .catch((error) => {
+                        toast.error(error)
+                    })
+                    .finally(() => {
+                        setLoading(false)
+                    })
+            } else {
+                toast.error("You have some invalid inputs, please review!")
+                setLoading(false)
+                return;
+            }
         } else if (currentTab === 'security') {
+            if ((values.password !== values.confirmPassword) || (values.password === values.oldPassword)) {
+                toast.error("You have some invalid inputs, please review!")
+                setLoading(false)
+                return;
+            }
             updateUserPassword({old_password: values.oldPassword, new_password: values.password})
                 .then((res) => {
                     if (res.status) {
@@ -93,6 +130,28 @@ function SettingsPage() {
     const handleMouseDownPassword = (event) => {
         event.preventDefault()
     }
+
+    const handleFeeChange = (field, value) => {
+        let obj = {...fees}
+        obj[field] = value
+        setFees(obj)
+    }
+
+    useEffect(() => {
+        retrieveSettings()
+            .then((res) => {
+                if (res.status) {
+                    if (res.data?.results.length > 0) {
+                        setFees(res.data.results[0])
+                    }
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+    }, [])
 
     return (
         <Container>
@@ -239,6 +298,9 @@ function SettingsPage() {
                                     <TextField
                                         placeholder="Enter Fee"
                                         style={{width: 400}}
+                                        type='number'
+                                        value={fees?.transfer_fee}
+                                        onChange={(e) => handleFeeChange('transfer_fee', e.target.value)}
                                     ></TextField>
                                 </FlexRow>
                             </FlexRow>
@@ -249,6 +311,35 @@ function SettingsPage() {
                                     <TextField
                                         placeholder="Enter Fee"
                                         style={{width: 400}}
+                                        type='number'
+                                        value={fees?.close_trade_fee}
+                                        onChange={(e) => handleFeeChange('close_trade_fee', e.target.value)}
+                                    ></TextField>
+                                </FlexRow>
+                            </FlexRow>
+                            <FlexRow style={{marginTop: 30}}>
+                                <span>Traders ROT per slot</span>
+                                <FlexRow style={{width: 220}}>
+                                    <div className="box">%</div>
+                                    <TextField
+                                        placeholder="Enter Percentage"
+                                        style={{width: 400}}
+                                        type='number'
+                                        value={fees?.merchant_trade_rot_percentage}
+                                        onChange={(e) => handleFeeChange('merchant_trade_rot_percentage', e.target.value)}
+                                    ></TextField>
+                                </FlexRow>
+                            </FlexRow>
+                            <FlexRow style={{marginTop: 30}}>
+                                <span>Carpadi ROT per slot</span>
+                                <FlexRow style={{width: 220}}>
+                                    <div className="box">%</div>
+                                    <TextField
+                                        placeholder="Enter Percentage"
+                                        style={{width: 400}}
+                                        type='number'
+                                        value={fees?.carpadi_trade_rot_percentage}
+                                        onChange={(e) => handleFeeChange('carpadi_trade_rot_percentage', e.target.value)}
                                     ></TextField>
                                 </FlexRow>
                             </FlexRow>
@@ -390,7 +481,7 @@ function SettingsPage() {
                         <Button
                             text={isLoading ? "Saving ..." : "Save Changes"}
                             width={372}
-                            disabled={(values.password !== values.confirmPassword) || (values.password === values.oldPassword) || isLoading}
+                            disabled={isLoading}
                             onClick={() => saveChanges()}
                         />
                     </div>
