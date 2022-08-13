@@ -19,6 +19,7 @@ import {useRouter} from "next/router";
 import {tradeService} from "../../services/trade";
 import {retrieveCars} from "../../services/car";
 import {formatDate, trimString} from "../../helpers/formatters";
+import {retrieveSettings} from "../../services/setting";
 
 
 const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
@@ -32,15 +33,28 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
     const [searchTerm, setSearchTerm] = useState('')
     const [trade, setTrade] = useState({
         "car": selectedCar?.id,
-        "slots_available": 0,
+        "slots_available": 1,
         "estimated_return_on_trade": 0,
         "trade_status": selectedCar?.status,
         "min_sale_price": 0,
         "max_sale_price": 0,
-        "estimated_sales_duration": 0,
+        "estimated_sales_duration": 1,
         "bts_time": 0,
         "date_of_sale": new Date()
     })
+    const [fees, setFees] = useState({
+        "id": null,
+        "created": null,
+        "modified": null,
+        "carpadi_trade_rot_percentage": 0,
+        "merchant_trade_rot_percentage": 0,
+        "transfer_fee": 0,
+        "close_trade_fee": 0
+    })
+    const [pricePerslot, setPPS] = useState((Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(trade.slots_available))
+    const [extimatedRot, setEROT] = useState((Number(pricePerslot) * (Number(fees?.merchant_trade_rot_percentage) / 100)))
+    const [minSellingPrice, setMSP] = useState(((Number(pricePerslot) * (Number(fees?.carpadi_trade_rot_percentage) / 100)) * trade.slots_available))
+
     const options = {
         addCar: {
             title: 'Select Car',
@@ -54,6 +68,14 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
 
     const handleTradeChange = (prop) => (event) => {
         setTrade({...trade, [prop]: event.target.value})
+        if (prop === 'slots_available') {
+            const pps = (Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(event.target.value)
+            setPPS(pps)
+            const erot = (Number(pps) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+            setEROT(erot)
+            setMSP((((Number(fees?.carpadi_trade_rot_percentage) / 100)) * ((pps + erot) * Number(event.target.value))) + Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)
+            )
+        }
     }
 
     const handleNavigation = (action: string) => {
@@ -63,7 +85,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
     }
 
     const retrieveCarList = (page = 0) => {
-        retrieveCars(rowsPerPage, page)
+        retrieveCars(rowsPerPage, page, 'inspected')
             .then((response) => {
                 if (response.status) {
                     setCars(response.data.results)
@@ -93,12 +115,32 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
         } else {
             retrieveCarList()
         }
+        retrieveSettings()
+            .then((res) => {
+                if (res.status) {
+                    if (res.data?.results.length > 0) {
+                        setFees(res.data.results[0])
+                    }
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+        setTimeout(() => {
+            setPPS((Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(trade.slots_available))
+            setEROT((Number(pricePerslot) * (Number(fees?.merchant_trade_rot_percentage) / 100)))
+            setMSP(((Number(pricePerslot) * (Number(fees?.carpadi_trade_rot_percentage) / 100)) * trade.slots_available))
+        }, 1000)
     }, [car])
 
     const saveTrade = () => {
         setLoading(true)
         trade['car'] = selectedCar?.id
-        trade['trade_status'] = selectedCar?.status
+        trade['trade_status'] = 'pending'
+        trade['min_sale_price'] = minSellingPrice
+        trade['estimated_return_on_trade'] = Number(minSellingPrice) - (Number(selectedCar?.bought_price) + Number(selectedCar?.cost_of_repairs) + Number(selectedCar?.maintenance_cost))
         return tradeService.createSingleTrade(trade)
             .then((data) => {
                 if (data.status) {
@@ -219,12 +261,12 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                                 src={row.pictures.length > 0 ? row.pictures[0] : null}
                                                                 width={48}
                                                                 height={48}
-                                                                alt={row?.information?.make}
+                                                                alt={row?.information?.brand?.name}
                                                                 style={{borderRadius: '8px'}}
                                                             />
                                                         </TableCell>
                                                         <TableCell align="left">
-                                                            {row?.information?.make} {row?.information?.model} {row?.information?.year}
+                                                            {row?.name || row?.information?.brand?.name}
                                                         </TableCell>
                                                         <TableCell
                                                             align="left">{trimString(row?.information?.id)}</TableCell>
@@ -267,7 +309,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                             width={185}
                                             height={135}
                                             style={{borderRadius: '8px'}}
-                                            alt={selectedCar?.information?.make}
+                                            alt={selectedCar?.information?.brand?.name}
                                         />
                                         <div className="stats">
                                             <img
@@ -280,7 +322,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                 Trade ID {trimString(selectedCar?.information?.id)}
                                             </Typography>
                                             <Typography
-                                                variant="h6">{selectedCar?.information?.model || selectedCar?.information?.make} {selectedCar?.information?.year}</Typography>
+                                                variant="h6">{selectedCar?.name || selectedCar?.information?.brand?.name}</Typography>
                                         </div>
                                     </VehicleDetails>
                                     <Button
@@ -296,6 +338,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                     <div className="title">Trade Information</div>
                                     <TextField className="input" placeholder="Slot Quantity" label="Slot Quantity"
                                                value={trade.slots_available} type='number'
+                                               InputProps={{inputProps: {min: 1}}}
                                                onChange={handleTradeChange('slots_available')}/>
                                     <FlexRow className="input">
                                         <div className="currency-box">&#8358;</div>
@@ -303,7 +346,8 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                             placeholder="Price per slot"
                                             label="Price per slot"
                                             fullWidth
-                                            onChange={handleTradeChange('')}
+                                            value={pricePerslot}
+                                            disabled
                                         ></TextField>
                                     </FlexRow>
                                     <FlexRow className="input">
@@ -311,7 +355,9 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                         <TextField
                                             placeholder="Estimated ROT per slot"
                                             label="Estimated ROT per slot"
+                                            value={extimatedRot}
                                             fullWidth
+                                            disabled
                                             onChange={handleTradeChange('estimated_return_on_trade')}
                                         ></TextField>
                                     </FlexRow>
@@ -319,34 +365,37 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                         className="input"
                                         placeholder="Trading Duration in Months"
                                         label="Trading Duration in Months"
+                                        variant='standard'
+                                        value={trade?.estimated_sales_duration}
                                         onChange={handleTradeChange('estimated_sales_duration')}
                                     />
-                                    <div
-                                        className="title"
-                                        style={{marginBottom: 20, marginTop: 40}}
-                                    >
-                                        Carpadi Commission
-                                    </div>
                                     <FlexRow className="input">
                                         <div className="currency-box">&#8358;</div>
-                                        <TextField disabled placeholder="Bought price"
-                                                   fullWidth value={selectedCar?.bought_price}></TextField>
+                                        <TextField disabled placeholder="Car value" label="Car value"
+                                                   fullWidth
+                                                   value={Number(selectedCar?.bought_price) + Number(selectedCar?.cost_of_repairs) + Number(selectedCar?.maintenance_cost)}></TextField>
                                     </FlexRow>
                                     <FlexRow className="input">
                                         <div className="currency-box">&#8358;</div>
                                         <TextField
                                             placeholder="Minimum selling price"
                                             label="Minimum selling price"
+                                            variant='standard'
+                                            value={minSellingPrice}
                                             fullWidth
+                                            disabled
                                             onChange={handleTradeChange('min_sale_price')}
                                         ></TextField>
                                     </FlexRow>
                                     <FlexRow className="input">
                                         <div className="currency-box">&#8358;</div>
                                         <TextField
-                                            placeholder="Maximum selling price"
-                                            label="Maximum selling price"
+                                            placeholder="Total Maintenance on Car"
+                                            label="Total Maintenance on Car"
+                                            variant='standard'
+                                            value={Number(selectedCar?.maintenance_cost) + +Number(selectedCar?.cost_of_repairs)}
                                             fullWidth
+                                            disabled
                                             onChange={handleTradeChange('max_sale_price')}
                                         ></TextField>
                                     </FlexRow>
@@ -375,17 +424,17 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                 </Typography>
                                                 <Typography variant="h5">&#8358; 0.00</Typography>
                                             </PriceCard>
-                                            <PriceCard
-                                                style={{
-                                                    background: t.alertSuccessLite,
-                                                    marginTop: 20
-                                                }}
-                                            >
-                                                <Typography variant="body1">
-                                                    Estimated Carpadi maximum Profit on Sales
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
-                                            </PriceCard>
+                                            {/*<PriceCard*/}
+                                            {/*    style={{*/}
+                                            {/*        background: t.alertSuccessLite,*/}
+                                            {/*        marginTop: 20*/}
+                                            {/*    }}*/}
+                                            {/*>*/}
+                                            {/*    <Typography variant="body1">*/}
+                                            {/*        Estimated Carpadi maximum Profit on Sales*/}
+                                            {/*    </Typography>*/}
+                                            {/*    <Typography variant="h5">&#8358; 0.00</Typography>*/}
+                                            {/*</PriceCard>*/}
                                         </Grid>
                                     </div>
                                 </div>
