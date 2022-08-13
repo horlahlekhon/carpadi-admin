@@ -15,7 +15,7 @@ import {withStyles} from '@material-ui/styles'
 import {useState, useRef, useEffect} from 'react'
 import Checkbox from "../../../../components/shared/Checkbox";
 import {toast} from "react-hot-toast";
-import {formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
+import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
 import {deleteCar, retrieveSingleCar, updateCar} from "../../../../services/car";
 import {CarStatus} from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
@@ -24,6 +24,7 @@ import {uploadFile} from "../../../../services/upload";
 import ntc from "../../../../lib/ntc";
 import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
+import {retrieveInspection} from "../../../../services/inspection";
 
 function CarProfilePage() {
     const router = useRouter()
@@ -44,31 +45,50 @@ function CarProfilePage() {
             "transmission": null,
             "car_type": null,
             "fuel_type": null,
-            "mileage": null,
-            "age": null,
+            "mileage": 0,
+            "age": 0,
             "description": null,
             "trim": null,
-            "year": null,
-            "model": null,
             "manufacturer": null,
-            "make": null,
             "vin": null,
+            "brand": {
+                "id": null,
+                "created": null,
+                "modified": null,
+                "name": null,
+                "model": null,
+                "year": 0
+            },
             "created": null,
             "modified": null
         },
         "status": null,
-        "bought_price": null,
+        "bought_price": "0",
+        "inspection": {"id": null, "status": null},
         "created": null,
         "modified": null,
         "colour": null,
         "cost_of_repairs": null,
         "resale_price": null,
-        "inspection_report": null,
         "margin": null,
-        "name": null,
         "description": null,
-        "licence_plate": null,
-        "car_inspector": null
+        "name": null,
+        "licence_plate": null
+    })
+    const [inspection, setInspection] = useState({
+        "id": null,
+        "created": null,
+        "modified": null,
+        "owners_name": null,
+        "inspection_date": null,
+        "owners_phone": null,
+        "owners_review": null,
+        "address": null,
+        "status": "ongoing",
+        "inspection_verdict": null,
+        "inspector": null,
+        "inspection_assignor": null,
+        "car": null
     })
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
@@ -158,6 +178,19 @@ function CarProfilePage() {
                 .then((response) => {
                     if (response.status) {
                         setCarData(response.data)
+                        if (response.data?.inspection?.id) {
+                            retrieveInspection(response.data.inspection.id)
+                                .then((response) => {
+                                    if (response.status) {
+                                        setInspection(response.data)
+                                    } else {
+                                        toast.error(response.data)
+                                    }
+                                })
+                                .catch((error) => {
+                                    toast.error(error.data)
+                                })
+                        }
                     } else {
                         toast.error(response.data)
                     }
@@ -199,12 +232,12 @@ function CarProfilePage() {
             "bought_price": car.bought_price,
             "colour": car.colour,
             "resale_price": car.resale_price,
-            "inspection_report": car.inspection_report,
+            "inspection_report": null,
             "margin": car.margin,
             "description": car.description,
             "name": car.name,
             "licence_plate": car.licence_plate,
-            "car_inspector": car.car_inspector
+            "car_inspector": null
         }
 
         const vehicleData = {
@@ -216,10 +249,10 @@ function CarProfilePage() {
             "age": car?.information?.age,
             "description": car?.description,
             "trim": car?.information?.trim,
-            "year": car?.information?.year,
-            "model": car?.information?.model,
+            "year": car?.information?.brand?.year,
+            "model": car?.information?.brand?.model,
             "manufacturer": car?.information?.manufacturer,
-            "make": car?.information?.make,
+            "make": car?.information?.brand?.name,
             "vin": car?.information?.vin
         }
 
@@ -337,7 +370,7 @@ function CarProfilePage() {
                             width={210}
                             outlined={true}
                             marginRight="16px"
-                            disabled={!car?.car_inspector}
+                            disabled={!car?.inspection?.id}
                             onClick={() => showModal('vehicleInspectionReport', 'Vehicle Inspection Report', 'An overview of the information gathered.')}
                         />
                         <Button
@@ -452,15 +485,15 @@ function CarProfilePage() {
                         </Detail>
                         <Detail>
                             <div className="key">Make</div>
-                            <div className="value">{car?.information?.make || 'NA'}</div>
+                            <div className="value">{car?.information?.brand?.name || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Model</div>
-                            <div className="value">{car?.information?.model || 'NA'}</div>
+                            <div className="value">{car?.information?.brand?.model || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Year</div>
-                            <div className="value">{car?.information?.year || 'NA'}</div>
+                            <div className="value">{car?.information?.brand?.year || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Color</div>
@@ -719,9 +752,10 @@ function CarProfilePage() {
                                 <Grid item xs={12} style={{display: 'flex'}}>
                                     <VehicleDetails style={{width: 700}}>
                                         <img
-                                            src="/images/Big-Default-Car.png"
+                                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                             width={185}
                                             height={135}
+                                            alt={car?.name}
                                             style={{borderRadius: '8px'}}
                                         />
                                         <div className="stats">
@@ -732,9 +766,9 @@ function CarProfilePage() {
                                                 style={{marginBottom: -15}}
                                             />
                                             <Typography variant="h5" className="trade">
-                                                Trade ID 09890
+                                                {trimString(inspection?.id || 'NA')}
                                             </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                            <Typography variant="h6">{car?.name || 'NA'}</Typography>
                                         </div>
                                     </VehicleDetails>
                                     <Button
@@ -751,32 +785,33 @@ function CarProfilePage() {
                                     <div className="content">
                                         <Grid item xs={12} style={{marginTop: -10}}>
                                             <Statistic>
-                                                <div className="key">Inspector’s Name</div>
-                                                <div className="value">Jhon Do Smith</div>
+                                                <div className="key">Status</div>
+                                                <div className="value">{inspection?.status}</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Owner’s Name</div>
+                                                <div
+                                                    className="value">{trimString(inspection?.owners_name, 25) || 'NA'}</div>
                                             </Statistic>
                                             <Statistic>
                                                 <div className="key">Inspection Date</div>
-                                                <div className="value">June 12 | 2020</div>
+                                                <div className="value">{formatDate(inspection?.inspection_date)}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Year</div>
-                                                <div className="value">2015</div>
+                                                <div className="key">Owners Phone</div>
+                                                <div className="value">{inspection?.owners_phone}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Brand</div>
-                                                <div className="value">Toyota</div>
+                                                <div className="key">Owners Review</div>
+                                                <div className="value">{inspection?.owners_review}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Model</div>
-                                                <div className="value">Camry</div>
+                                                <div className="key">Inspection Verdict</div>
+                                                <div className="value">{inspection?.inspection_verdict}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Mileage</div>
-                                                <div className="value">18,000</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">VIN</div>
-                                                <div className="value">BC83891899837</div>
+                                                <div className="key">Address</div>
+                                                <div className="value">{inspection?.address}</div>
                                             </Statistic>
                                         </Grid>
                                     </div>
