@@ -153,9 +153,9 @@ function CarListingsPage() {
                                                  height={48}/>
                                         </TableCell>
                                         <TableCell align="left">{row.vin}</TableCell>
-                                        <TableCell align="left">{row?.information?.make}</TableCell>
-                                        <TableCell align="left">{row?.information?.model}</TableCell>
-                                        <TableCell align="left">{row?.information?.year}</TableCell>
+                                        <TableCell align="left">{row?.information?.brand?.name}</TableCell>
+                                        <TableCell align="left">{row?.information?.brand?.model}</TableCell>
+                                        <TableCell align="left">{row?.information?.brand?.year}</TableCell>
                                         <TableCell align="left">{row?.information?.fuel_type}</TableCell>
                                         <TableCell align="left">
                                             {row?.information?.transmission}

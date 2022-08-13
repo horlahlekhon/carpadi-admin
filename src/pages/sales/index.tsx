@@ -1,13 +1,7 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
-    FormControl,
     Grid,
-    IconButton,
-    Input,
-    InputAdornment,
-    InputLabel,
-    Modal,
     Paper,
     Table,
     TableBody,
@@ -15,21 +9,20 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-    TextField,
     Typography,
     withStyles
 } from '@material-ui/core'
 import {t} from '../../styles/theme'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
 import Button from '../../components/shared/Button'
 import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
-import Image from 'next/image'
-import {SearchOutlined, Add} from '@material-ui/icons'
-import ToggleSwitch from '../../components/shared/ToggleSwitch'
 import CPToast from "../../components/shared/CPToast";
 import CreateSale from "../../components/shared/CreateSale";
+import {toast} from "react-hot-toast";
+import {retrieveSales} from "../../services/sale";
+import {trimString} from "../../helpers/formatters";
 
 function SalesPage() {
     enum Sales {
@@ -42,6 +35,28 @@ function SalesPage() {
     const [selectedSales, setSelected] = useState(Sales.ACTIVE)
     const [page, setPage] = useState(0)
     const [createSale, setCreateSale] = useState(false)
+    const [sales, setSales] = useState([])
+    const [paginationKeys, setPagination] = useState({
+        "count": 0,
+        "next": null,
+        "previous": null,
+    })
+    const [saleStats, setSaleStats] = useState(
+        {
+            "active_trades": {
+                "trading_users": 0,
+                "active_trades": 0
+            },
+            "sold_trades": {
+                "trading_users": 0,
+                "sold_trades": 0
+            },
+            "closed_trades": {
+                "trading_users": 0,
+                "closed_trades": 0
+            }
+        }
+    )
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
     }
@@ -77,49 +92,36 @@ function SalesPage() {
         setSelected(sale)
     }
 
-    function createData(
-        idx: number,
-        imageUrl: string,
-        vin: string,
-        make: string,
-        model: string,
-        year: number,
-        fuelType: string,
-        sellingPrice: number,
-        dateListed: string,
-        tradeStatus: string
-    ) {
-        return {
-            idx,
-            imageUrl,
-            vin,
-            make,
-            model,
-            year,
-            fuelType,
-            sellingPrice,
-            dateListed,
-            tradeStatus
-        }
+    const retrieveSaleStats = () => {
     }
 
-    const rows = Array.from(Array(30).keys()).map((i) => {
-        return createData(
-            i + 1,
-            '/images/Default-Car.png',
-            `VID-1${i}1${i}`,
-            'Toyota',
-            'Rav 4'+i,
-            2004,
-            'Petrol',
-            10000000,
-            new Date().toISOString().split('T')[0],
-            'Ongoing'
-        )
-    })
+    const getSales = (saleStatus = 'active', page = 0) => {
+        retrieveSales(rowsPerPage, page, saleStatus)
+            .then((response) => {
+                if (response.status) {
+                    setSales(response.data.results)
+                    setPagination({
+                        "count": response.data.count,
+                        "next": response.data.next,
+                        "previous": response.data.prevoius,
+                    })
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
+    }
+
+    useEffect(() => {
+        retrieveSaleStats()
+        getSales()
+    }, [])
+
 
     const {items} = usePagination({
-        count: rows.length / rowsPerPage,
+        count: Math.ceil(paginationKeys.count / rowsPerPage),
         onChange: handleChangePage
     })
 
@@ -167,6 +169,8 @@ function SalesPage() {
                     <StatsCard
                         onClick={() => {
                             selectSale(Sales.ACTIVE)
+                            setPage(0);
+                            getSales('active')
                         }}
                         style={{
                             border:
@@ -191,6 +195,8 @@ function SalesPage() {
                     <StatsCard
                         onClick={() => {
                             selectSale(Sales.INACTIVE)
+                            setPage(0);
+                            getSales('inactive')
                         }}
                         style={{
                             border:
@@ -230,18 +236,18 @@ function SalesPage() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row) => (
+                            {sales
+                                .map((row, idx) => (
                                     <TableRow
-                                        key={row.idx}
+                                        key={idx}
                                         // style={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                     >
                                         <TableCell component="th" scope="row">
-                                            {row.idx}
+                                            {idx + 1}
                                         </TableCell>
                                         <TableCell component="th" scope="row">
-                                            <img src={row.imageUrl} width={48} height={48}/>
+                                            <img src={row?.product_images.length > 0 ? row?.product_images[0] : null}
+                                                 width={48} height={48} alt={trimString(row?.car)}/>
                                         </TableCell>
                                         <TableCell align="right">{row.vin}</TableCell>
                                         <TableCell align="right">{row.make}</TableCell>
@@ -257,7 +263,7 @@ function SalesPage() {
                                                 text="View"
                                                 width={66}
                                                 outlined={true}
-                                                onClick={() => handleNavigation(`sales/${row.vin}`)}
+                                                onClick={() => handleNavigation(`sales/${row.id}`)}
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -267,8 +273,8 @@ function SalesPage() {
                 </TableContainer>
                 <TableFooter>
                     <div>
-                        Showing page {page + 1} of {Math.ceil(rows.length / rowsPerPage)}/{' '}
-                        {rows.length} Total Items
+                        Showing page {page + 1} of {Math.ceil(sales.length / rowsPerPage)}/{' '}
+                        {paginationKeys.count} Total Items
                     </div>
 
                     <nav>

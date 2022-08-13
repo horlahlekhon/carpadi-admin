@@ -24,20 +24,21 @@ function UserProfilePage() {
     const [modalTitle, setModalTitle] = useState('')
     const [viewAllTransactions, setViewAllTransactions] = useState(false)
     const [user, setUserData] = useState({
-        "id": "0",
+        "id": null,
         "user": {
-            "id": "0",
-            "username": "NA",
-            "first_name": "NA",
-            "last_name": "NA",
-            "profile_picture": "NA",
-            "email": "NA",
-            "phone": "NA",
+            "id": null,
+            "username": null,
+            "first_name": null,
+            "last_name": null,
+            "profile_picture": null,
+            "email": null,
+            "phone": null,
             "is_active": false
         },
-        "created": "2022-06-17T09:11:56.000265Z",
-        "modified": "2022-06-17T09:11:56.000265Z",
-        "bvn": "3568302072"
+        "banks": [],
+        "created": null,
+        "modified": null,
+        "bvn": null
     })
     const [wallet, setWalletData] = useState({
         "id": "NA",
@@ -321,20 +322,23 @@ function UserProfilePage() {
                                             <Statistic style={{fontSize: 14}}>
                                                 <div className="key">Personal Bank Account</div>
                                             </Statistic>
-                                            <Statistic>
-                                                <div className="key stacked">
-                                                    <div className="account-number">Acct NA</div>
-                                                    <div className="bank-name">Bank NA</div>
-                                                    <div className="account-name">
-                                                        Acct Name NA
+                                            {user.banks.map((bank, idx) => (
+                                                <Statistic key={idx}>
+                                                    <div className="key stacked">
+                                                        <div
+                                                            className="account-number">Acct {bank?.account_number}</div>
+                                                        <div className="bank-name">Bank {bank?.name}</div>
+                                                        <div className="account-name">
+                                                            Acct Name {user?.user?.first_name} {user?.user?.last_name}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div className="value">
-                                                    <div className="checkmark">
-                                                        <Check style={{height: 12}}/>
+                                                    <div className="value">
+                                                        <div className="checkmark">
+                                                            <Check style={{height: 12}}/>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </Statistic>
+                                                </Statistic>
+                                            ))}
                                         </Grid>
                                     </Grid>
                                 </Grid>
