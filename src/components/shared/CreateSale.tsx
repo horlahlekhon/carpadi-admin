@@ -23,6 +23,7 @@ import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "./CPToast";
 import {createSale} from "../../services/sale";
 import {uploadFile} from "../../services/upload";
+import {CarStatus} from "../../lib/enums";
 
 const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     const router = useRouter()
@@ -124,7 +125,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     }
 
     const retrieveCarList = (page = 0) => {
-        retrieveCars(rowsPerPage, page)
+        retrieveCars(rowsPerPage, page, CarStatus.INSPECTED)
             .then((response) => {
                 if (response.status) {
                     setCars(response.data.results)
@@ -317,12 +318,12 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                                             src={row.pictures.length > 0 ? row.pictures[0] : null}
                                                             width={48}
                                                             height={48}
-                                                            alt={row?.information?.make}
+                                                            alt={row?.information?.brand?.name}
                                                             style={{borderRadius: '8px'}}
                                                         />
                                                     </TableCell>
                                                     <TableCell align="left">
-                                                        {row?.information?.make} {row?.information?.model} {row?.information?.year}
+                                                        {row?.name || row?.information?.brand?.name}
                                                     </TableCell>
                                                     <TableCell
                                                         align="left">{trimString(row?.information?.id)}</TableCell>
