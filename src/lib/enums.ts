@@ -58,5 +58,6 @@ export {
     TradeStates,
     CarMaintenanceTypes,
     CarTransmissionTypes,
-    FuelTypes
+    FuelTypes,
+    CarTypes
 }

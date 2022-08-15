@@ -20,6 +20,7 @@ import {tradeService} from "../../services/trade";
 import {retrieveCars} from "../../services/car";
 import {formatDate, trimString} from "../../helpers/formatters";
 import {retrieveSettings} from "../../services/setting";
+import {CarStates} from "../../lib/enums";
 
 
 const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
@@ -70,12 +71,27 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
         setTrade({...trade, [prop]: event.target.value})
         if (prop === 'slots_available') {
             const pps = (Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(event.target.value)
-            setPPS(pps)
+            // @ts-ignore
+            setPPS(pps.toFixed(2))
             const erot = (Number(pps) * (Number(fees?.merchant_trade_rot_percentage) / 100))
-            setEROT(erot)
-            setMSP((((Number(fees?.carpadi_trade_rot_percentage) / 100)) * ((pps + erot) * Number(event.target.value))) + Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)
-            )
+            // @ts-ignore
+            setEROT(erot.toFixed(2))
+            // @ts-ignore
+            setMSP(((((Number(fees?.carpadi_trade_rot_percentage) / 100)) * ((pps + erot) * Number(event.target.value))) + Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)).toFixed(2))
         }
+    }
+
+    const handleTradeChangeX = (value) => {
+        setTrade({...trade, 'slots_available': value})
+        const pps = (Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(value)
+        // @ts-ignore
+        setPPS(pps.toFixed(2))
+        const erot = (Number(pps) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+        // @ts-ignore
+        setEROT(erot.toFixed(2))
+        // @ts-ignore
+        setMSP(((((Number(fees?.carpadi_trade_rot_percentage) / 100)) * ((pps + erot) * Number(value))) + Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)).toFixed(2))
+
     }
 
     const handleNavigation = (action: string) => {
@@ -85,7 +101,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
     }
 
     const retrieveCarList = (page = 0) => {
-        retrieveCars(rowsPerPage, page, 'inspected')
+        retrieveCars(rowsPerPage, page, CarStates.AVAILABLE)
             .then((response) => {
                 if (response.status) {
                     setCars(response.data.results)
@@ -128,19 +144,18 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
             .catch((error) => {
                 toast.error(error)
             })
-        setTimeout(() => {
-            setPPS((Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(trade.slots_available))
-            setEROT((Number(pricePerslot) * (Number(fees?.merchant_trade_rot_percentage) / 100)))
-            setMSP(((Number(pricePerslot) * (Number(fees?.carpadi_trade_rot_percentage) / 100)) * trade.slots_available))
-        }, 1000)
     }, [car])
+
+    useEffect(() => {
+        handleTradeChangeX(trade?.slots_available || 1)
+    })
 
     const saveTrade = () => {
         setLoading(true)
         trade['car'] = selectedCar?.id
         trade['trade_status'] = 'pending'
         trade['min_sale_price'] = minSellingPrice
-        trade['estimated_return_on_trade'] = Number(minSellingPrice) - (Number(selectedCar?.bought_price) + Number(selectedCar?.cost_of_repairs) + Number(selectedCar?.maintenance_cost))
+        trade['estimated_return_on_trade'] = Number((Number(minSellingPrice) - (Number(selectedCar?.bought_price) + Number(selectedCar?.cost_of_repairs) + Number(selectedCar?.maintenance_cost))).toFixed(2))
         return tradeService.createSingleTrade(trade)
             .then((data) => {
                 if (data.status) {
@@ -319,7 +334,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                 style={{marginBottom: -15}}
                                             />
                                             <Typography variant="h5" className="trade">
-                                                Trade ID {trimString(selectedCar?.information?.id)}
+                                                {trimString(selectedCar?.information?.id)}
                                             </Typography>
                                             <Typography
                                                 variant="h6">{selectedCar?.name || selectedCar?.information?.brand?.name}</Typography>
