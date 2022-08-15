@@ -178,19 +178,6 @@ function CarProfilePage() {
                 .then((response) => {
                     if (response.status) {
                         setCarData(response.data)
-                        if (response.data?.inspection?.id) {
-                            retrieveInspection(response.data.inspection.id)
-                                .then((response) => {
-                                    if (response.status) {
-                                        setInspection(response.data)
-                                    } else {
-                                        toast.error(response.data)
-                                    }
-                                })
-                                .catch((error) => {
-                                    toast.error(error.data)
-                                })
-                        }
                     } else {
                         toast.error(response.data)
                     }
@@ -314,6 +301,23 @@ function CarProfilePage() {
         setCarData(obj)
     }
 
+    function viewInspectionReport() {
+        if (car?.inspection?.id) {
+            retrieveInspection(car.inspection.id)
+                .then((response) => {
+                    if (response.status) {
+                        setInspection(response.data)
+                        showModal('vehicleInspectionReport', 'Vehicle Inspection Report', 'An overview of the information gathered.')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
     useEffect(() => {
         setCarId(String(router.query.id))
         retrieveCar(String(router.query.id))
@@ -324,12 +328,12 @@ function CarProfilePage() {
         <Container>
             <CPToast/>
             {createSale && <CreateSale modalOpen={true} onClick={() => setCreateSale(false)}/>}
+            {createTrade && <CreateTrade car={car} onClick={() => setCreateTrade(false)}/>}
             <Header>
                 <Typography variant="h4">
                     <b>{trimString(carId)}</b>
                 </Typography>
             </Header>
-            {createTrade && <CreateTrade car={car} onClick={() => setCreateTrade(false)}/>}
             <Breadcrumbs>
                 <img
                     src="/icons/Inventory-Black.svg"
@@ -371,7 +375,7 @@ function CarProfilePage() {
                             outlined={true}
                             marginRight="16px"
                             disabled={!car?.inspection?.id}
-                            onClick={() => showModal('vehicleInspectionReport', 'Vehicle Inspection Report', 'An overview of the information gathered.')}
+                            onClick={() => viewInspectionReport()}
                         />
                         <Button
                             text="Delete Car Profile"
@@ -1230,3 +1234,8 @@ const Statistic = styled.div`
     font-weight: bold;
   }
 `
+
+function viewInspectionReport(): void {
+    throw new Error('Function not implemented.')
+}
+
