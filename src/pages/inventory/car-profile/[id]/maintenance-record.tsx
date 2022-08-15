@@ -231,6 +231,10 @@ function SingleUnderInspectionMaintenancePage() {
         retrieveCarMaintenance(String(router.query.id))
     }, [])
 
+    const calculateTotal = () => {
+        return maintenances.reduce((a, b) => Number(a?.cost || 0) + Number(b?.cost || 0), 0)
+    }
+
     return (
         <Container>
             <CPToast/>
@@ -281,7 +285,7 @@ function SingleUnderInspectionMaintenancePage() {
                                 style={{marginBottom: -10}}
                             />
                             <Typography variant="h6" className="trade">
-                                Trade ID {trimString(car?.information?.id)}
+                                {trimString(car?.information?.id)}
                             </Typography>
                             <Typography variant="h6">{car?.name}</Typography>
                         </div>
@@ -297,7 +301,7 @@ function SingleUnderInspectionMaintenancePage() {
                             <>
                                 <PriceCard>
                                     <Typography variant="body1">Total Maintenance Cost</Typography>
-                                    <Typography variant="h5">₦ NA</Typography>
+                                    <Typography variant="h5">₦ {formatNumber(calculateTotal())}</Typography>
                                 </PriceCard>
                             </>
                         )}
@@ -310,7 +314,7 @@ function SingleUnderInspectionMaintenancePage() {
                             borderBottom: `1px solid ${t.extraLiteGrey}`
                         }}>Description</Typography>
                         <p>
-                            NA
+                            {car?.description || 'NA'}
                         </p>
                     </>
                 )}
@@ -380,7 +384,7 @@ function SingleUnderInspectionMaintenancePage() {
                                 <Typography variant='h6'>Expenses</Typography>
                                 {maintenances.map((ex, i) => (
                                     <Expense key={i}>
-                                        <div className="key">NA</div>
+                                        <div className="key">{ex?.maintenance_data?.name || 'NA'}</div>
                                         <div className="value">&#8358; {formatNumber(ex.cost)}</div>
                                     </Expense>
                                 ))}
