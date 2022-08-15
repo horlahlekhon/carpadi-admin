@@ -53,11 +53,20 @@ enum CarTypes {
     Coupe = "coupe",
 }
 
+
+enum InspectionStates {
+    ONGOING = "ongoing",
+    COMPLETED = "completed",
+    PENDING = "pending",
+    EXPIRED = "expired",
+}
+
 export {
     CarStates,
     TradeStates,
     CarMaintenanceTypes,
     CarTransmissionTypes,
     FuelTypes,
-    CarTypes
+    CarTypes,
+    InspectionStates
 }

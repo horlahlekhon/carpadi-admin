@@ -17,7 +17,7 @@ import Checkbox from "../../../../components/shared/Checkbox";
 import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
 import {deleteCar, retrieveSingleCar, updateCar} from "../../../../services/car";
-import {CarStates} from "../../../../lib/enums";
+import {CarStates, InspectionStates} from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
 import CPToast from "../../../../components/shared/CPToast";
 import {uploadFile} from "../../../../services/upload";
@@ -428,8 +428,10 @@ function CarProfilePage() {
                                 </ImageGrid>
                             </div>
                             <Button text="Create Sales Profile" width='100%' outlined={true}
+                                    disabled={!car?.inspection || car?.inspection?.status !== InspectionStates.COMPLETED}
                                     onClick={() => setCreateSale(true)}/>
                             <Button text="Maintenance Record" width='100%' outlined={true} marginTop={16}
+                                    disabled={!car?.inspection || car?.inspection?.status === InspectionStates.PENDING}
                                     marginBottom={30}
                                     onClick={() => handleNavigation(`/inventory/car-profile/${car.id}/maintenance-record?status=${status}`)}/>
                             <CheckItem style={{background: status === 'car listings' ? t.alertSuccessLite : ''}}>
@@ -525,6 +527,7 @@ function CarProfilePage() {
                         </Detail>
                         {['car listings'].includes(status) && (
                             <Button text='Create Trade' width='100%' marginTop={30}
+                                    disabled={car?.status !== CarStates.AVAILABLE}
                                     onClick={() => setCreateTrade(true)}
                             />
                         )}
