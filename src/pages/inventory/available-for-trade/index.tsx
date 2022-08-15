@@ -19,7 +19,7 @@ import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
 import {retrieveCars} from "../../../services/car";
 import {toast} from "react-hot-toast";
-import {CarStatus} from "../../../lib/enums";
+import {CarStates} from "../../../lib/enums";
 import {formatDate} from "../../../helpers/formatters";
 
 function AvailableForTradePage() {
@@ -67,7 +67,7 @@ function AvailableForTradePage() {
     const classes = useStyles()
 
     const retrieveCarList = (page = 0) => {
-        retrieveCars(rowsPerPage, page, CarStatus.AVAILABLE)
+        retrieveCars(rowsPerPage, page, CarStates.AVAILABLE)
             .then((response) => {
                 if (response.status) {
                     setPagination({

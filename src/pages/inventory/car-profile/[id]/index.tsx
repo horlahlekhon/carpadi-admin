@@ -17,7 +17,7 @@ import Checkbox from "../../../../components/shared/Checkbox";
 import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
 import {deleteCar, retrieveSingleCar, updateCar} from "../../../../services/car";
-import {CarStatus} from "../../../../lib/enums";
+import {CarStates} from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
 import CPToast from "../../../../components/shared/CPToast";
 import {uploadFile} from "../../../../services/upload";
@@ -434,11 +434,11 @@ function CarProfilePage() {
                                     onClick={() => handleNavigation(`/inventory/car-profile/${car.id}/maintenance-record?status=${status}`)}/>
                             <CheckItem style={{background: status === 'car listings' ? t.alertSuccessLite : ''}}>
                                 <span>Car Listings</span>
-                                <Checkbox color='primary' checked={car.status === CarStatus.NEW.valueOf()} disabled/>
+                                <Checkbox color='primary' checked={car.status === CarStates.NEW.valueOf()} disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'under inspection' ? t.alertSuccessLite : ''}}>
                                 <span>Under Inspection</span>
-                                <Checkbox color='primary' checked={car.status === CarStatus.INSPECTED.valueOf()}
+                                <Checkbox color='primary' checked={car.status === CarStates.INSPECTED.valueOf()}
                                           disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'available for trade' ? t.alertSuccessLite : ''}}>
@@ -446,7 +446,7 @@ function CarProfilePage() {
                                     <span className='title'>Available for Trade</span>
                                     <span className='success'>controlled by created trade</span>
                                 </div>
-                                <Checkbox color='primary' checked={car.status === CarStatus.AVAILABLE.valueOf()}
+                                <Checkbox color='primary' checked={car.status === CarStates.AVAILABLE.valueOf()}
                                           disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'ongoing trade' ? t.alertSuccessLite : ''}}>
@@ -454,7 +454,7 @@ function CarProfilePage() {
                                     <span className='title'>Ongoing Trade</span>
                                     <span className='danger'>system controlled</span>
                                 </div>
-                                <Checkbox color='primary' checked={car.status === CarStatus.ONGOING_TRADE.valueOf()}
+                                <Checkbox color='primary' checked={car.status === CarStates.ONGOING_TRADE.valueOf()}
                                           disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'sold' ? t.alertSuccessLite : ''}}>
@@ -462,11 +462,11 @@ function CarProfilePage() {
                                     <span className='title'>Sold</span>
                                     <span className='danger'>system controlled</span>
                                 </div>
-                                <Checkbox color='primary' checked={car.status === CarStatus.SOLD.valueOf()} disabled/>
+                                <Checkbox color='primary' checked={car.status === CarStates.SOLD.valueOf()} disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'archived' ? t.alertSuccessLite : ''}}>
                                 <span>Add to Archived</span>
-                                <Checkbox color='primary' checked={car.status === CarStatus.ARCHIVED.valueOf()}/>
+                                <Checkbox color='primary' checked={car.status === CarStates.ARCHIVED.valueOf()}/>
                             </CheckItem>
                         </Flex>
                     </div>

@@ -1,4 +1,4 @@
-enum CarStatus {
+enum CarStates {
     ALL = '',
     SOLD = 'sold',
     INSPECTED = 'inspected',
@@ -10,7 +10,7 @@ enum CarStatus {
     ARCHIVED = "archived",
 }
 
-enum TradeStatus {
+enum TradeStates {
     PENDING = "pending",
     ONGOING = "ongoing",
     COMPLETED = "completed",
@@ -18,7 +18,45 @@ enum TradeStatus {
     CLOSED = "closed",
 }
 
+enum CarMaintenanceTypes {
+    SPARE_PART = "spare_part",
+    EXPENSE = "expense",
+}
+
+enum CarTransmissionTypes {
+    MANUAL = "manual",
+    AUTOMATIC = "automatic",
+}
+
+enum FuelTypes {
+    PETROL = "petrol",
+    DIESEL = "diesel",
+    CNG = "cng",
+    LPG = "lpg",
+    ELECTRIC = "electric",
+    HYBRID = "hybrid"
+}
+
+enum CarTypes {
+    SUV = "suv",
+    SALOON = "saloon",
+    MINIVAN = "minivan",
+    CONVERTIBLE = "convertible",
+    MicroCar = "microcar",
+    CityCar = "city_car",
+    Hatchback = "hatchback",
+    Sedan = "sedan",
+    FamilyCar = "family_car",
+    MuscleCar = "muscle_car",
+    Roadster = "roadster",
+    PickUp = "pickup",
+    Coupe = "coupe",
+}
+
 export {
-    CarStatus,
-    TradeStatus
+    CarStates,
+    TradeStates,
+    CarMaintenanceTypes,
+    CarTransmissionTypes,
+    FuelTypes
 }

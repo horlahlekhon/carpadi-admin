@@ -23,7 +23,7 @@ import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "./CPToast";
 import {createSale} from "../../services/sale";
 import {uploadFile} from "../../services/upload";
-import {CarStatus} from "../../lib/enums";
+import {CarStates} from "../../lib/enums";
 
 const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     const router = useRouter()
@@ -125,7 +125,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     }
 
     const retrieveCarList = (page = 0) => {
-        retrieveCars(rowsPerPage, page, CarStatus.INSPECTED)
+        retrieveCars(rowsPerPage, page, CarStates.INSPECTED)
             .then((response) => {
                 if (response.status) {
                     setCars(response.data.results)
