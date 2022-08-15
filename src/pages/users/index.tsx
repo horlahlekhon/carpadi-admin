@@ -66,6 +66,12 @@ function UsersPage() {
     }
 
     const retrieveUsers = ({tradeStatus = '', page = 0, status = ''}) => {
+        setUsers([])
+        setPagination({
+            "count": 0,
+            "next": null,
+            "previous": null,
+        })
         merchantService.retrieveMerchants(rowsPerPage, page, tradeStatus, '', status)
             .then((response) => {
                 if (response.status) {
