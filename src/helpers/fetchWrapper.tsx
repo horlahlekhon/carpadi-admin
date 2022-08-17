@@ -1,4 +1,5 @@
 import getConfig from 'next/config';
+import router from 'next/router'
 
 const {publicRuntimeConfig} = getConfig();
 
@@ -75,9 +76,14 @@ function handleResponse(response) {
         const data = text && JSON.parse(text);
         if (!response.ok) {
             const error = (data && data.detail) || (data && data.error) || (data && data.messages && data.messages[0]) || (data && data.car && data.car[0]) || (data && data.vin && data.vin[0]) || response.statusText;
+            if (response.status === 404) {
+                router.push('/errors/not-found')
+            }
+            if (response.status >= 500) {
+                router.push('/errors/server-error')
+            }
             return Promise.reject(error);
         }
-
         return data;
     });
 }
