@@ -1,14 +1,12 @@
-import {BehaviorSubject} from 'rxjs';
+
 import getConfig from 'next/config';
-import Router from 'next/router'
 import {fetchWrapper} from '../helpers/fetchWrapper';
 
 const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
-
-const createSparePart = (data) => {
-    return fetchWrapper.post(`${baseUrl}/spare-parts/`, data)
+const retrieveCarBrands = (limit = 10, offset = 0) => {
+    return fetchWrapper.get(`${baseUrl}/car-brands?limit=${limit}&offset=${offset}`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -17,8 +15,8 @@ const createSparePart = (data) => {
         })
 }
 
-const updateSparePart = (data, id) => {
-    return fetchWrapper.put(`${baseUrl}/spare-parts/${id}`, data)
+const retrieveSingleCarBrand = (id) => {
+    return fetchWrapper.get(`${baseUrl}/car-brands/${id}`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -27,8 +25,8 @@ const updateSparePart = (data, id) => {
         })
 }
 
-const retrieveSPareParts = (limit = 10, offset = 0, brand = '') => {
-    return fetchWrapper.get(`${baseUrl}/spare-parts?limit=${limit}&offset=${offset}&car_brand=${brand}`)
+const createCarBrand = (data) => {
+    return fetchWrapper.post(`${baseUrl}/car-brands/`, data)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -37,8 +35,8 @@ const retrieveSPareParts = (limit = 10, offset = 0, brand = '') => {
         })
 }
 
-const retrieveSingleSparePart = (id) => {
-    return fetchWrapper.get(`${baseUrl}/spare-parts/${id}`)
+const updateCarBrand = (id, data) => {
+    return fetchWrapper.patch(`${baseUrl}/car-brands/${id}/`, data)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -46,10 +44,22 @@ const retrieveSingleSparePart = (id) => {
             return {status: false, data: error};
         })
 }
+
+const deleteCarBrand = (id) => {
+    return fetchWrapper.delete(`${baseUrl}/car-brands/${id}/`)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
 
 export {
-    createSparePart,
-    retrieveSingleSparePart,
-    retrieveSPareParts,
-    updateSparePart
+    retrieveCarBrands,
+    retrieveSingleCarBrand,
+    createCarBrand,
+    updateCarBrand,
+    deleteCarBrand
 }

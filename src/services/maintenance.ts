@@ -17,6 +17,16 @@ const createMaintenance = (data) => {
         })
 }
 
+const updateMaintenance = (data, id) => {
+    return fetchWrapper.put(`${baseUrl}/maintenances/${id}`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
 const retrieveMaintenances = (limit = 10, offset = 0, id = '') => {
     return fetchWrapper.get(`${baseUrl}/maintenances?limit=${limit}&offset=${offset}&car=${id}`)
         .then((response) => {
@@ -40,5 +50,6 @@ const retrieveSingleMaintenance = (id) => {
 export {
     createMaintenance,
     retrieveSingleMaintenance,
-    retrieveMaintenances
+    retrieveMaintenances,
+    updateMaintenance
 }

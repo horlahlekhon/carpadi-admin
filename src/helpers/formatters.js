@@ -14,6 +14,6 @@ export const formatNumber = (value) => {
 
 export const trimString = (value, length = 7) => {
     if (value) {
-        return String(value).substring(0, length);
+        return String(value).slice(length * -1);
     }
 }

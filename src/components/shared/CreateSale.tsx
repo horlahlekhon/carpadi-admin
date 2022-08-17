@@ -125,7 +125,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     }
 
     const retrieveCarList = (page = 0) => {
-        retrieveCars(rowsPerPage, page, CarStates.INSPECTED)
+        retrieveCars(rowsPerPage, page, CarStates.ALL)
             .then((response) => {
                 if (response.status) {
                     setCars(response.data.results)
