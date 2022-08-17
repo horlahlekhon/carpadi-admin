@@ -1,5 +1,5 @@
 import getConfig from 'next/config';
-import {fetchWrapper} from '../helpers/fetchWrapper';
+
 
 const {publicRuntimeConfig} = getConfig();
 const baseUrl = `https://api.Cloudinary.com/v1_1/${publicRuntimeConfig.cloudinaryCloudName}`;
