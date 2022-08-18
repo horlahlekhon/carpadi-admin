@@ -61,6 +61,13 @@ enum InspectionStates {
     EXPIRED = "expired",
 }
 
+enum UploadTypes {
+    CAR = "car",
+    USER = "user",
+    CAR_FEATURE = "car-feature",
+    CAR_PRODUCT = "car-product",
+}
+
 export {
     CarStates,
     TradeStates,
@@ -68,5 +75,6 @@ export {
     CarTransmissionTypes,
     FuelTypes,
     CarTypes,
-    InspectionStates
+    InspectionStates,
+    UploadTypes
 }

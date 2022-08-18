@@ -172,7 +172,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
             "highlight": highlight,
             "selling_price": sellingPrice,
             "status": state.saleActive ? 'active' : 'inactive',
-            "car": selectedCar.information.id,
+            "car": selectedCar?.id,
         }
         return createSale(sale)
             .then((data) => {
