@@ -510,7 +510,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                         </FlexRow>
                         <InputGrid>
                             {salesImages.map((si, idx) => (
-                                <div className="input">
+                                <div className="input" key={idx}>
                                     <div
                                         className="text">{si?.url !== '' ? trimString(si?.url, 12) : 'Upload Image'}</div>
                                     <Button
