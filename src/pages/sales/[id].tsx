@@ -185,8 +185,9 @@ function SalesProfilePage() {
                 <PriceSection container spacing={3}>
                     <Grid item xs={6}>
                         <VehicleDetails>
-                            <Image
-                                src="/images/Big-Default-Car.png"
+                            <img
+                                src={sale?.product_images.length > 0 ? sale.product_images[0] : null}
+                                alt={sale?.car?.make}
                                 height={135}
                                 width={185}
                                 style={{borderRadius: '8px'}}
@@ -910,6 +911,8 @@ const Flex = styled.div`
   margin-top: 16px;
 
   .slideshow {
+    min-width: 500px;
+    min-height: 300px;
     margin-right: 20px;
     position: relative;
     height: fit-content;

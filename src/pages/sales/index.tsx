@@ -22,7 +22,7 @@ import CPToast from "../../components/shared/CPToast";
 import CreateSale from "../../components/shared/CreateSale";
 import {toast} from "react-hot-toast";
 import {retrieveSales} from "../../services/sale";
-import {trimString} from "../../helpers/formatters";
+import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 
 function SalesPage() {
     enum Sales {
@@ -187,7 +187,7 @@ function SalesPage() {
                             variant="h5"
                             color={selectedSales == Sales.ACTIVE ? 'primary' : 'inherit'}
                         >
-                            3,803
+                            NA
                         </Typography>
                     </StatsCard>
                 </Grid>
@@ -213,7 +213,7 @@ function SalesPage() {
                             variant="h5"
                             color={selectedSales == Sales.INACTIVE ? 'primary' : 'inherit'}
                         >
-                            20
+                            NA
                         </Typography>
                     </StatsCard>
                 </Grid>
@@ -247,17 +247,17 @@ function SalesPage() {
                                         </TableCell>
                                         <TableCell component="th" scope="row">
                                             <img src={row?.product_images.length > 0 ? row?.product_images[0] : null}
-                                                 width={48} height={48} alt={trimString(row?.car)}/>
+                                                 width={48} height={48} alt={trimString(row?.id)}/>
                                         </TableCell>
-                                        <TableCell align="right">{row.vin}</TableCell>
-                                        <TableCell align="right">{row.make}</TableCell>
-                                        <TableCell align="right">{row.model}</TableCell>
-                                        <TableCell align="right">{row.year}</TableCell>
-                                        <TableCell align="right">{row.fuelType}</TableCell>
+                                        <TableCell align="right">{row?.car?.vin}</TableCell>
+                                        <TableCell align="right">{row?.car?.make}</TableCell>
+                                        <TableCell align="right">{row?.car?.model}</TableCell>
+                                        <TableCell align="right">{row?.car?.year}</TableCell>
+                                        <TableCell align="right">{row?.car?.fuel_type}</TableCell>
                                         <TableCell align="right">
-                                            &#8358;{row.sellingPrice}
+                                            &#8358;{formatNumber(row?.selling_price)}
                                         </TableCell>
-                                        <TableCell align="right">{row.dateListed}</TableCell>
+                                        <TableCell align="right">{formatDate(row?.created)}</TableCell>
                                         <TableCell align="right">
                                             <Button
                                                 text="View"
