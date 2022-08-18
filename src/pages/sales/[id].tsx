@@ -12,7 +12,7 @@ import {useEffect, useState} from 'react'
 import {deleteCar, retrieveSingleCar} from "../../services/car";
 import {toast} from "react-hot-toast";
 import {deleteSale, retrieveSingleSale} from "../../services/sale";
-import {trimString} from "../../helpers/formatters";
+import {formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "../../components/shared/CPToast";
 
 function SalesProfilePage() {
@@ -147,7 +147,7 @@ function SalesProfilePage() {
                     <div className="vehicle-info">
                         <Image src="/images/Toyota-Full.png" height={11} width={40}/>
                         <Typography variant="h5" style={{marginLeft: 20}}>
-                            NA
+                            {trimString(saleId)}
                         </Typography>
                     </div>
                     <div className="button-group">
@@ -199,16 +199,16 @@ function SalesProfilePage() {
                                     style={{marginBottom: -15}}
                                 />
                                 <Typography variant="h5" className="trade">
-                                    Trade ID NA
+                                    {trimString(sale?.car?.id)}
                                 </Typography>
-                                <Typography variant="h6">NA</Typography>
+                                <Typography variant="h6">{sale?.car?.make} {sale?.car?.model}</Typography>
                             </div>
                         </VehicleDetails>
                     </Grid>
                     <Grid item xs={6}>
                         <PriceCard>
                             <div>Selling Price</div>
-                            <Typography variant="h4">&#8358; NA</Typography>
+                            <Typography variant="h4">&#8358; {formatNumber(sale?.selling_price)}</Typography>
                         </PriceCard>
                     </Grid>
                 </PriceSection>
@@ -267,7 +267,7 @@ function SalesProfilePage() {
                     {sale?.car_features.map((ft, idx) => (
                         <div className="key-features" key={idx}>
                             <img src={ft?.feature_images.length > 0 ? ft.feature_images[0] : null}
-                                 alt={ft?.name + ' image'}/>
+                                 alt={ft?.name + 'feature image'}/>
                             <Typography variant="subtitle1" className="text">
                                 {ft?.name || 'NA'}
                             </Typography>
