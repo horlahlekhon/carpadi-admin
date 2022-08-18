@@ -387,9 +387,9 @@ function TradeProfilePage() {
                                     <Grid item xs={12}>
                                         <PriceCard>
                                             <Typography variant="body1">
-                                                Estimated Carpadi minimum Profit on sales
+                                                Estimated Carpadi Profit on sales
                                             </Typography>
-                                            <Typography variant="h5">&#8358; NA</Typography>
+                                            <Typography variant="h5">&#8358; {formatNumber(tradeData?.estimated_return_on_trade)}</Typography>
                                         </PriceCard>
                                     </Grid>
                                     {/*<Grid item xs={12}>*/}
@@ -646,18 +646,9 @@ function TradeProfilePage() {
                                             placeholder="Minimum selling price"
                                             label="Minimum selling price"
                                             fullWidth
+                                            disabled
                                             value={tradeData.min_sale_price}
                                             onChange={handleTradeChange('min_sale_price')}
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Maximum selling price"
-                                            label="Maximum selling price"
-                                            fullWidth
-                                            value={tradeData.max_sale_price}
-                                            onChange={handleTradeChange('max_sale_price')}
                                         ></TextField>
                                     </FlexRow>
                                 </div>

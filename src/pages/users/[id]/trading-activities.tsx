@@ -72,6 +72,7 @@ function TradingActivitiesPage() {
     }
 
     const retrieveActivities = (id, tradeStatus = activityTab) => {
+        setActivities([])
         if (id !== null && id !== undefined) {
             tradeService.retrieveUserTrades(id, tradeStatus).then((response) => {
                 if (response.status) {

@@ -36,8 +36,11 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     const [sellingPrice, setSellingPrice] = useState(0)
     const [highlight, setHighlight] = useState('')
     const [keyFeatures, setKeyFeatures] = useState([])
+    const [salesImages, setSalesImages] = useState([])
     const [keyFeature, setKeyFeature] = useState(refKeyFeature)
+    const [saleImage, setSaleImage] = useState({url: ''})
     const [kfIdx, setKFIdx] = useState(0)
+    const [sfIdx, setSFIdx] = useState(0)
     const [selectedCar, setSelectedCar] = useState(null)
     const [isLoading, setLoading] = useState(false)
     const [state, setState] = useState({
@@ -64,6 +67,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
 
     const hiddenFileInput = useRef(null);
     const hiddenFileInput2 = useRef(null);
+    const hiddenFileInput3 = useRef(null);
 
     const handleNavigation = (action: string) => {
         router.push(`${action}`)
@@ -89,6 +93,27 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                     const arr = [...keyFeatures];
                     arr[kfIdx].feature_images.push(url)
                     setKeyFeatures(arr)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    };
+
+    const handleFileChange3 = event => {
+        const fileUploaded = event.target.files[0];
+        uploadFile(fileUploaded)
+            .then((res) => {
+                if (res.status) {
+                    const url = res.data.secure_url;
+                    const arr = [...salesImages];
+                    arr[sfIdx] = {url}
+                    setSalesImages(arr)
                 } else {
                     toast.error(res.data)
                 }
@@ -164,10 +189,16 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
         setKeyFeature(refKeyFeature)
     }
 
+    const addSaleImage = () => {
+        const arr = [...salesImages, saleImage];
+        setSalesImages(arr)
+        setSaleImage({url: ''})
+    }
+
     function saveSale() {
         setLoading(true)
         const sale = {
-            "images": selectedCar?.pictures,
+            "images": salesImages.map(a => a?.url),
             "features": keyFeatures,
             "highlight": highlight,
             "selling_price": sellingPrice,
@@ -196,9 +227,19 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
         setKeyFeatures(arr)
     }
 
+    function deleteSaleImage(idx, url) {
+        const arr = salesImages.filter(a => a?.url !== url);
+        setSalesImages(arr)
+    }
+
     function addKfImage(idx) {
         setKFIdx(idx)
         hiddenFileInput2.current.click();
+    }
+
+    function addSFImage(idx) {
+        setSFIdx(idx)
+        hiddenFileInput3.current.click();
     }
 
     function updateKeyFeature(idx: number, field: string, value: string) {
@@ -214,6 +255,13 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
             accept="image/*"
             ref={hiddenFileInput2}
             onChange={handleFileChange2}
+            style={{display: 'none'}}
+        />
+        <input
+            type="file"
+            accept="image/*"
+            ref={hiddenFileInput3}
+            onChange={handleFileChange3}
             style={{display: 'none'}}
         />
         <Modal
@@ -453,36 +501,30 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                     />
                                 </div>
                             </InputGrid>))}
-                        {/*<FlexRow style={{marginBottom: 20, marginTop: 60}}>*/}
-                        {/*    <HeaderText>Car Sales Image</HeaderText>*/}
-                        {/*    <IconPill>*/}
-                        {/*        Add Image*/}
-                        {/*        <Add className="icon"/>*/}
-                        {/*    </IconPill>*/}
-                        {/*</FlexRow>*/}
-                        {/*<InputGrid>*/}
-                        {/*    <div className="input">*/}
-                        {/*        <div className="text">Upload Image</div>*/}
-                        {/*        <Button*/}
-                        {/*            text="Upload"*/}
-                        {/*            outlined={true}*/}
-                        {/*            width={71}*/}
-                        {/*            height={28}*/}
-                        {/*            borderRadius="8px"*/}
-                        {/*        />*/}
-                        {/*    </div>*/}
-                        {/*    <div className="input">*/}
-                        {/*        <div className="text">engine indlmor.png</div>*/}
-                        {/*        <Button*/}
-                        {/*            text="Delete"*/}
-                        {/*            outlined={true}*/}
-                        {/*            width={71}*/}
-                        {/*            height={28}*/}
-                        {/*            bgColor={t.alertError}*/}
-                        {/*            borderRadius="8px"*/}
-                        {/*        />*/}
-                        {/*    </div>*/}
-                        {/*</InputGrid>*/}
+                        <FlexRow style={{marginBottom: 20, marginTop: 60}}>
+                            <HeaderText>Car Sales Image</HeaderText>
+                            <IconPill onClick={() => addSaleImage()}>
+                                Add Image
+                                <Add className="icon"/>
+                            </IconPill>
+                        </FlexRow>
+                        <InputGrid>
+                            {salesImages.map((si, idx) => (
+                                <div className="input">
+                                    <div
+                                        className="text">{si?.url !== '' ? trimString(si?.url, 12) : 'Upload Image'}</div>
+                                    <Button
+                                        text={si?.url !== '' ? "Delete" : "Upload"}
+                                        outlined={true}
+                                        width={71}
+                                        height={28}
+                                        bgColor={si?.url !== '' ? t.alertError : ''}
+                                        borderRadius="8px"
+                                        onClick={() => si?.url !== '' ? deleteSaleImage(idx, si?.url) : addSFImage(idx)}
+                                    />
+                                </div>
+                            ))}
+                        </InputGrid>
                         <div style={{display: 'flex', marginTop: 70}}>
                             <Button
                                 text="Proceed"
@@ -557,10 +599,10 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             <Flex>
                                 <div className="gallery">
                                     <ImageGrid>
-                                        {selectedCar.pictures.map((im, idx) => (
+                                        {salesImages.map((im, idx) => (
                                             <img
                                                 key={idx}
-                                                src={im}
+                                                src={im?.url}
                                                 className="image"
                                             />
                                         ))}

@@ -131,8 +131,6 @@ function HomePage() {
             obj['name'] = key
             if (typeof value === "object") {
                 obj['value'] = value?.percentage || value?.count
-            } else {
-                obj['value'] = value
             }
             arr.push(obj)
         }
@@ -153,6 +151,10 @@ function HomePage() {
                 toast.error(error)
             })
     }, [])
+
+    useEffect(() => {
+        parsePieChartData()
+    }, [pageData, year])
 
     return (
         <Container>
