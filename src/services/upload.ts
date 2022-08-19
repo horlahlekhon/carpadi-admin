@@ -1,4 +1,6 @@
 import getConfig from 'next/config';
+import {UploadTypes} from "../lib/enums";
+import {randomString} from "../helpers/condeGenerators";
 
 
 const {publicRuntimeConfig} = getConfig();
@@ -11,10 +13,11 @@ const preset = `${publicRuntimeConfig.cloudinaryPreset}`;
  * @param actionName
  * @param file
  */
-const uploadFile = (file, actionName = 'image/upload') => {
+const uploadFile = (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload',) => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', preset);
+    formData.append('public_id', `${uploadType}_${resourceId}_${randomString()}`);
     return fetch(`${baseUrl}/${actionName}`, {method: 'POST', body: formData})
         .then(async (response) => {
             let res = await response.json()

@@ -14,6 +14,7 @@ import {deleteSale, retrieveSingleSale, updateSale} from "../../services/sale";
 import {formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "../../components/shared/CPToast";
 import {uploadFile} from "../../services/upload";
+import {UploadTypes} from "../../lib/enums";
 
 function SalesProfilePage() {
     const refKeyFeature = {
@@ -58,7 +59,7 @@ function SalesProfilePage() {
 
     const handleFileChange2 = event => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded)
+        uploadFile(fileUploaded, UploadTypes.CAR_FEATURE, sale?.car?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;
@@ -79,7 +80,7 @@ function SalesProfilePage() {
 
     const handleFileChange3 = event => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded)
+        uploadFile(fileUploaded, UploadTypes.CAR_PRODUCT, sale?.car?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;

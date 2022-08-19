@@ -2,11 +2,19 @@ import {withStyles} from "@material-ui/styles";
 import {t} from "../../styles/theme";
 import {
     FormControl,
-    Grid, IconButton,
+    Grid,
+    IconButton,
     Input,
     InputAdornment,
-    InputLabel, Modal,
-    Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    InputLabel,
+    Modal,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
     TextField,
     Typography
 } from "@material-ui/core";
@@ -23,7 +31,7 @@ import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "./CPToast";
 import {createSale} from "../../services/sale";
 import {uploadFile} from "../../services/upload";
-import {CarStates} from "../../lib/enums";
+import {CarStates, UploadTypes} from "../../lib/enums";
 
 const CreateSale = ({modalOpen = true, onClick, car = null}) => {
     const router = useRouter()
@@ -86,7 +94,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
 
     const handleFileChange2 = event => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded)
+        uploadFile(fileUploaded, UploadTypes.CAR_FEATURE, selectedCar?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;
@@ -107,7 +115,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
 
     const handleFileChange3 = event => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded)
+        uploadFile(fileUploaded, UploadTypes.CAR_PRODUCT, selectedCar?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;

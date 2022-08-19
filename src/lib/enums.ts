@@ -66,6 +66,7 @@ enum UploadTypes {
     USER = "user",
     CAR_FEATURE = "car-feature",
     CAR_PRODUCT = "car-product",
+    ANY = 'any'
 }
 
 export {
