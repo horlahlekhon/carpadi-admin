@@ -10,8 +10,10 @@ const preset = `${publicRuntimeConfig.cloudinaryPreset}`;
 
 /**
  * Upload file to cloudinary
+ * @param uploadType
+ * @param resourceId
  * @param actionName
- * @param file
+ * @param file [Required]
  */
 const uploadFile = (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload',) => {
     const formData = new FormData();

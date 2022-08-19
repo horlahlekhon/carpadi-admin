@@ -1,7 +1,4 @@
-import {
-    FormControl, Modal, Select, TextField,
-    Typography, withStyles
-} from "@material-ui/core";
+import {FormControl, Modal, Select, TextField, Typography, withStyles} from "@material-ui/core";
 import Image from "next/image";
 import {t} from "../../styles/theme";
 import Button from "./Button";
@@ -10,10 +7,11 @@ import {useRef, useState} from "react";
 import {toast} from "react-hot-toast";
 import styled from "styled-components";
 import {retrieveVINDetails} from "../../services/vehicle";
-import {deleteUpload, uploadFile} from "../../services/upload";
+import {uploadFile} from "../../services/upload";
 import ntc from "../../lib/ntc";
 import {trimString} from "../../helpers/formatters";
 import {createCar} from "../../services/car";
+import {UploadTypes} from "../../lib/enums";
 
 const AddCarProfile = ({modalOpen = true, onClick}) => {
     const router = useRouter()
@@ -76,7 +74,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
 
     const handleFile = (file) => {
         setisUploading(true)
-        uploadFile(file)
+        uploadFile(file, UploadTypes.CAR, vin)
             .then((res) => {
                 if (res.status) {
                     const arr = [...uploadedPictures, res.data];
