@@ -63,7 +63,7 @@ function TradesPage({response}) {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1);
-        retrieveTrades(selectedTrade === Trades.ACTIVE ? 'purchased' : selectedTrade === Trades.SOLD ? 'completed' : 'sold', newPage - 1)
+        retrieveTrades(selectedTrade === Trades.ACTIVE ? 'ongoing' : selectedTrade === Trades.SOLD ? 'completed' : 'sold', newPage - 1)
     }
 
     const handleNavigation = (action: string) => {
@@ -84,7 +84,13 @@ function TradesPage({response}) {
             })
     }
 
-    const retrieveTrades = (tradeStatus = 'purchased', page = 0) => {
+    const retrieveTrades = (tradeStatus = 'ongoing', page = 0) => {
+        setTrades([])
+        setPagination({
+            "count": 0,
+            "next": null,
+            "previous": null,
+        })
         tradeService.retrieveTrades(rowsPerPage, page, tradeStatus)
             .then((response) => {
                 if (response.status) {
@@ -127,7 +133,7 @@ function TradesPage({response}) {
     const classes = useStyles({})
 
     const {items} = usePagination({
-        count: Math.ceil(paginationKeys.count/rowsPerPage),
+        count: Math.ceil(paginationKeys.count / rowsPerPage),
         onChange: handleChangePage
     })
 
@@ -183,7 +189,7 @@ function TradesPage({response}) {
                         onClick={() => {
                             setSelected(Trades.ACTIVE);
                             setPage(0);
-                            retrieveTrades('purchased')
+                            retrieveTrades('ongoing')
                         }}
                         style={{
                             border:

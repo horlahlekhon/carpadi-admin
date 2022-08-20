@@ -1,708 +1,772 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import { Grid, Typography, Paper, Modal, TextField } from '@material-ui/core'
-import { t } from '../../styles/theme'
-import { useRouter } from 'next/router'
+import {Grid, Modal, Paper, TextField, Typography} from '@material-ui/core'
+import {t} from '../../styles/theme'
+import {useRouter} from 'next/router'
 import Button from '../../components/shared/Button'
 import Image from 'next/image'
-import { withStyles } from '@material-ui/styles'
+import {withStyles} from '@material-ui/styles'
 import ToggleSwitch from '../../components/shared/ToggleSwitch'
-import { Add } from '@material-ui/icons'
-import { useState } from 'react'
+import {Add} from '@material-ui/icons'
+import {useEffect, useRef, useState} from 'react'
+import {toast} from "react-hot-toast";
+import {deleteSale, retrieveSingleSale, updateSale} from "../../services/sale";
+import {formatNumber, trimString} from "../../helpers/formatters";
+import CPToast from "../../components/shared/CPToast";
+import {uploadFile} from "../../services/upload";
+import {UploadTypes} from "../../lib/enums";
 
 function SalesProfilePage() {
-  const router = useRouter()
-  const pageId = router.query.id || 'NA'
-  const [state, setState] = useState({
-    saleActive: true
-  })
-  const [modalOpen, setModalState] = useState(false)
-  const [modalView, setModalView] = useState('')
-  const [modalTitle, setModalTitle] = useState('')
+    const refKeyFeature = {
+        name: '',
+        feature_images: []
+    }
+    const router = useRouter()
+    const [saleId, setSaleId] = useState(null)
+    const [state, setState] = useState({
+        saleActive: false
+    })
+    const [modalOpen, setModalState] = useState(false)
+    const [modalView, setModalView] = useState('')
+    const [modalTitle, setModalTitle] = useState('')
+    const [sale, setSale] = useState({
+        "id": null,
+        "product_images": [],
+        "car_features": [],
+        "highlight": null,
+        "trade": null,
+        "created": null,
+        "modified": null,
+        "selling_price": "0",
+        "status": null,
+        "car": null
+    })
+    const [isSaving, setIsSaving] = useState(false)
+    const [isLoading, setLoading] = useState(false)
+    const [carouselIdx, setCarouselIdx] = useState(0)
+    const [keyFeature, setKeyFeature] = useState(refKeyFeature)
+    const [saleImage, setSaleImage] = useState('')
+    const [kfIdx, setKFIdx] = useState(0)
+    const [sfIdx, setSFIdx] = useState(0)
+    const hiddenFileInput2 = useRef(null);
+    const hiddenFileInput3 = useRef(null);
 
-  const showModal = (viewName: string, title: string) => {
-    setModalView(viewName)
-    setModalTitle(title)
-    setModalState(true)
-  }
+    const showModal = (viewName: string, title: string) => {
+        setModalView(viewName)
+        setModalTitle(title)
+        setModalState(true)
+    }
 
-  const handleChange = (event) => {
-    setState({ ...state, [event.target.name]: event.target.checked })
-  }
-
-  const handleNavigation = (action: string) => {
-    router.replace(`${action}`)
-  }
-  return (
-    <Container>
-      <Header>
-        <Typography variant="h4">
-          <b>{pageId}</b>
-        </Typography>
-      </Header>
-      <Breadcrumbs>
-        <img
-          src="/icons/Vehicle-Blue.svg"
-          width={'20px'}
-          height={'18px'}
-          style={{ marginRight: '12px' }}
-        />
-        <div
-          onClick={() => {
-            handleNavigation('/sales')
-          }}
-        >
-          <span className="text">Selling</span>
-          <span className="separator"></span>
-        </div>
-        <div
-          onClick={() => {
-            handleNavigation(`sales/${pageId}`)
-          }}
-        >
-          <span className="text">{pageId}</span>
-          <span className="separator"></span>
-        </div>
-      </Breadcrumbs>
-      <Body>
-        <ActionBar>
-          <div className="vehicle-info">
-            <Image src="/images/Toyota-Full.png" height={11} width={40} />
-            <Typography variant="h5" style={{ marginLeft: 20 }}>
-              Toyota Rav4 2020
-            </Typography>
-          </div>
-          <div className="button-group">
-            <Button
-              text="Vehicle Inspection Report"
-              width={210}
-              outlined={true}
-              marginRight="16px"
-            />
-            <Button
-              text="Delete Sales Profile"
-              width={160}
-              outlined={true}
-              marginRight="16px"
-              bgColor={t.alertError}
-              onClick={() => {
-                showModal('deleteSale', '')
-              }}
-            />
-            <Button
-              text="Edit Images"
-              width={150}
-              outlined={true}
-              marginRight="16px"
-              onClick={() => showModal('editImages', 'Edit Car Sales Images')}
-            />
-            <Button
-              text="Edit Details"
-              width={150}
-              outlined={true}
-              onClick={() => showModal('editDetails', 'Edit Car Sales Details')}
-            />
-          </div>
-        </ActionBar>
-        <PriceSection container spacing={3}>
-          <Grid item xs={6}>
-            <VehicleDetails>
-              <Image
-                src="/images/Big-Default-Car.png"
-                height={135}
-                width={185}
-                style={{ borderRadius: '8px' }}
-              />
-              <div className="stats">
-                <img
-                  src="/images/Toyota-Full.png"
-                  width={80}
-                  height={22}
-                  style={{ marginBottom: -15 }}
-                />
-                <Typography variant="h5" className="trade">
-                  Trade ID 09890
-                </Typography>
-                <Typography variant="h6">Toyota Rav4 2020</Typography>
-              </div>
-            </VehicleDetails>
-          </Grid>
-          <Grid item xs={6}>
-            <PriceCard>
-              <div>Selling Price</div>
-              <Typography variant="h4">&#8358; 12,500,000.00</Typography>
-            </PriceCard>
-          </Grid>
-        </PriceSection>
-        <SalesStatus>
-          <Typography variant="h6" className="status">
-            Sales Status
-          </Typography>
-          <div className="cta">
-            <span>Set As Active</span>
-            <ToggleSwitch
-              checked={state.saleActive}
-              onChange={handleChange}
-              name="saleActive"
-            />
-          </div>
-        </SalesStatus>
-        <Typography variant="h6" color="secondary">
-          Car Sales Highlight
-        </Typography>
-        <p style={{ marginBottom: 40 }}>
-          Interdum et malesuada fames ac ante ipsum primis in faucibus. Aenean
-          nulla neque, facilisis eget sem in, porttitor porttitor diam. Maecenas
-          vitae nisi pharetra, dapibus nisl sit amet, pulvinar erat.
-        </p>
-        <Typography variant="h6" color="secondary">
-          Car Sales Image
-        </Typography>
-        <Flex>
-          <div className="slideshow">
-            <img
-              className="main"
-              src="/images/FullSize-Default-Car.png"
-              height={403}
-              width={558}
-            />
-            <img
-              src="/images/Previous-Slideshow.png"
-              alt="Prev"
-              className="previous"
-            />
-            <img src="/images/Next-Slideshow.png" alt="Next" className="next" />
-          </div>
-          <div className="gallery">
-            <ImageGrid>
-              <img src="/images/FullSize-Default-Car.png" className="image" />
-              <img src="/images/FullSize-Default-Car.png" className="image" />
-              <img src="/images/FullSize-Default-Car.png" className="image" />
-              <img src="/images/FullSize-Default-Car.png" className="image" />
-            </ImageGrid>
-          </div>
-        </Flex>
-        <Typography variant="h6" color="secondary">
-          Key Features
-        </Typography>
-        <Features>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-          <div className="key-features">
-            <img src="/images/Big-Default-Car.png" alt="Feature" />
-            <Typography variant="subtitle1" className="text">
-              Leather Seats
-            </Typography>
-          </div>
-        </Features>
-      </Body>
-      <Modal
-        open={modalOpen}
-        onClose={() => {
-          setModalState(false)
-        }}
-      >
-        <ModalBody>
-          <ModalBodyHeader>
-            <Typography variant="h5" style={{ fontWeight: 600 }}>
-              {modalTitle}
-            </Typography>
-            <Image
-              src="/icons/Cancel-Black.svg"
-              width={25}
-              height={25}
-              onClick={() => setModalState(false)}
-              style={{ cursor: 'pointer' }}
-            />
-          </ModalBodyHeader>
-          <Typography variant="inherit" style={{ marginBottom: 20 }}>
-            {modalTitle !== ''
-              ? ' Kindly provide the following information below.'
-              : ''}{' '}
-            &nbsp;
-          </Typography>
-          {modalView === 'editDetails' && (
-            <>
-              <HeaderText variant="inherit" style={{ marginTop: '40px' }}>
-                Sales For
-              </HeaderText>
-              <InfoSection container spacing={3}>
-                <Grid item xs={12}>
-                  <VehicleDetails style={{ width: 700 }}>
-                    <img
-                      src="/images/Big-Default-Car.png"
-                      width={185}
-                      height={135}
-                      style={{ borderRadius: '8px' }}
-                    />
-                    <div className="stats">
-                      <img
-                        src="/images/Toyota-Full.png"
-                        width={80}
-                        height={22}
-                        style={{ marginBottom: -15 }}
-                      />
-                      <Typography variant="h5" className="trade">
-                        Trade ID 09890
-                      </Typography>
-                      <Typography variant="h6">Toyota Rav4 2020</Typography>
-                    </div>
-                  </VehicleDetails>
-                </Grid>
-              </InfoSection>
-              <HeaderText style={{ marginBottom: 16 }}>
-                Car Sales Highlight
-              </HeaderText>
-              <TextField
-                fullWidth
-                placeholder="Accident free | full customs duty paid | good history report ..."
-              ></TextField>
-
-              <FlexRow
-                style={{ marginBottom: 50, marginTop: 40, alignItems: 'start' }}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <HeaderText variant="inherit" style={{ marginBottom: 14 }}>
-                    Selling Price
-                  </HeaderText>
-                  <FlexRow>
-                    <div className="currency-box">&#8358;</div>
-                    <TextField
-                      placeholder="Enter price"
-                      style={{ width: 400 }}
-                    ></TextField>
-                  </FlexRow>
-                </div>
-                <SalesStatus className="stacked" style={{ marginLeft: 'auto' }}>
-                  <HeaderText className="status">Sales Status</HeaderText>
-                  <div className="cta">
-                    <span>Set As Active</span>
-                    <ToggleSwitch
-                      checked={state.saleActive}
-                      onChange={handleChange}
-                      name="saleActive"
-                    />
-                  </div>
-                </SalesStatus>
-              </FlexRow>
-              <Button
-                text="Save Changes"
-                width={510}
-                marginLeft="auto"
-                marginRight="auto"
-                onClick={() => setModalState(false)}
-              />
-            </>
-          )}
-          {modalView === 'editImages' && (
-            <>
-              <HeaderText variant="inherit" style={{ marginTop: '40px' }}>
-                Sales For
-              </HeaderText>
-              <InfoSection container spacing={3}>
-                <Grid item xs={12}>
-                  <VehicleDetails style={{ width: 700 }}>
-                    <img
-                      src="/images/Big-Default-Car.png"
-                      width={185}
-                      height={135}
-                      style={{ borderRadius: '8px' }}
-                    />
-                    <div className="stats">
-                      <img
-                        src="/images/Toyota-Full.png"
-                        width={80}
-                        height={22}
-                        style={{ marginBottom: -15 }}
-                      />
-                      <Typography variant="h5" className="trade">
-                        Trade ID 09890
-                      </Typography>
-                      <Typography variant="h6">Toyota Rav4 2020</Typography>
-                    </div>
-                  </VehicleDetails>
-                </Grid>
-              </InfoSection>
-              <FlexRow style={{ marginBottom: 20 }}>
-                <HeaderText>Key Features</HeaderText>
-                <IconPill>
-                  Add key feature
-                  <Add className="icon" />
-                </IconPill>
-              </FlexRow>
-              <InputGrid>
-                <TextField
-                  className="text-field"
-                  fullWidth
-                  placeholder="Key Feature 1"
-                />
-                <div className="input">
-                  <div className="text">Upload Image</div>
-                  <Button
-                    text="Upload"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    borderRadius="8px"
-                  />
-                </div>
-              </InputGrid>
-              <InputGrid>
-                <TextField
-                  className="text-field"
-                  fullWidth
-                  placeholder="Key Feature 2"
-                />
-                <div className="input">
-                  <div className="text">engine indlmor.png</div>
-                  <Button
-                    text="Delete"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    bgColor={t.alertError}
-                    borderRadius="8px"
-                  />
-                </div>
-              </InputGrid>
-              <FlexRow style={{ marginBottom: 20, marginTop: 60 }}>
-                <HeaderText>Car Sales Image</HeaderText>
-                <IconPill>
-                  Add Image
-                  <Add className="icon" />
-                </IconPill>
-              </FlexRow>
-              <InputGrid>
-                <div className="input">
-                  <div className="text">Upload Image</div>
-                  <Button
-                    text="Upload"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    borderRadius="8px"
-                  />
-                </div>
-                <div className="input">
-                  <div className="text">Upload Image</div>
-                  <Button
-                    text="Upload"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    borderRadius="8px"
-                  />
-                </div>
-              </InputGrid>
-              <InputGrid>
-                <div className="input">
-                  <div className="text">Upload Image</div>
-                  <Button
-                    text="Upload"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    borderRadius="8px"
-                  />
-                </div>
-                <div className="input">
-                  <div className="text">Upload Image</div>
-                  <Button
-                    text="Upload"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    borderRadius="8px"
-                  />
-                </div>
-              </InputGrid>
-              <InputGrid>
-                <div className="input">
-                  <div className="text">Upload Image</div>
-                  <Button
-                    text="Upload"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    borderRadius="8px"
-                  />
-                </div>
-                <div className="input">
-                  <div className="text">engine indlmor.png</div>
-                  <Button
-                    text="Delete"
-                    outlined={true}
-                    width={71}
-                    height={28}
-                    bgColor={t.alertError}
-                    borderRadius="8px"
-                  />
-                </div>
-              </InputGrid>
-              <Button
-                text="Proceed"
-                width={510}
-                marginLeft="auto"
-                marginRight="auto"
-                marginTop={50}
-                onClick={() =>
-                  showModal('imagesPreview', 'Car Sales Image Preview')
+    const handleFileChange2 = event => {
+        const fileUploaded = event.target.files[0];
+        uploadFile(fileUploaded, UploadTypes.CAR_FEATURE, sale?.car?.id)
+            .then((res) => {
+                if (res.status) {
+                    const url = res.data.secure_url;
+                    const obj = {...sale}
+                    obj.car_features[kfIdx].feature_images.push(url)
+                    setSale(obj)
+                } else {
+                    toast.error(res.data)
                 }
-              />
-            </>
-          )}
-          {modalView === 'imagesPreview' && (
-            <>
-              <HeaderText variant="inherit" style={{ marginTop: '40px' }}>
-                Sales For
-              </HeaderText>
-              <InfoSection container spacing={3}>
-                <Grid item xs={12}>
-                  <VehicleDetails style={{ width: 700 }}>
-                    <img
-                      src="/images/Big-Default-Car.png"
-                      width={185}
-                      height={135}
-                      style={{ borderRadius: '8px' }}
-                    />
-                    <div className="stats">
-                      <img
-                        src="/images/Toyota-Full.png"
-                        width={80}
-                        height={22}
-                        style={{ marginBottom: -15 }}
-                      />
-                      <Typography variant="h5" className="trade">
-                        Trade ID 09890
-                      </Typography>
-                      <Typography variant="h6">Toyota Rav4 2020</Typography>
-                    </div>
-                  </VehicleDetails>
-                </Grid>
-              </InfoSection>
-              <Typography variant="h6" color="secondary">
-                Key Features
-              </Typography>
-              <Features className="modal">
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-                <div className="key-features">
-                  <img src="/images/Big-Default-Car.png" alt="Feature" />
-                  <Typography variant="subtitle1" className="text">
-                    Leather Seats
-                  </Typography>
-                </div>
-              </Features>
-              <Typography variant="h6" color="secondary">
-                Car Sales Image
-              </Typography>
-              <Flex>
-                <div className="gallery">
-                  <ImageGrid className="modal">
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                    <img
-                      src="/images/FullSize-Default-Car.png"
-                      className="image modal"
-                    />
-                  </ImageGrid>
-                </div>
-              </Flex>
-              <Button
-                text="Save Changes"
-                width={510}
-                marginLeft="auto"
-                marginRight="auto"
-                marginTop={50}
-                onClick={() => setModalState(false)}
-              />
-            </>
-          )}
-          {modalView === 'deleteSale' && (
-            <>
-              <Info>
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    };
+
+    const handleFileChange3 = event => {
+        const fileUploaded = event.target.files[0];
+        uploadFile(fileUploaded, UploadTypes.CAR_PRODUCT, sale?.car?.id)
+            .then((res) => {
+                if (res.status) {
+                    const url = res.data.secure_url;
+                    const obj = {...sale}
+                    obj.product_images[sfIdx] = url;
+                    setSale(obj)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    };
+
+    const handleChange = (event) => {
+        setState({...state, [event.target.name]: event.target.checked})
+    }
+
+    const handleNavigation = (action: string) => {
+        router.push(`${action}`)
+    }
+
+    function nextImage() {
+        if (carouselIdx < sale.product_images.length - 1) {
+            setCarouselIdx(carouselIdx + 1)
+        }
+    }
+
+    function prevImage() {
+        if (carouselIdx > 0) {
+            setCarouselIdx(carouselIdx - 1)
+        }
+    }
+
+    function deleteSaleProfile() {
+        setIsSaving(true)
+        deleteSale(saleId)
+            .then((res) => {
+                if (res.status) {
+                    toast.success('Deleted Successfully!')
+                    handleNavigation(`/sales`)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => [
+                toast.error(error)
+            ])
+            .finally(() => {
+                setIsSaving(false)
+                setModalState(false)
+            })
+    }
+
+    const getSale = (id) => {
+        if (id !== null && id !== undefined && id !== '') {
+            retrieveSingleSale(id)
+                .then((response) => {
+                        if (response.status) {
+                            setSale(response.data)
+                            if (response.data?.status === 'active') {
+                                setState({...state, saleActive: true})
+                            }
+                        } else {
+                            toast.error(response.data)
+                        }
+                    }
+                )
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
+    useEffect(() => {
+        setSaleId(String(router.query.id))
+        getSale(String(router.query.id))
+    }, [])
+
+    function handleSaleChange(key: string, value: string) {
+        let obj = {...sale}
+        obj[key] = value;
+        setSale(obj)
+    }
+
+    function saveSale() {
+        updateSale(saleId, {
+            ...sale,
+            car: sale?.car?.id,
+            features: sale?.car_features || [],
+            images: sale?.product_images || [],
+            status: state?.saleActive ? 'active' : 'inactive'
+        })
+            .then((res) => {
+                if (res.status) {
+                    toast.success('Updated Successfully')
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((err) => {
+                toast.error(err)
+            })
+            .finally(() => {
+                setModalState(false)
+            })
+    }
+
+    const addKeyfeature = () => {
+        const obj = {...sale}
+        obj['car_features'] = [...obj?.car_features, keyFeature];
+        setSale(obj)
+        setKeyFeature(refKeyFeature)
+    }
+
+    const addSaleImage = () => {
+        const obj = {...sale}
+        obj['product_images'] = [...obj?.product_images, saleImage];
+        setSale(obj)
+        setSaleImage('')
+    }
+
+    function deleteKfImage(idx, url) {
+        const obj = {...sale}
+        obj['car_features'] = obj?.car_features.filter(a => a?.url !== url);
+        setSale(obj)
+    }
+
+    function deleteSaleImage(idx, url) {
+        const obj = {...sale}
+        obj['product_images'] = obj?.product_images.filter(a => a !== url);
+        setSale(obj)
+    }
+
+    function addKfImage(idx) {
+        setKFIdx(idx)
+        hiddenFileInput2.current.click();
+    }
+
+    function addSFImage(idx) {
+        setSFIdx(idx)
+        hiddenFileInput3.current.click();
+    }
+
+    function updateKeyFeature(idx: number, field: string, value: string) {
+        const obj = {...sale}
+        obj.car_features[idx].name = value;
+        setSale(obj)
+    }
+
+    return (
+        <Container>
+            <CPToast/><input
+            type="file"
+            accept="image/*"
+            ref={hiddenFileInput2}
+            onChange={handleFileChange2}
+            style={{display: 'none'}}
+        />
+            <input
+                type="file"
+                accept="image/*"
+                ref={hiddenFileInput3}
+                onChange={handleFileChange3}
+                style={{display: 'none'}}
+            />
+
+            <Header>
+                <Typography variant="h4">
+                    <b>{trimString(saleId)}</b>
+                </Typography>
+            </Header>
+            <Breadcrumbs>
                 <img
-                  src="/icons/Trash-Red.svg"
-                  alt="Trash"
-                  height={40}
-                  width={40}
+                    src="/icons/Vehicle-Blue.svg"
+                    width={'20px'}
+                    height={'18px'}
+                    style={{marginRight: '12px'}}
                 />
-                <Typography
-                  variant="h6"
-                  style={{ marginTop: 48, marginBottom: 16 }}
+                <div
+                    onClick={() => {
+                        handleNavigation('/sales')
+                    }}
                 >
-                  Delete Car Sales Profile
-                </Typography>
-                <Typography
-                  variant="subtitle2"
-                  style={{ maxWidth: 206, marginBottom: 39 }}
+                    <span className="text">Selling</span>
+                    <span className="separator"></span>
+                </div>
+                <div
+                    onClick={() => {
+                        handleNavigation(`sales/${saleId}`)
+                    }}
                 >
-                  You are about to delete this vehicle sales profile.
+                    <span className="text">{trimString(saleId)}</span>
+                    <span className="separator"></span>
+                </div>
+            </Breadcrumbs>
+            <Body>
+                <ActionBar>
+                    <div className="vehicle-info">
+                        <Image src="/images/Toyota-Full.png" height={11} width={40}/>
+                        <Typography variant="h5" style={{marginLeft: 20}}>
+                            {trimString(saleId)}
+                        </Typography>
+                    </div>
+                    <div className="button-group">
+                        {/*<Button*/}
+                        {/*    text="Vehicle Inspection Report"*/}
+                        {/*    width={210}*/}
+                        {/*    outlined={true}*/}
+                        {/*    marginRight="16px"*/}
+                        {/*/>*/}
+                        <Button
+                            text="Delete Sales Profile"
+                            width={160}
+                            outlined={true}
+                            marginRight="16px"
+                            bgColor={t.alertError}
+                            onClick={() => {
+                                showModal('deleteSale', '')
+                            }}
+                        />
+                        <Button
+                            text="Edit Images"
+                            width={150}
+                            outlined={true}
+                            marginRight="16px"
+                            onClick={() => showModal('editImages', 'Edit Car Sales Images')}
+                        />
+                        <Button
+                            text="Edit Details"
+                            width={150}
+                            outlined={true}
+                            onClick={() => showModal('editDetails', 'Edit Car Sales Details')}
+                        />
+                    </div>
+                </ActionBar>
+                <PriceSection container spacing={3}>
+                    <Grid item xs={6}>
+                        <VehicleDetails>
+                            <img
+                                src={sale?.product_images.length > 0 ? sale.product_images[0] : null}
+                                alt={sale?.car?.make}
+                                height={135}
+                                width={185}
+                                style={{borderRadius: '8px'}}
+                            />
+                            <div className="stats">
+                                <img
+                                    src="/images/Toyota-Full.png"
+                                    width={80}
+                                    height={22}
+                                    style={{marginBottom: -15}}
+                                />
+                                <Typography variant="h5" className="trade">
+                                    {trimString(sale?.car?.id)}
+                                </Typography>
+                                <Typography variant="h6">{sale?.car?.make} {sale?.car?.model}</Typography>
+                            </div>
+                        </VehicleDetails>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <PriceCard>
+                            <div>Selling Price</div>
+                            <Typography variant="h4">&#8358; {formatNumber(sale?.selling_price)}</Typography>
+                        </PriceCard>
+                    </Grid>
+                </PriceSection>
+                <SalesStatus>
+                    <Typography variant="h6" className="status">
+                        Sales Status
+                    </Typography>
+                    <div className="cta">
+                        <span>Set As Active</span>
+                        <ToggleSwitch
+                            checked={state.saleActive}
+                            onChange={handleChange}
+                            name="saleActive"
+                        />
+                    </div>
+                </SalesStatus>
+                <Typography variant="h6" color="secondary">
+                    Car Sales Highlight
                 </Typography>
-                <Button
-                  text="Yes, Delete"
-                  width={174}
-                  onClick={() => setModalState(false)}
-                />
-              </Info>
-            </>
-          )}
-        </ModalBody>
-      </Modal>
-    </Container>
-  )
+                <p style={{marginBottom: 40}}>
+                    {sale?.highlight}
+                </p>
+                <Typography variant="h6" color="secondary">
+                    Car Sales Image
+                </Typography>
+                <Flex>
+                    <div className="slideshow">
+                        <img
+                            className="main"
+                            src={sale?.product_images.length > 0 ? sale.product_images[carouselIdx] : null}
+                            height={403}
+                            width={558}
+                            style={{borderRadius: '14px'}}
+                            alt={sale?.status + ' sale'}
+                        />
+                        <img
+                            src="/images/Previous-Slideshow.png"
+                            alt="Prev"
+                            className="previous"
+                            onClick={prevImage}
+                        />
+                        <img src="/images/Next-Slideshow.png" alt="Next" className="next" onClick={nextImage}/>
+                    </div>
+                    <div className="gallery">
+                        <ImageGrid>
+                            {sale?.product_images.map((img, idx) => (
+                                <img key={idx} src={img} className="image"/>
+                            ))}
+                        </ImageGrid>
+                    </div>
+                </Flex>
+                <Typography variant="h6" color="secondary">
+                    Key Features
+                </Typography>
+                <Features>
+                    {sale?.car_features.map((ft, idx) => (
+                        <div className="key-features" key={idx}>
+                            <img src={ft?.feature_images.length > 0 ? ft.feature_images[0] : null}
+                                 alt={ft?.name + 'feature image'}/>
+                            <Typography variant="subtitle1" className="text">
+                                {ft?.name || 'NA'}
+                            </Typography>
+                        </div>
+                    ))}
+                </Features>
+            </Body>
+            <Modal
+                open={modalOpen}
+                onClose={() => {
+                    setModalState(false)
+                }}
+            >
+                <ModalBody>
+                    <ModalBodyHeader>
+                        <Typography variant="h5" style={{fontWeight: 600}}>
+                            {modalTitle}
+                        </Typography>
+                        <Image
+                            src="/icons/Cancel-Black.svg"
+                            width={25}
+                            height={25}
+                            onClick={() => setModalState(false)}
+                            style={{cursor: 'pointer'}}
+                        />
+                    </ModalBodyHeader>
+                    <Typography variant="inherit" style={{marginBottom: 20}}>
+                        {modalTitle !== ''
+                            ? ' Kindly provide the following information below.'
+                            : ''}{' '}
+                        &nbsp;
+                    </Typography>
+                    {modalView === 'editDetails' && (
+                        <>
+                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                Sales For
+                            </HeaderText>
+                            <InfoSection container spacing={3}>
+                                <Grid item xs={12}>
+                                    <VehicleDetails style={{width: 700}}>
+                                        <img
+                                            src={sale?.product_images.length > 0 ? sale.product_images[0] : null}
+                                            alt='Sales Image'
+                                            width={185}
+                                            height={135}
+                                            style={{borderRadius: '8px'}}
+                                        />
+                                        <div className="stats">
+                                            <img
+                                                src="/images/Toyota-Full.png"
+                                                width={80}
+                                                height={22}
+                                                style={{marginBottom: -15}}
+                                            />
+                                            <Typography variant="h5" className="trade">
+                                                {trimString(sale?.car?.id)}
+                                            </Typography>
+                                            <Typography
+                                                variant="h6">{sale?.car?.make} {sale?.car?.model} {sale?.car?.year}</Typography>
+                                        </div>
+                                    </VehicleDetails>
+                                </Grid>
+                            </InfoSection>
+                            <HeaderText style={{marginBottom: 16}}>
+                                Car Sales Highlight
+                            </HeaderText>
+                            <TextField
+                                fullWidth
+                                placeholder="Accident free | full customs duty paid | good history report ..."
+                                value={sale?.highlight}
+                                onChange={(e) => handleSaleChange('highlight', e.target.value)}
+                            ></TextField>
+
+                            <FlexRow
+                                style={{marginBottom: 50, marginTop: 40, alignItems: 'start'}}
+                            >
+                                <div style={{display: 'flex', flexDirection: 'column'}}>
+                                    <HeaderText variant="inherit" style={{marginBottom: 14}}>
+                                        Selling Price
+                                    </HeaderText>
+                                    <FlexRow>
+                                        <div className="currency-box">&#8358;</div>
+                                        <TextField
+                                            placeholder="Enter price"
+                                            style={{width: 400}}
+                                            type='number'
+                                            value={sale?.selling_price}
+                                            onChange={(e) => handleSaleChange('selling_price', e.target.value)}
+                                        ></TextField>
+                                    </FlexRow>
+                                </div>
+                                <SalesStatus className="stacked" style={{marginLeft: 'auto'}}>
+                                    <HeaderText className="status">Sales Status</HeaderText>
+                                    <div className="cta">
+                                        <span>Set As Active</span>
+                                        <ToggleSwitch
+                                            checked={state.saleActive}
+                                            onChange={handleChange}
+                                            name="saleActive"
+                                        />
+                                    </div>
+                                </SalesStatus>
+                            </FlexRow>
+                            <Button
+                                text="Save Changes"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                onClick={() => saveSale()}
+                            />
+                        </>
+                    )}
+                    {modalView === 'editImages' && (
+                        <>
+                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                Sales For
+                            </HeaderText>
+                            <InfoSection container spacing={3}>
+                                <Grid item xs={12}>
+                                    <VehicleDetails style={{width: 700}}>
+                                        <img
+                                            src={sale?.product_images.length > 0 ? sale?.product_images[0] : null}
+                                            alt='Sale Image'
+                                            width={185}
+                                            height={135}
+                                            style={{borderRadius: '8px'}}
+                                        />
+                                        <div className="stats">
+                                            <img
+                                                src="/images/Toyota-Full.png"
+                                                width={80}
+                                                height={22}
+                                                style={{marginBottom: -15}}
+                                            />
+                                            <Typography variant="h5" className="trade">
+                                                {trimString(sale?.car?.id)}
+                                            </Typography>
+                                            <Typography
+                                                variant="h6">{sale?.car?.make} {sale?.car?.model} {sale?.car?.year}</Typography>
+                                        </div>
+                                    </VehicleDetails>
+                                </Grid>
+                            </InfoSection>
+                            <FlexRow style={{marginBottom: 20}}>
+                                <HeaderText>Key Features</HeaderText>
+                                <IconPill onClick={() => addKeyfeature()}>
+                                    Add key feature
+                                    <Add className="icon"/>
+                                </IconPill>
+                            </FlexRow>
+                            {sale?.car_features.map((cf, idx) => (
+                                <InputGrid key={idx}>
+                                    <TextField
+                                        className="text-field"
+                                        fullWidth
+                                        placeholder={`Key Feature ${idx + 1}`}
+                                        value={sale?.car_features[idx]?.name}
+                                        onChange={(e) => updateKeyFeature(idx, 'name', e.target.value)}
+                                    />
+                                    <div className="input">
+                                        <div
+                                            className="text">{sale?.car_features[idx]?.feature_images.length > 0 ? trimString(sale?.car_features[idx]?.feature_images[0]) : 'Upload Image'}</div>
+                                        <Button
+                                            text={sale?.car_features[idx]?.feature_images.length > 0 ? "Delete" : "Upload"}
+                                            outlined={true}
+                                            width={71}
+                                            height={28}
+                                            borderRadius="8px"
+                                            bgColor={sale?.car_features[idx]?.feature_images.length > 0 ? t.alertError : ''}
+                                            onClick={() => sale?.car_features[idx]?.feature_images.length > 0 ? deleteKfImage(idx, sale?.car_features[idx]?.feature_images[0]) : addKfImage(idx)}
+                                        />
+                                    </div>
+                                </InputGrid>
+                            ))}
+                            <FlexRow style={{marginBottom: 20, marginTop: 60}}>
+                                <HeaderText>Car Sales Image</HeaderText>
+                                <IconPill onClick={() => addSaleImage()}>
+                                    Add Image
+                                    <Add className="icon"/>
+                                </IconPill>
+                            </FlexRow>
+                            <InputGrid>
+                                {sale?.product_images.map((si, idx) => (
+                                    <div className="input" key={idx}>
+                                        <div
+                                            className="text">{si !== '' ? trimString(si, 12) : 'Upload Image'}</div>
+                                        <Button
+                                            text={si !== '' ? "Delete" : "Upload"}
+                                            outlined={true}
+                                            width={71}
+                                            height={28}
+                                            bgColor={si !== '' ? t.alertError : ''}
+                                            borderRadius="8px"
+                                            onClick={() => si !== '' ? deleteSaleImage(idx, si) : addSFImage(idx)}
+                                        />
+                                    </div>
+                                ))}
+                            </InputGrid>
+                            <Button
+                                text="Proceed"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={50}
+                                onClick={() =>
+                                    showModal('imagesPreview', 'Car Sales Image Preview')
+                                }
+                            />
+                        </>
+                    )}
+                    {modalView === 'imagesPreview' && (
+                        <>
+                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                Sale For
+                            </HeaderText>
+                            <InfoSection container spacing={3}>
+                                <Grid item xs={12}>
+                                    <VehicleDetails style={{width: 700}}>
+                                        <img
+                                            src={sale?.product_images.length > 0 ? sale?.product_images[0] : null}
+                                            alt='Sale Image'
+                                            width={185}
+                                            height={135}
+                                            style={{borderRadius: '8px'}}
+                                        />
+                                        <div className="stats">
+                                            <img
+                                                src="/images/Toyota-Full.png"
+                                                width={80}
+                                                height={22}
+                                                style={{marginBottom: -15}}
+                                            />
+                                            <Typography variant="h5" className="trade">
+                                                {trimString(sale?.car?.id)}
+                                            </Typography>
+                                            <Typography
+                                                variant="h6">{sale?.car?.make} {sale?.car?.model} {sale?.car?.year}</Typography>
+                                        </div>
+                                    </VehicleDetails>
+                                </Grid>
+                            </InfoSection>
+                            <Typography variant="h6" color="secondary">
+                                Key Features
+                            </Typography>
+                            <Features className="modal">
+                                {sale?.car_features.map((ft, idx) => (
+                                    <div className="key-features" key={idx}>
+                                        <img src={ft?.feature_images.length > 0 ? ft?.feature_images[0] : null}
+                                             alt={ft?.name + " Feature"}/>
+                                        <Typography variant="subtitle1" className="text">
+                                            {ft?.name}
+                                        </Typography>
+                                    </div>
+                                ))}
+                            </Features>
+                            <Typography variant="h6" color="secondary">
+                                Car Sales Image
+                            </Typography>
+                            <Flex>
+                                <div className="gallery">
+                                    <ImageGrid className="modal">
+                                        {sale?.product_images.map((url, idx) => (
+                                            <img key={idx}
+                                                 src={url}
+                                                 className="image modal"
+                                            />
+                                        ))}
+                                    </ImageGrid>
+                                </div>
+                            </Flex>
+                            <Button
+                                text="Save Changes"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={50}
+                                onClick={() => saveSale()}
+                            />
+                        </>
+                    )}
+                    {modalView === 'deleteSale' && (
+                        <>
+                            <Info>
+                                <img
+                                    src="/icons/Trash-Red.svg"
+                                    alt="Trash"
+                                    height={40}
+                                    width={40}
+                                />
+                                <Typography
+                                    variant="h6"
+                                    style={{marginTop: 48, marginBottom: 16}}
+                                >
+                                    Delete Car Sales Profile
+                                </Typography>
+                                <Typography
+                                    variant="subtitle2"
+                                    style={{maxWidth: 206, marginBottom: 39}}
+                                >
+                                    You are about to delete this vehicle sales profile.
+                                </Typography>
+                                <Button
+                                    text={isSaving ? "Deleting ..." : "Yes, Delete"}
+                                    width={174}
+                                    onClick={deleteSaleProfile}
+                                />
+                            </Info>
+                        </>
+                    )}
+                </ModalBody>
+            </Modal>
+        </Container>
+    )
 }
 
 export default SalesProfilePage
 
 SalesProfilePage.getLayout = function getLayout(page) {
-  return <MainLayout>{page}</MainLayout>
+    return <MainLayout>{page}</MainLayout>
 }
 
 const HeaderText = withStyles({
-  root: {
-    color: t.lightGrey,
-    fontWeight: 'bold',
-    display: 'block'
-  }
+    root: {
+        color: t.lightGrey,
+        fontWeight: 'bold',
+        display: 'block'
+    }
 })(Typography)
 
 const InfoSection = withStyles({
-  root: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: '20px',
-    marginTop: '8px'
-  }
+    root: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: '20px',
+        marginTop: '8px'
+    }
 })(Grid)
 
 const PriceSection = withStyles({
-  root: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  }
+    root: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    }
 })(Grid)
 
 const PriceCard = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    height: '131px',
-    width: '482px',
-    padding: '13px 19px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    background: `${t.alertSuccessLite}`,
-    float: 'right'
-  }
+    elevation1: {boxShadow: 'none'},
+    root: {
+        height: '131px',
+        width: '482px',
+        padding: '13px 19px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        background: `${t.alertSuccessLite}`,
+        float: 'right'
+    }
 })(Paper)
 
 const Info = styled.div`
@@ -727,6 +791,7 @@ const ModalBody = styled.div`
   max-height: calc(100vh - 100px);
   overflow-y: auto;
   scrollbar-width: none;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -763,10 +828,12 @@ const Breadcrumbs = styled.div`
   div {
     &:not(:last-child) {
       margin-right: 10px;
+
       .text {
         padding-right: 10px;
         cursor: pointer;
       }
+
       .separator {
         :after {
           color: ${t.grey};
@@ -868,6 +935,8 @@ const Flex = styled.div`
   margin-top: 16px;
 
   .slideshow {
+    min-width: fit-content;
+    min-height: 300px;
     margin-right: 20px;
     position: relative;
     height: fit-content;
@@ -884,6 +953,7 @@ const Flex = styled.div`
     .previous {
       left: 16px;
     }
+
     .next {
       right: 16px;
     }
@@ -895,7 +965,7 @@ const Flex = styled.div`
         width: 400px;
         height: 240px;
 
-        .next,.prev{
+        .next, .prev {
 
         }
       }

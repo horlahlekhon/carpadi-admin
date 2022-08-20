@@ -10,6 +10,7 @@ import {useEffect, useState} from 'react'
 import {toast, Toaster} from 'react-hot-toast'
 import {tradeService} from '../../../services/trade'
 import trade from "../index";
+import CPToast from "../../../components/shared/CPToast";
 
 function TradeProfilePage() {
     const router = useRouter()
@@ -29,7 +30,8 @@ function TradeProfilePage() {
             bought_price: 0,
             image: '/images/Big-Default-Car.png',
             make: null,
-            model: null
+            model: null,
+            maintenance_cost: 0
         },
         return_on_trade_per_unit: 0,
         total_users_trading: 0,
@@ -44,7 +46,8 @@ function TradeProfilePage() {
         estimated_sales_duration: 0,
         bts_time: null,
         date_of_sale: null,
-        sold_slots_price: 0
+        sold_slots_price: 0,
+        carpadi_rot: 0
     })
 
     useEffect(() => {
@@ -96,6 +99,9 @@ function TradeProfilePage() {
             .catch((error) => {
                 toast.error(error.data)
             })
+            .finally(() => {
+                setEditDetails(false)
+            })
     }
 
     const retrieveTrade = () => {
@@ -115,23 +121,7 @@ function TradeProfilePage() {
     const formatNumber = (number) => Number(number).toLocaleString()
     return (
         <Container>
-            <div>
-                <Toaster
-                    position="top-right"
-                    toastOptions={{
-                        style: {
-                            border: '1px solid #243773',
-                            padding: '16px',
-                            fontWeight: 'bold',
-                            color: '#243773'
-                        },
-                        iconTheme: {
-                            primary: '#243773',
-                            secondary: '#FFFAEE'
-                        }
-                    }}
-                />
-            </div>
+            <CPToast/>
             <Header>
                 <Typography variant="h4">
                     <b>Trade</b>
@@ -297,7 +287,7 @@ function TradeProfilePage() {
                             <Statistic>
                                 <div className="key">ROT Per Slot</div>
                                 <div className="value">
-                                    &#8358; {formatNumber(tradeData.estimated_return_on_trade)}
+                                    &#8358; {formatNumber(tradeData.return_on_trade_per_unit)}
                                 </div>
                             </Statistic>
                             <Statistic>
@@ -306,17 +296,10 @@ function TradeProfilePage() {
                                     {Math.ceil(tradeData.estimated_sales_duration / 30)} Months
                                 </div>
                             </Statistic>
-                            <Typography
-                                variant="h6"
-                                className="title"
-                                style={{marginTop: 40}}
-                            >
-                                Carpadi Commission
-                            </Typography>
                             <Statistic>
-                                <div className="key">Bought Price</div>
+                                <div className="key">Car Value</div>
                                 <div className="value">
-                                    &#8358; {formatNumber(tradeData.car.bought_price)}
+                                    &#8358; {formatNumber(tradeData.car.bought_price + tradeData?.car?.maintenance_cost)}
                                 </div>
                             </Statistic>
                             <Statistic>
@@ -326,15 +309,9 @@ function TradeProfilePage() {
                                 </div>
                             </Statistic>
                             <Statistic>
-                                <div className="key">Maximum Selling Price</div>
+                                <div className="key">Total Miantenance on Car</div>
                                 <div className="value">
-                                    &#8358; {formatNumber(tradeData.max_sale_price)}
-                                </div>
-                            </Statistic>
-                            <Statistic>
-                                <div className="key">Trading Duration in Months</div>
-                                <div className="value">
-                                    {Math.ceil(tradeData.estimated_sales_duration / 30)} Months
+                                    &#8358; {formatNumber(tradeData.car?.maintenance_cost)}
                                 </div>
                             </Statistic>
                         </div>
@@ -371,9 +348,9 @@ function TradeProfilePage() {
                             <Grid item xs={6}>
                                 <PriceCard>
                                     <Typography variant="body1">
-                                        Total Users with Closed Trade
+                                        Projected Carpai Profit on Trade
                                     </Typography>
-                                    <Typography variant="h5">NA</Typography>
+                                    <Typography variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
                                 </PriceCard>
                             </Grid>
                             <Grid item xs={12}>
@@ -410,19 +387,19 @@ function TradeProfilePage() {
                                     <Grid item xs={12}>
                                         <PriceCard>
                                             <Typography variant="body1">
-                                                Estimated Carpadi minimum Profit on sales
+                                                Estimated Carpadi Profit on sales
                                             </Typography>
-                                            <Typography variant="h5">&#8358; NA</Typography>
+                                            <Typography variant="h5">&#8358; {formatNumber(tradeData?.estimated_return_on_trade)}</Typography>
                                         </PriceCard>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <PriceCard style={{background: t.alertSuccessLite}}>
-                                            <Typography variant="body1">
-                                                Estimated Carpadi maximum Profit on sales
-                                            </Typography>
-                                            <Typography variant="h5">&#8358; NA</Typography>
-                                        </PriceCard>
-                                    </Grid>
+                                    {/*<Grid item xs={12}>*/}
+                                    {/*    <PriceCard style={{background: t.alertSuccessLite}}>*/}
+                                    {/*        <Typography variant="body1">*/}
+                                    {/*            Estimated Carpadi maximum Profit on sales*/}
+                                    {/*        </Typography>*/}
+                                    {/*        <Typography variant="h5">&#8358; NA</Typography>*/}
+                                    {/*    </PriceCard>*/}
+                                    {/*</Grid>*/}
                                 </>
                             )}
                             {String(tradeType).toLowerCase() === 'sold' && (
@@ -466,9 +443,10 @@ function TradeProfilePage() {
                                             <Grid item xs={12}>
                                                 <PriceCard style={{background: t.alertSuccessLite}}>
                                                     <Typography variant="body1">
-                                                        Carpadi Commision On Trade
+                                                        Trade Margin
                                                     </Typography>
-                                                    <Typography variant="h5">&#8358; NA</Typography>
+                                                    <Typography
+                                                        variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
                                                 </PriceCard>
                                             </Grid>
                                             <Grid item xs={12}>
@@ -593,7 +571,8 @@ function TradeProfilePage() {
                                             >
                                                 Trade ID {tradeId}
                                             </Typography>
-                                            <Typography variant="h6">{tradeData.car.make}-{tradeData.car.model}</Typography>
+                                            <Typography
+                                                variant="h6">{tradeData.car.make}-{tradeData.car.model}</Typography>
                                         </div>
                                     </VehicleDetails>
                                     <Button
@@ -667,18 +646,9 @@ function TradeProfilePage() {
                                             placeholder="Minimum selling price"
                                             label="Minimum selling price"
                                             fullWidth
+                                            disabled
                                             value={tradeData.min_sale_price}
                                             onChange={handleTradeChange('min_sale_price')}
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Maximum selling price"
-                                            label="Maximum selling price"
-                                            fullWidth
-                                            value={tradeData.max_sale_price}
-                                            onChange={handleTradeChange('max_sale_price')}
                                         ></TextField>
                                     </FlexRow>
                                 </div>
@@ -715,17 +685,17 @@ function TradeProfilePage() {
                                                 </Typography>
                                                 <Typography variant="h5">&#8358; NA</Typography>
                                             </PriceCard>
-                                            <PriceCard
-                                                style={{
-                                                    background: t.alertSuccessLite,
-                                                    marginTop: 20
-                                                }}
-                                            >
-                                                <Typography variant="body1">
-                                                    Estimated Carpadi maximum Profit on Sales
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; NA</Typography>
-                                            </PriceCard>
+                                            {/*<PriceCard*/}
+                                            {/*    style={{*/}
+                                            {/*        background: t.alertSuccessLite,*/}
+                                            {/*        marginTop: 20*/}
+                                            {/*    }}*/}
+                                            {/*>*/}
+                                            {/*    <Typography variant="body1">*/}
+                                            {/*        Estimated Carpadi maximum Profit on Sales*/}
+                                            {/*    </Typography>*/}
+                                            {/*    <Typography variant="h5">&#8358; NA</Typography>*/}
+                                            {/*</PriceCard>*/}
                                         </Grid>
                                     </div>
                                 </div>

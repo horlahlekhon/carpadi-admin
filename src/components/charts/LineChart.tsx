@@ -22,7 +22,7 @@ ChartJS.register(
 );
 
 
-const LChart = ({data = [], showYAxis = false, showLegend = false, height = 320, showGrid = false}) => {
+const LChart = ({ttc = [], rot = []}) => {
     const options = {
         responsive: true,
         maintainAspectRatio: false,
@@ -47,20 +47,20 @@ const LChart = ({data = [], showYAxis = false, showLegend = false, height = 320,
         },
     };
 
-    const labels = ['WK 0', 'WK 1', 'WK 2', 'WK 3', 'WK 4', 'WK 5'];
+    const labels = ['WK 1', 'WK 2', 'WK 3', 'WK 4', 'WK 5'];
 
     const chartData = {
         labels,
         datasets: [
             {
                 label: 'Total Trading Cash',
-                data: labels.map(() => Math.random() * 100),
+                data: ttc,
                 borderColor: '#56A0D7',
                 backgroundColor: '#56A0D7',
             },
             {
                 label: 'Return On Trades',
-                data: labels.map(() => Math.random() * 100),
+                data: rot,
                 borderColor: '#162A69',
                 backgroundColor: '#162A69',
             },

@@ -1,4 +1,5 @@
 import {
+    Avatar,
     FormControl,
     IconButton,
     Input,
@@ -11,8 +12,10 @@ import styled from 'styled-components'
 import {SearchOutlined} from '@material-ui/icons'
 import {t} from '../../../styles/theme'
 import {authService} from "../../../services/auth"
+import {useRouter} from "next/router";
 
 function TopBar() {
+    const router = useRouter()
     const currentDate = new Date().toISOString();
     const currentUser = authService.userValue;
 
@@ -42,12 +45,13 @@ function TopBar() {
                     }
                 />
             </FormControl>
-            <User>
-                <img
+            <User onClick={() => router.push('/user-profile')}>
+                {currentUser?.profile_picture && <img
                     className="image"
                     src="/images/Big-Default-Car.png"
                     alt="James Dalles"
-                />
+                />}
+                {!currentUser?.profile_picture && <Avatar className='image'>{String(currentUser?.first_name).slice(0,1)+String(currentUser?.last_name).slice(0,1)}</Avatar>}
                 <div
                     className="text">{!!currentUser ? `${currentUser.first_name} ${currentUser.last_name}` : "N/A"}</div>
             </User>
@@ -79,6 +83,7 @@ const User = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  cursor: pointer;
 
   .image {
     width: 45px;

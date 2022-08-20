@@ -12,19 +12,31 @@ import {
     withStyles
 } from '@material-ui/core'
 import {t} from '../../../styles/theme'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
 import Button from '../../../components/shared/Button'
 import {makeStyles} from '@material-ui/styles'
 import {usePagination} from '@material-ui/lab/Pagination'
+import {retrieveCars} from "../../../services/car";
+import {toast} from "react-hot-toast";
+import {CarStates} from "../../../lib/enums";
+import {formatDate} from "../../../helpers/formatters";
 
 function SoldInventoryPage() {
     const rowsPerPage = 10
     const router = useRouter()
     const [page, setPage] = useState(0)
+    const [cars, setCars] = useState([])
+    const [refCars, setRefCars] = useState([])
+    const [paginationKeys, setPagination] = useState({
+        "count": 0,
+        "next": null,
+        "previous": null,
+    })
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
+        retrieveCarList(newPage - 1)
     }
 
     const handleNavigation = (action: string) => {
@@ -54,46 +66,32 @@ function SoldInventoryPage() {
 
     const classes = useStyles()
 
-    function createData(
-        idx: number,
-        imageUrl: string,
-        tradingId: string,
-        totalSlots: number,
-        availableSlots: number,
-        soldSlots: number,
-        pricePerSlot: number,
-        totalSlotPrice: number,
-        dateListed: string
-    ) {
-        return {
-            idx,
-            imageUrl,
-            tradingId,
-            totalSlots,
-            availableSlots,
-            soldSlots,
-            pricePerSlot,
-            totalSlotPrice,
-            dateListed
-        }
+    const retrieveCarList = (page = 0) => {
+        retrieveCars(rowsPerPage, page, CarStates.SOLD)
+            .then((response) => {
+                if (response.status) {
+                    setPagination({
+                        "count": response.data.count,
+                        "next": response.data.next,
+                        "previous": response.data.previous,
+                    })
+                    setCars(response.data.results)
+                    setRefCars(response.data.results)
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
     }
 
-    const rows = Array.from(Array(300).keys()).map((i) => {
-        return createData(
-            i + 1,
-            '/images/Default-Car.png',
-            `${(Math.random() * 1002033).toFixed(0)}`,
-            100,
-            50,
-            24,
-            50000,
-            50000000.0,
-            new Date().toISOString().split('T')[0]
-        )
-    })
+    useEffect(() => {
+        retrieveCarList(0)
+    }, [])
 
     const {items} = usePagination({
-        count: rows.length / rowsPerPage,
+        count: Math.ceil(paginationKeys.count / rowsPerPage),
         onChange: handleChangePage
     })
 
@@ -131,50 +129,44 @@ function SoldInventoryPage() {
                             <TableRow>
                                 <TableCell>No</TableCell>
                                 <TableCell align="left">Image</TableCell>
-                                <TableCell align="left">Trading ID</TableCell>
-                                <TableCell align="left">Total Slots</TableCell>
-                                <TableCell align="left">Available Slots</TableCell>
-                                <TableCell align="left">Sold Slots</TableCell>
-                                <TableCell align="left">Price Per Slot</TableCell>
-                                <TableCell align="left">Total Slot Price</TableCell>
+                                <TableCell align="left">VIN</TableCell>
+                                <TableCell align="left">Make</TableCell>
+                                <TableCell align="left">Model</TableCell>
+                                <TableCell align="left">Year</TableCell>
+                                <TableCell align="left">Fuel Type</TableCell>
+                                <TableCell align="left">Transmission Type</TableCell>
                                 <TableCell align="left">Date Listed</TableCell>
                                 <TableCell align="left">&nbsp;</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {rows
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row) => (
-                                    <TableRow key={row.idx}>
+                            {cars
+                                .map((row, idx) => (
+                                    <TableRow
+                                        key={idx}
+                                    >
                                         <TableCell component="th" scope="row">
-                                            {row.idx}
+                                            {idx}
                                         </TableCell>
                                         <TableCell component="th" scope="row">
-                                            <img src={row.imageUrl} width={48} height={48}/>
+                                            <img src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
+                                                 height={48}/>
                                         </TableCell>
-                                        <TableCell align="left">{row.tradingId}</TableCell>
-                                        <TableCell align="left">{row.totalSlots}</TableCell>
-                                        <TableCell align="left">{row.availableSlots}</TableCell>
-                                        <TableCell align="left">{row.soldSlots}</TableCell>
+                                        <TableCell align="left">{row.vin}</TableCell>
+                                        <TableCell align="left">{row?.information?.brand?.name}</TableCell>
+                                        <TableCell align="left">{row?.information?.brand?.model}</TableCell>
+                                        <TableCell align="left">{row?.information?.brand?.year}</TableCell>
+                                        <TableCell align="left">{row?.information?.fuel_type}</TableCell>
                                         <TableCell align="left">
-                                            &#8358; {row.pricePerSlot.toLocaleString()}
+                                            {row?.information?.transmission}
                                         </TableCell>
-                                        <TableCell align="left">
-                                            &#8358; {row.totalSlotPrice.toLocaleString()}
-                                        </TableCell>
-                                        <TableCell
-                                            align="left"
-                                        >
-                                            {row.dateListed}
-                                        </TableCell>
+                                        <TableCell align="left">{formatDate(row?.information?.created)}</TableCell>
                                         <TableCell align="left">
                                             <Button
                                                 text="View"
                                                 width={66}
                                                 outlined={true}
-                                                onClick={() =>
-                                                    handleNavigation(`/inventory/car-profile/${row.tradingId}?status=sold`)
-                                                }
+                                                onClick={() => handleNavigation(`/inventory/car-profile/${row.id}?status=sold`)}
                                             />
                                         </TableCell>
                                     </TableRow>
@@ -184,8 +176,8 @@ function SoldInventoryPage() {
                 </TableContainer>
                 <TableFooter>
                     <div>
-                        Showing page {page + 1} of {Math.ceil(rows.length / rowsPerPage)}/{' '}
-                        {rows.length} Total Items
+                        Showing page {page + 1} of {Math.ceil(paginationKeys.count / rowsPerPage)}/{' '}
+                        {paginationKeys.count} Total Items
                     </div>
 
                     <nav>
@@ -257,23 +249,11 @@ SoldInventoryPage.getLayout = function getLayout(page) {
     return <MainLayout>{page}</MainLayout>
 }
 
+
 const TableCard = withStyles({
     elevation1: {boxShadow: 'none'},
     root: {
         marginTop: 32
-    }
-})(Paper)
-
-const StatsCard = withStyles({
-    elevation1: {boxShadow: 'none'},
-    root: {
-        height: '123px',
-        padding: '14px 19px',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        transition: 'all 0.3s ease-out'
     }
 })(Paper)
 

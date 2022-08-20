@@ -5,41 +5,107 @@ import {
     Modal,
     TextField,
     Select,
-    FormControl,
-    InputLabel,
-    Input,
-    InputAdornment,
-    IconButton, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Grid, Paper
+    FormControl, Grid
 } from '@material-ui/core'
 import {t} from '../../../../styles/theme'
 import {useRouter} from 'next/router'
 import Button from '../../../../components/shared/Button'
 import Image from 'next/image'
 import {withStyles} from '@material-ui/styles'
-import {useState, useRef} from 'react'
+import {useState, useRef, useEffect} from 'react'
 import Checkbox from "../../../../components/shared/Checkbox";
-import {Add, SearchOutlined} from "@material-ui/icons";
-import ToggleSwitch from "../../../../components/shared/ToggleSwitch";
-import {usePagination} from "@material-ui/lab/Pagination";
-import {toast, Toaster} from "react-hot-toast";
+import {toast} from "react-hot-toast";
+import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
+import {deleteCar, retrieveSingleCar, updateCar} from "../../../../services/car";
+import {CarStates, InspectionStates} from "../../../../lib/enums";
+import CreateTrade from "../../../../components/shared/CreateTrade";
+import CPToast from "../../../../components/shared/CPToast";
+import {uploadFile} from "../../../../services/upload";
+import ntc from "../../../../lib/ntc";
+import {updateVehicle} from "../../../../services/vehicle";
+import CreateSale from "../../../../components/shared/CreateSale";
+import {createInspection, retrieveInspection} from "../../../../services/inspection";
+import {authService} from "../../../../services/auth";
+
 
 function CarProfilePage() {
     const router = useRouter()
-    const pageId = router.query.id || 'NA'
+    const [carId, setCarId] = useState(null)
+    const [isSaving, setIsSaving] = useState(false)
+    const [carouselIdx, setCarouselIdx] = useState(0)
+    const [createTrade, setCreateTrade] = useState(false)
     const status = String(router.query.status).toLowerCase() || 'NA'
-    const rowsPerPage = 10
+    const [car, setCarData] = useState({
+        "id": null,
+        "maintenance_cost": 0,
+        "total_cost": 0,
+        "pictures": [],
+        "vin": null,
+        "information": {
+            "id": null,
+            "engine": null,
+            "transmission": null,
+            "car_type": null,
+            "fuel_type": null,
+            "mileage": 0,
+            "age": 0,
+            "description": null,
+            "trim": null,
+            "manufacturer": null,
+            "vin": null,
+            "brand": {
+                "id": null,
+                "created": null,
+                "modified": null,
+                "name": null,
+                "model": null,
+                "year": 0
+            },
+            "created": null,
+            "modified": null
+        },
+        "status": null,
+        "bought_price": "0",
+        "inspection": {"id": null, "status": null},
+        "created": null,
+        "modified": null,
+        "colour": null,
+        "cost_of_repairs": null,
+        "resale_price": null,
+        "margin": null,
+        "description": null,
+        "name": null,
+        "licence_plate": null
+    })
+    const [newInspection, setNewInspection] = useState({
+        "owners_name": null,
+        "inspection_date": null,
+        "owners_phone": null,
+        "address": null,
+        "inspector": null,
+        "car": null
+    })
+    const [inspection, setInspection] = useState({
+        "id": null,
+        "created": null,
+        "modified": null,
+        "owners_name": null,
+        "inspection_date": null,
+        "owners_phone": null,
+        "owners_review": null,
+        "address": null,
+        "status": "ongoing",
+        "inspection_verdict": null,
+        "inspector": null,
+        "inspection_assignor": null,
+        "car": null
+    })
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
     const [modalTagline, setModalTagline] = useState(' Kindly provide the following information below.')
-    const [transmissionType, setTransmissionType] = useState('')
-    const [fuelType, setFuelType] = useState('')
     const [carBrand, setCarBrand] = useState('')
-    const [state, setState] = useState({
-        saleActive: true
-    })
-    const [selectedCarId, setSelectedCar] = useState(null)
-    const [page, setPage] = useState(0)
+    const [createSale, setCreateSale] = useState(false)
     const hiddenFileInput = useRef(null);
 
     const showModal = (viewName: string, title: string, customTagline: string = null!) => {
@@ -65,105 +131,248 @@ function CarProfilePage() {
     };
 
     const handleFile = (file) => {
-    }
-
-    function createData(
-        idx: number,
-        imageUrl: string,
-        vin: string,
-        make: string,
-        model: string,
-        year: number,
-        fuelType: string,
-        sellingPrice: number,
-        dateListed: string,
-        tradeStatus: string
-    ) {
-        return {
-            idx,
-            imageUrl,
-            vin,
-            make,
-            model,
-            year,
-            fuelType,
-            sellingPrice,
-            dateListed,
-            tradeStatus
-        }
-    }
-
-    const rows = Array.from(Array(300).keys()).map((i) => {
-        return createData(
-            i + 1,
-            '/images/Default-Car.png',
-            `VID-11${i}`,
-            'Toyota',
-            'Rav 4',
-            2004,
-            'Petrol',
-            10000000,
-            new Date().toISOString().split('T')[0],
-            'Ongoing'
-        )
-    })
-
-    const handleChange = (event) => {
-        setState({...state, [event.target.name]: event.target.checked})
-    }
-
-    const handleChangePage = (event: unknown, newPage: number) => {
-        setPage(newPage - 1)
-    }
-
-    const {items} = usePagination({
-        count: rows.length / rowsPerPage,
-        onChange: handleChangePage
-    })
-
-    const saveTrade = () => {
-        setModalState(false)
-        toast.success('Trade Created')
-    }
-
-    const saveEditedDetails = () => {
-        setModalState(false)
-        toast.success('Saved Successfully!')
-    }
-
-    function saveImages() {
-        setModalState(false)
-        toast.success('Saved Images Successfully!')
+        setIsSaving(true)
+        uploadFile(file)
+            .then((res) => {
+                if (res.status) {
+                    let arr = car.pictures
+                    arr.push(res.data?.secure_url)
+                    setCarData({...car, pictures: arr})
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setIsSaving(false)
+            })
     }
 
     function deleteCarProfile() {
-        setModalState(false)
-        toast.success('Deleted Successfully!')
-        handleNavigation(`/inventory`)
+        setIsSaving(true)
+        deleteCar(carId)
+            .then((res) => {
+                if (res.status) {
+                    toast.success('Deleted Successfully!')
+                    handleNavigation(`/inventory`)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => [
+                toast.error(error)
+            ])
+            .finally(() => {
+                setIsSaving(false)
+                setModalState(false)
+            })
     }
 
+    function nextImage() {
+        if (carouselIdx < car.pictures.length - 1) {
+            setCarouselIdx(carouselIdx + 1)
+        }
+    }
+
+    function prevImage() {
+        if (carouselIdx > 0) {
+            setCarouselIdx(carouselIdx - 1)
+        }
+    }
+
+    const retrieveCar = (id) => {
+        if (id !== null && id !== undefined && id !== '') {
+            retrieveSingleCar(id)
+                .then((response) => {
+                    if (response.status) {
+                        setCarData(response.data)
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
+    const saveCarImages = () => {
+        setIsSaving(true)
+        const data = {
+            "vin": car.vin,
+            "car_pictures": car.pictures,
+            "colour": car.colour,
+        }
+        updateCar(carId, data)
+            .then((response) => {
+                if (response.status) {
+                    toast.success('Updated Car Successfully!')
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setIsSaving(false)
+            })
+    }
+    const updateCarData = () => {
+        setIsSaving(true)
+        const data = {
+            "vin": car.vin,
+            "car_pictures": car.pictures,
+            "status": car.status,
+            "bought_price": car.bought_price,
+            "colour": car.colour,
+            "resale_price": car.resale_price,
+            "inspection_report": null,
+            "margin": car.margin,
+            "description": car.description,
+            "name": car.name,
+            "licence_plate": car.licence_plate,
+            "car_inspector": null
+        }
+
+        const vehicleData = {
+            "engine": car?.information?.engine,
+            "transmission": car?.information?.transmission,
+            "car_type": car?.information?.car_type || '',
+            "fuel_type": car?.information?.fuel_type,
+            "mileage": car?.information?.mileage,
+            "age": car?.information?.age,
+            "description": car?.description,
+            "trim": car?.information?.trim,
+            "year": car?.information?.brand?.year,
+            "model": car?.information?.brand?.model,
+            "manufacturer": car?.information?.manufacturer,
+            "make": car?.information?.brand?.name,
+            "vin": car?.information?.vin
+        }
+
+        updateCar(carId, data)
+            .then((response) => {
+                if (response.status) {
+                    toast.success('Updated Car Successfully!')
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setIsSaving(false)
+            })
+
+        updateVehicle(car.information.id, vehicleData)
+            .then((response) => {
+                if (response.status) {
+                    toast.success('Updated Vehicle Successfully!')
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setIsSaving(false)
+            })
+    }
+
+    function removePicture(url) {
+        const arr = car.pictures.filter(a => a !== url);
+        setCarData({...car, pictures: arr})
+    }
+
+    function setColor(colorCode) {
+        const result = ntc.name(colorCode)
+        if (result.length >= 2 && result[1]) {
+            // @ts-ignore
+            setCarData({...car, 'colour': String(result[1])})
+        } else {
+            toast.error('We are having issues determining that color, try selecting another shade.')
+        }
+    }
+
+    function setField(fieldName, value) {
+        let obj = {...car}
+        obj[fieldName] = value;
+        setCarData(obj)
+    }
+
+    function setInfoField(fieldName, value) {
+        let obj = {...car}
+        obj['information'][fieldName] = value;
+        setCarData(obj)
+    }
+
+    function viewInspectionReport() {
+        if (car?.inspection?.id) {
+            retrieveInspection(car.inspection.id)
+                .then((response) => {
+                    if (response.status) {
+                        setInspection(response.data)
+                        showModal('vehicleInspectionReport', 'Vehicle Inspection Report', 'An overview of the information gathered.')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
+    const updateInspectionFields = (field, value) => {
+        let obj = {...newInspection}
+        obj[field] = value;
+        setNewInspection(obj)
+    }
+
+    function addInspection(): void {
+        const data = {
+            ...newInspection,
+            inspector: authService?.userValue?.id,
+            car: car?.id
+        }
+        setIsSaving(true)
+        createInspection(data)
+            .then((res) => {
+                if (res.status) {
+                    toast.success("Created Inspection Successfully")
+                    retrieveCar(String(router.query.id))
+                } else {
+                    toast.error(res?.data)
+                }
+            })
+            .catch((err) => {
+                toast.error(err)
+            })
+            .finally(() => {
+                setIsSaving(false)
+                setModalState(false)
+            })
+    }
+
+    useEffect(() => {
+        setCarId(String(router.query.id))
+        retrieveCar(String(router.query.id))
+    }, [])
+
+    // @ts-ignore
     return (
         <Container>
-            <div>
-                <Toaster
-                    position="top-right"
-                    toastOptions={{
-                        style: {
-                            border: '1px solid #243773',
-                            padding: '16px',
-                            fontWeight: 'bold',
-                            color: '#243773'
-                        },
-                        iconTheme: {
-                            primary: '#243773',
-                            secondary: '#FFFAEE'
-                        }
-                    }}
-                />
-            </div>
+            <CPToast/>
+            {createSale && <CreateSale modalOpen={true} onClick={() => setCreateSale(false)}/>}
+            {createTrade && <CreateTrade car={car} onClick={() => setCreateTrade(false)}/>}
             <Header>
                 <Typography variant="h4">
-                    <b>{pageId}</b>
+                    <b>{trimString(carId)}</b>
                 </Typography>
             </Header>
             <Breadcrumbs>
@@ -181,12 +390,14 @@ function CarProfilePage() {
                     <span className="text">Inventory</span>
                     <span className="separator"></span>
                 </div>
-                <div>
+                <div onClick={() => {
+                    handleNavigation('/inventory/car-listings')
+                }}>
                     <span className="text" style={{textTransform: 'capitalize'}}>{status}</span>
                     <span className="separator"></span>
                 </div>
                 <div>
-                    <span className="text">{pageId}</span>
+                    <span className="text">{trimString(carId)}</span>
                     <span className="separator"></span>
                 </div>
             </Breadcrumbs>
@@ -195,17 +406,31 @@ function CarProfilePage() {
                     <div className="vehicle-info">
                         <Image src="/images/Toyota-Full.png" height={11} width={40}/>
                         <Typography variant="h5" style={{marginLeft: 20}}>
-                            Toyota Rav4 2020
+                            {car?.name || 'NA'}
                         </Typography>
                     </div>
                     <div className="button-group">
-                        <Button
-                            text="Vehicle Inspection Report"
-                            width={210}
-                            outlined={true}
-                            marginRight="16px"
-                            onClick={() => showModal('vehicleInspectionReport', 'Vehicle Inspection Report', 'An overview of the information gathered.')}
-                        />
+                        {car?.inspection?.id &&
+                            <Button
+                                text="Vehicle Inspection Report"
+                                width={210}
+                                outlined={true}
+                                marginRight="16px"
+                                disabled={!car?.inspection?.id}
+                                onClick={() => viewInspectionReport()}
+                            />
+                        }
+
+                        {!car?.inspection?.id &&
+                            <Button
+                                text="Add Inspection Report"
+                                width={210}
+                                outlined={true}
+                                marginRight="16px"
+                                onClick={() => showModal('createInspection', 'Add Inspection')}
+                            />
+                        }
+
                         <Button
                             text="Delete Car Profile"
                             width={160}
@@ -237,7 +462,7 @@ function CarProfilePage() {
                             <div className="slideshow">
                                 <img
                                     className="main"
-                                    src="/images/FullSize-Default-Car.png"
+                                    src={car.pictures[carouselIdx]}
                                     height={255}
                                     width='100%'
                                 />
@@ -245,117 +470,124 @@ function CarProfilePage() {
                                     src="/images/Previous-Slideshow.png"
                                     alt="Prev"
                                     className="previous"
+                                    onClick={prevImage}
                                 />
-                                <img src="/images/Next-Slideshow.png" alt="Next" className="next"/>
+                                <img src="/images/Next-Slideshow.png" alt="Next" className="next" onClick={nextImage}/>
                             </div>
                             <div className="gallery">
                                 <ImageGrid>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
+                                    {car.pictures.map((img, i) => (
+                                        <img src={img} className="image" key={i} alt={'image' + i}/>
+                                    ))}
                                 </ImageGrid>
                             </div>
                             <Button text="Create Sales Profile" width='100%' outlined={true}
-                                    onClick={() => showModal('addCar', "Add Car To Sales Platform")}/>
+                                    disabled={!car?.inspection || car?.inspection?.status !== InspectionStates.COMPLETED}
+                                    onClick={() => setCreateSale(true)}/>
                             <Button text="Maintenance Record" width='100%' outlined={true} marginTop={16}
+                                    disabled={!car?.inspection || car?.inspection?.status === InspectionStates.PENDING}
                                     marginBottom={30}
-                                    onClick={() => handleNavigation(`/inventory/car-profile/VID-110/maintenance-record?status=${status}`)}/>
+                                    onClick={() => handleNavigation(`/inventory/car-profile/${car.id}/maintenance-record?status=${status}`)}/>
                             <CheckItem style={{background: status === 'car listings' ? t.alertSuccessLite : ''}}>
                                 <span>Car Listings</span>
-                                <Checkbox color='primary'/>
+                                <Checkbox color='primary' checked={car.status === CarStates.NEW.valueOf()} disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'under inspection' ? t.alertSuccessLite : ''}}>
                                 <span>Under Inspection</span>
-                                <Checkbox color='primary'/>
+                                <Checkbox color='primary' checked={car.status === CarStates.INSPECTED.valueOf()}
+                                          disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'available for trade' ? t.alertSuccessLite : ''}}>
                                 <div className='multi'>
                                     <span className='title'>Available for Trade</span>
                                     <span className='success'>controlled by created trade</span>
                                 </div>
-                                <Checkbox color='primary'/>
+                                <Checkbox color='primary' checked={car.status === CarStates.AVAILABLE.valueOf()}
+                                          disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'ongoing trade' ? t.alertSuccessLite : ''}}>
                                 <div className='multi'>
                                     <span className='title'>Ongoing Trade</span>
                                     <span className='danger'>system controlled</span>
                                 </div>
-                                <Checkbox color='primary'/>
+                                <Checkbox color='primary' checked={car.status === CarStates.ONGOING_TRADE.valueOf()}
+                                          disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'sold' ? t.alertSuccessLite : ''}}>
                                 <div className='multi'>
                                     <span className='title'>Sold</span>
                                     <span className='danger'>system controlled</span>
                                 </div>
-                                <Checkbox color='primary'/>
+                                <Checkbox color='primary' checked={car.status === CarStates.SOLD.valueOf()} disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'archived' ? t.alertSuccessLite : ''}}>
                                 <span>Add to Archived</span>
-                                <Checkbox color='primary'/>
+                                <Checkbox color='primary' checked={car.status === CarStates.ARCHIVED.valueOf()}/>
                             </CheckItem>
                         </Flex>
                     </div>
                     <div className="right">
                         <Detail>
                             <div className="key">Date Added</div>
-                            <div className="value">March 20, 1989</div>
+                            <div className="value">{humanReadableDate(car?.created)}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Vehicle ID</div>
-                            <div className="value">VID-09890</div>
+                            <div className="value">{trimString(car?.information?.id) || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Vehicle Identification Number</div>
-                            <div className="value">EN-9930-929292-91923</div>
+                            <div className="value">{car?.vin || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Number of Seats</div>
-                            <div className="value">4</div>
+                            <div className="value">NA</div>
                         </Detail>
                         <Detail>
                             <div className="key">Make</div>
-                            <div className="value">Toyota</div>
+                            <div className="value">{car?.information?.brand?.name || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Model</div>
-                            <div className="value">Rav4</div>
+                            <div className="value">{car?.information?.brand?.model || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Year</div>
-                            <div className="value">2020</div>
+                            <div className="value">{car?.information?.brand?.year || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Color</div>
-                            <div className="value">Grey</div>
+                            <div className="value">{car?.colour || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Body Type</div>
-                            <div className="value">Saloon</div>
+                            <div className="value">{car?.information?.car_type || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Fuel Type</div>
-                            <div className="value">Petrol</div>
+                            <div className="value">{car?.information?.fuel_type || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Transmission Type</div>
-                            <div className="value">Automatic</div>
+                            <div className="value">{car?.information?.transmission || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Current Mileage</div>
-                            <div className="value">5,000</div>
+                            <div className="value">{formatNumber(car?.information?.mileage) || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Vehicle Age</div>
-                            <div className="value">3 Years</div>
+                            <div className="value">{formatNumber(car?.information?.age) || 'NA'} Years</div>
                         </Detail>
                         {['car listings'].includes(status) && (
                             <Button text='Create Trade' width='100%' marginTop={30}
-                                    onClick={() => showModal('createTrade', 'Create Trade')}
+                                    disabled={car?.status !== CarStates.AVAILABLE}
+                                    onClick={() => setCreateTrade(true)}
                             />
                         )}
                         {['available for trade', 'ongoing trade', 'sold'].includes(status) && (
                             <Button text='View Trade' width='100%' marginTop={30}
-                                    onClick={() => handleNavigation(`/trade/${pageId}`)}/>
+                                    onClick={() => handleNavigation(`/trade/${carId}`)}/>
                         )}
                     </div>
                 </SplitContainer>
@@ -385,6 +617,67 @@ function CarProfilePage() {
                             : ''}{' '}
                         &nbsp;
                     </Typography>
+                    {modalView === 'createInspection' && (
+                        <>
+                            <InputGrid>
+                                <Flex style={{marginBottom: '5px'}}>
+                                    <HeaderText style={{marginTop: 10}}>Enter Inspection Date</HeaderText>
+                                    <TextField
+                                        type='datetime-local'
+                                        className="text-field"
+                                        fullWidth
+                                        variant='standard'
+                                        value={newInspection?.inspection_date}
+                                        onChange={(e) => updateInspectionFields('inspection_date', e.target.value)}
+                                    />
+                                </Flex>
+                            </InputGrid>
+                            <InputGrid style={{marginTop: 5}}>
+                                <Flex style={{marginBottom: '5px'}}>
+                                    <HeaderText style={{marginTop: 10}}>Enter Owners Name</HeaderText>
+                                    <TextField
+                                        className="text-field"
+                                        fullWidth
+                                        variant='standard'
+                                        value={newInspection?.owners_name}
+                                        onChange={(e) => updateInspectionFields('owners_name', e.target.value)}
+                                    />
+                                </Flex>
+                                <Flex style={{marginBottom: '5px'}}>
+                                    <HeaderText style={{marginTop: 10}}>Enter Owners Phone Number</HeaderText>
+                                    <TextField
+                                        className="text-field"
+                                        fullWidth
+                                        variant='standard'
+                                        value={newInspection?.owners_phone}
+                                        onChange={(e) => updateInspectionFields('owners_phone', e.target.value)}
+                                    />
+                                </Flex>
+                            </InputGrid>
+                            <Flex style={{marginBottom: '5px'}}>
+                                <HeaderText style={{marginTop: 10}}>Enter Owners Address</HeaderText>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    variant='standard'
+                                    multiline
+                                    rows={2}
+                                    maxRows={4}
+                                    value={newInspection?.address}
+                                    onChange={(e) => updateInspectionFields('address', e.target.value)}
+                                />
+                            </Flex>
+                            <Button
+                                text={isSaving ? "Saving..." : "Add Inspection"}
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={40}
+                                disabled={isSaving}
+                                onClick={() => addInspection()}
+                            />
+                        </>
+                    )}
                     {modalView === 'editDetails' && (
                         <>
                             <HeaderText style={{marginBottom: 10, marginTop: 20}}>Select Car Brand</HeaderText>
@@ -410,45 +703,58 @@ function CarProfilePage() {
                                     className="text-field"
                                     fullWidth
                                     placeholder="VIN"
+                                    label="VIN"
+                                    variant='standard'
+                                    value={car.vin}
+                                    disabled
                                 />
                                 <TextField
                                     className="text-field"
                                     fullWidth
                                     placeholder="Color"
+                                    label={car.colour || 'Color'}
                                     type='color'
+                                    variant='standard'
+                                    onChange={(e) => setColor(e.target.value)}
                                 />
                             </InputGrid>
                             <InputGrid>
                                 <FormControl fullWidth>
                                     <Select
-                                        value={transmissionType}
+                                        value={car?.information?.transmission}
                                         onChange={(event) =>
-                                            setTransmissionType(String(event.target.value))
-                                        }
+                                            setInfoField('transmission', event.target.value)}
                                         displayEmpty
                                         inputProps={{'aria-label': 'Without label'}}
                                     >
                                         <option value="" disabled>
                                             Transmission Type
                                         </option>
-                                        <option value={'Manual'}>Manual</option>
-                                        <option value={'Automatic'}>Automatic</option>
+                                        <option value={'MANUAL'}
+                                                selected={String(car?.information?.transmission).toLowerCase() === 'manual'}>Manual
+                                        </option>
+                                        <option value={'AUTOMATIC'}
+                                                selected={String(car?.information?.transmission).toLowerCase() === 'automatic'}>Automatic
+                                        </option>
                                     </Select>
                                 </FormControl>
                                 <FormControl fullWidth>
                                     <Select
-                                        value={fuelType}
+                                        value={car?.information?.fuel_type}
                                         onChange={(event) =>
-                                            setFuelType(String(event.target.value))
-                                        }
+                                            setInfoField('fuel_type', event.target.value)}
                                         displayEmpty
                                         inputProps={{'aria-label': 'Without label'}}
                                     >
                                         <option value="" disabled>
                                             Fuel Type
                                         </option>
-                                        <option value={'Petrol'}>Petrol</option>
-                                        <option value={'Diesel'}>Diesel</option>
+                                        <option value={'PETROL'}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === 'petrol'}>Petrol
+                                        </option>
+                                        <option value={'DIESEL'}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === 'diesel'}>Diesel
+                                        </option>
                                     </Select>
                                 </FormControl>
                             </InputGrid>
@@ -457,50 +763,49 @@ function CarProfilePage() {
                                     className="text-field"
                                     fullWidth
                                     placeholder="Vehicle Age"
+                                    label="Vehicle Age"
+                                    variant='standard'
+                                    value={car?.information?.age || 0}
+                                    onChange={(e) => setInfoField('age', e.target.value)}
+                                    type='number'
                                 />
                                 <TextField
                                     className="text-field"
                                     fullWidth
                                     placeholder="Mileage"
+                                    label="Mileage"
+                                    variant='standard'
+                                    value={car?.information?.mileage || 0}
+                                    onChange={(e) => setInfoField('mileage', e.target.value)}
+                                    type='number'
                                 />
                             </InputGrid>
                             <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Description</HeaderText>
                             <TextField fullWidth type='textfield' multiline rows={4} placeholder='
-                                A detailed vehicle description'>
+                                A detailed vehicle description' value={car?.description}
+                                       onChange={(e) => setField('description', e.target.value)}>
                             </TextField>
                             <Button
-                                text="Save Changes"
+                                text={isSaving ? "Saving..." : "Save Changes"}
                                 width={510}
                                 marginLeft="auto"
                                 marginRight="auto"
                                 marginTop={40}
-                                onClick={() => saveEditedDetails()}
+                                disabled={isSaving}
+                                onClick={() => updateCarData()}
                             />
                         </>
                     )}
                     {modalView === 'editImages' && (
                         <>
                             <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
-                                <div className='image'>
-                                    <img src="/images/FullSize-Default-Car.png" className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'/>
-                                </div>
+                                {car.pictures.map((url, idx) => (
+                                    <div className='image' key={idx}>
+                                        <img src={url} className="image"/>
+                                        <img src="/icons/Delete-Circular-Green.svg" className='delete'
+                                             onClick={() => removePicture(url)}/>
+                                    </div>
+                                ))}
                             </ImageGrid>
                             <ImageUpload>
                                 <div className='content'>
@@ -515,17 +820,19 @@ function CarProfilePage() {
                                         onChange={handleFileChange}
                                         style={{display: 'none'}}
                                     />
-                                    <Button text='Upload' width={128} marginTop={40}
+                                    <Button text={isSaving ? 'Uploading...' : 'Upload'} disabled={isSaving} width={128}
+                                            marginTop={40}
                                             onClick={() => handleFileClick(event)}/>
                                 </div>
                             </ImageUpload>
                             <Button
-                                text="Save Changes"
+                                text={isSaving ? 'Saving...' : "Save Changes"}
                                 width={510}
                                 marginLeft="auto"
                                 marginRight="auto"
                                 marginTop={50}
-                                onClick={() => saveImages()}
+                                disabled={isSaving}
+                                onClick={() => saveCarImages()}
                             />
                         </>
                     )}
@@ -551,593 +858,12 @@ function CarProfilePage() {
                                     You are about to delete this vehicle profile.
                                 </Typography>
                                 <Button
-                                    text="Yes, Delete"
+                                    text={isSaving ? "Deleting..." : "Yes, Delete"}
                                     width={174}
                                     onClick={() => deleteCarProfile()}
                                 />
                             </Info>
                         </>
-                    )}
-                    {modalView === 'addCar' && (
-                        <>
-                            <Typography variant="inherit">
-                                Select Car From Created Trade
-                            </Typography>
-                            <FormControl
-                                style={{
-                                    width: '794px',
-                                    display: 'flex',
-                                    marginTop: '20px',
-                                    marginBottom: '10px'
-                                }}
-                                variant="standard"
-                            >
-                                <InputLabel htmlFor="standard-adornment-password">
-                                    Search
-                                </InputLabel>
-                                <Input
-                                    id="standard-adornment-password"
-                                    type="text"
-                                    endAdornment={
-                                        <InputAdornment position="end">
-                                            <IconButton aria-label="toggle password visibility">
-                                                <SearchOutlined/>
-                                            </IconButton>
-                                        </InputAdornment>
-                                    }
-                                />
-                            </FormControl>
-                            <TableCard style={{height: 480, overflowY: 'auto'}}>
-                                <TableContainer>
-                                    <Table style={{minWidth: 650}} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell align="left">Image</TableCell>
-                                                <TableCell align="left">Car</TableCell>
-                                                <TableCell align="left">Trade ID</TableCell>
-                                                <TableCell align="left">VIN</TableCell>
-                                                <TableCell align="left">Date Created</TableCell>
-                                                <TableCell align="left">Trade Status</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            {rows
-                                                .slice(
-                                                    page * rowsPerPage,
-                                                    page * rowsPerPage + rowsPerPage
-                                                )
-                                                .map((row) => (
-                                                    <TableRow
-                                                        key={row.idx}
-                                                        style={{
-                                                            cursor: 'pointer',
-                                                            background:
-                                                                selectedCarId === row.idx
-                                                                    ? t.primaryExtraLite
-                                                                    : 'white'
-                                                        }}
-                                                        onClick={() => setSelectedCar(row.idx)}
-                                                    >
-                                                        <TableCell component="th" scope="row">
-                                                            <img
-                                                                src={row.imageUrl}
-                                                                width={48}
-                                                                height={48}
-                                                                alt="car"
-                                                                style={{borderRadius: '8px'}}
-                                                            />
-                                                        </TableCell>
-                                                        <TableCell align="left">
-                                                            {row.model} {row.make} {row.year}
-                                                        </TableCell>
-                                                        <TableCell align="left">{row.idx}</TableCell>
-                                                        <TableCell align="left">{row.vin}</TableCell>
-                                                        <TableCell align="left">{row.dateListed}</TableCell>
-                                                        <TableCell align="left">
-                                                            {row.tradeStatus}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </TableCard>
-                            <div style={{display: 'flex', marginTop: 20}}>
-                                <Button
-                                    text="Proceed"
-                                    width={510}
-                                    marginLeft="auto"
-                                    marginRight="auto"
-                                    onClick={() => showModal('addCarDetails', '')}
-                                    disabled={selectedCarId === null}
-                                />
-                            </div>
-                        </>
-                    )}
-                    {modalView === 'addCarDetails' && (
-                        <>
-                            <Typography variant="inherit">
-                                Kindly provide the following information below.
-                            </Typography>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Creating Sales For
-                            </HeaderText>
-                            <InfoSection container spacing={3} style={{width: 700}}>
-                                <Grid item xs={6}>
-                                    <VehicleDetails>
-                                        <img
-                                            src="/images/Big-Default-Car.png"
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                Trade ID 09890
-                                            </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
-                                        </div>
-                                    </VehicleDetails>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Button
-                                        text="Select a Different Car"
-                                        outlined={true}
-                                        width={200}
-                                        marginLeft="auto"
-                                        onClick={() => setModalView('addCar')}
-                                    />
-                                </Grid>
-                            </InfoSection>
-                            <HeaderText style={{marginBottom: 16}}>
-                                Car Sales Highlight
-                            </HeaderText>
-                            <TextField
-                                fullWidth
-                                placeholder="Accident free | full customs duty paid | good history report ..."
-                            ></TextField>
-                            <HeaderText
-                                variant="inherit"
-                                style={{marginTop: 40, marginBottom: 20}}
-                            >
-                                Selling Price
-                            </HeaderText>
-                            <FlexRow style={{marginBottom: 50}}>
-                                <div className="currency-box">&#8358;</div>
-                                <TextField
-                                    placeholder="Enter price"
-                                    style={{width: 400}}
-                                ></TextField>
-                            </FlexRow>
-                            <FlexRow style={{marginBottom: 20}}>
-                                <HeaderText>Key Features</HeaderText>
-                                <IconPill>
-                                    Add key feature
-                                    <Add className="icon"/>
-                                </IconPill>
-                            </FlexRow>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Key Feature 1"
-                                />
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Key Feature 2"
-                                />
-                                <div className="input">
-                                    <div className="text">engine indlmor.png</div>
-                                    <Button
-                                        text="Delete"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        bgColor={t.alertError}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <FlexRow style={{marginBottom: 20, marginTop: 60}}>
-                                <HeaderText>Car Sales Image</HeaderText>
-                                <IconPill>
-                                    Add Image
-                                    <Add className="icon"/>
-                                </IconPill>
-                            </FlexRow>
-                            <InputGrid>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <InputGrid>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <InputGrid>
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text="Upload"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                                <div className="input">
-                                    <div className="text">engine indlmor.png</div>
-                                    <Button
-                                        text="Delete"
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        bgColor={t.alertError}
-                                        borderRadius="8px"
-                                    />
-                                </div>
-                            </InputGrid>
-                            <div style={{display: 'flex', marginTop: 70}}>
-                                <Button
-                                    text="Proceed"
-                                    width={510}
-                                    marginLeft="auto"
-                                    marginRight="auto"
-                                    onClick={() => showModal('viewCarSummary', '')}
-                                />
-                            </div>
-                        </>
-                    )}
-                    {modalView === 'viewCarSummary' && (
-                        <>
-                            <Typography variant="inherit">
-                                Kindly review the following information below.
-                            </Typography>
-                            <Body style={{width: 960}}>
-                                <PriceSection container spacing={3}>
-                                    <Grid item xs={6}>
-                                        <VehicleDetail>
-                                            <Image
-                                                src="/images/Big-Default-Car.png"
-                                                height={135}
-                                                width={185}
-                                                style={{borderRadius: '8px'}}
-                                            />
-                                            <div className="stats">
-                                                <img
-                                                    src="/images/Toyota-Full.png"
-                                                    width={80}
-                                                    height={22}
-                                                    style={{marginBottom: -15}}
-                                                />
-                                                <Typography variant="h5" className="trade">
-                                                    Trade ID 09890
-                                                </Typography>
-                                                <Typography variant="h6">Toyota Rav4 2020</Typography>
-                                            </div>
-                                        </VehicleDetail>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <PriceCard>
-                                            <div>Selling Price</div>
-                                            <Typography variant="h5">
-                                                &#8358; 12,500,000.00
-                                            </Typography>
-                                        </PriceCard>
-                                    </Grid>
-                                </PriceSection>
-                                <Typography variant="h6" color="secondary">
-                                    Car Sales Highlight
-                                </Typography>
-                                <p style={{marginBottom: 40}}>
-                                    Interdum et malesuada fames ac ante ipsum primis in faucibus.
-                                    Aenean nulla neque, facilisis eget sem in, porttitor porttitor
-                                    diam. Maecenas vitae nisi pharetra, dapibus nisl sit amet,
-                                    pulvinar erat.
-                                </p>
-                                <Typography variant="h6" color="secondary">
-                                    Key Features
-                                </Typography>
-                                <Features>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                    <div className="key-features">
-                                        <img src="/images/Big-Default-Car.png" alt="Feature"/>
-                                        <Typography variant="subtitle1" className="text">
-                                            Leather Seats
-                                        </Typography>
-                                    </div>
-                                </Features>
-                                <Typography variant="h6" color="secondary">
-                                    Car Sales Image
-                                </Typography>
-                                <Flex>
-                                    <div className="gallery">
-                                        <ImageGrid>
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                            <img
-                                                src="/images/FullSize-Default-Car.png"
-                                                className="image"
-                                            />
-                                        </ImageGrid>
-                                    </div>
-                                </Flex>
-                                <SalesStatus>
-                                    <Typography variant="h6" className="status">
-                                        Sales Status
-                                    </Typography>
-                                    <div className="cta">
-                                        <span>Set As Active</span>
-                                        <ToggleSwitch
-                                            checked={state.saleActive}
-                                            onChange={handleChange}
-                                            name="saleActive"
-                                        />
-                                    </div>
-                                </SalesStatus>
-                                <div style={{display: 'flex', marginTop: 70}}>
-                                    <Button
-                                        text="Create Sales Profile"
-                                        width={510}
-                                        marginLeft="auto"
-                                        marginRight="auto"
-                                        onClick={() => handleNavigation('/sales/VID-123')}
-                                    />
-                                </div>
-                            </Body>
-                        </>
-                    )}
-                    {modalView === 'createTrade' && (
-                        <div style={{maxWidth: 980}}>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Creating Trade for
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12} style={{display: 'flex'}}>
-                                    <VehicleDetails style={{width: 700}}>
-                                        <img
-                                            src="/images/Big-Default-Car.png"
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                Trade ID 09890
-                                            </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
-                                        </div>
-                                    </VehicleDetails>
-                                    <Button
-                                        text="Go to Car Profile"
-                                        width={150}
-                                        outlined={true}
-                                        onClick={() => setModalState(false)}
-                                    />
-                                </Grid>
-                            </InfoSection>
-                            <ModalSplitContainer>
-                                <div className="left">
-                                    <div className="title">Trade Information</div>
-                                    <TextField className="input" placeholder="Slot Quantity"/>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Price per slot"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">%</div>
-                                        <TextField
-                                            placeholder="Estimated ROT per slot"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                    <TextField
-                                        className="input"
-                                        placeholder="Trading Duration in Months"
-                                    />
-                                    <div
-                                        className="title"
-                                        style={{marginBottom: 20, marginTop: 40}}
-                                    >
-                                        Carpadi Commission
-                                    </div>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField placeholder="Bought price" fullWidth></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Maximum selling price"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Maximum selling price"
-                                            fullWidth
-                                        ></TextField>
-                                    </FlexRow>
-                                </div>
-                                <div className="right">
-                                    <div className="title">Trade Summary</div>
-                                    <div className="content">
-                                        <Grid item xs={12} style={{marginTop: -30}}>
-                                            <PriceCard style={{background: t.alertSuccessLite, marginBottom: 10}}>
-                                                <Typography variant="body1">
-                                                    Total Slot Price + Total ROT
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
-                                            </PriceCard>
-                                            <Statistic>
-                                                <div className="key">Initial + ROT</div>
-                                                <div className="value">&#8358; 0.00</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Sold Slot Price</div>
-                                                <div className="value">&#8358; 0.00</div>
-                                            </Statistic>
-                                            <PriceCard style={{marginTop: 40}}>
-                                                <Typography variant="body1">
-                                                    Estimated Carpadi minimum Profit on Sales
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
-                                            </PriceCard>
-                                            <PriceCard
-                                                style={{
-                                                    background: t.alertSuccessLite,
-                                                    marginTop: 20
-                                                }}
-                                            >
-                                                <Typography variant="body1">
-                                                    Estimated Carpadi maximum Profit on Sales
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
-                                            </PriceCard>
-                                        </Grid>
-                                    </div>
-                                </div>
-                            </ModalSplitContainer>
-                            <Button
-                                text={modalTitle}
-                                width={590}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop="40px"
-                                onClick={() => saveTrade()}
-                            />
-                        </div>
                     )}
                     {modalView === 'vehicleInspectionReport' && (
                         <div style={{maxWidth: 980}}>
@@ -1148,9 +874,10 @@ function CarProfilePage() {
                                 <Grid item xs={12} style={{display: 'flex'}}>
                                     <VehicleDetails style={{width: 700}}>
                                         <img
-                                            src="/images/Big-Default-Car.png"
+                                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                             width={185}
                                             height={135}
+                                            alt={car?.name}
                                             style={{borderRadius: '8px'}}
                                         />
                                         <div className="stats">
@@ -1161,9 +888,9 @@ function CarProfilePage() {
                                                 style={{marginBottom: -15}}
                                             />
                                             <Typography variant="h5" className="trade">
-                                                Trade ID 09890
+                                                {trimString(inspection?.id || 'NA')}
                                             </Typography>
-                                            <Typography variant="h6">Toyota Rav4 2020</Typography>
+                                            <Typography variant="h6">{car?.name || 'NA'}</Typography>
                                         </div>
                                     </VehicleDetails>
                                     <Button
@@ -1180,32 +907,33 @@ function CarProfilePage() {
                                     <div className="content">
                                         <Grid item xs={12} style={{marginTop: -10}}>
                                             <Statistic>
-                                                <div className="key">Inspector’s Name</div>
-                                                <div className="value">Jhon Do Smith</div>
+                                                <div className="key">Status</div>
+                                                <div className="value">{inspection?.status}</div>
+                                            </Statistic>
+                                            <Statistic>
+                                                <div className="key">Owner’s Name</div>
+                                                <div
+                                                    className="value">{trimString(inspection?.owners_name, 25) || 'NA'}</div>
                                             </Statistic>
                                             <Statistic>
                                                 <div className="key">Inspection Date</div>
-                                                <div className="value">June 12 | 2020</div>
+                                                <div className="value">{formatDate(inspection?.inspection_date)}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Year</div>
-                                                <div className="value">2015</div>
+                                                <div className="key">Owners Phone</div>
+                                                <div className="value">{inspection?.owners_phone}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Brand</div>
-                                                <div className="value">Toyota</div>
+                                                <div className="key">Owners Review</div>
+                                                <div className="value">{inspection?.owners_review}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Model</div>
-                                                <div className="value">Camry</div>
+                                                <div className="key">Inspection Verdict</div>
+                                                <div className="value">{inspection?.inspection_verdict}</div>
                                             </Statistic>
                                             <Statistic>
-                                                <div className="key">Mileage</div>
-                                                <div className="value">18,000</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">VIN</div>
-                                                <div className="value">BC83891899837</div>
+                                                <div className="key">Address</div>
+                                                <div className="value">{inspection?.address}</div>
                                             </Statistic>
                                         </Grid>
                                     </div>
@@ -1532,68 +1260,6 @@ const ImageUpload = styled.div`
     justify-content: center;
   }
 `
-const TableCard = withStyles({
-    elevation1: {boxShadow: 'none'}
-})(Paper)
-const FlexRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  .currency-box {
-    height: 27px;
-    width: 27px;
-    border-radius: 4px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: ${t.lightGrey};
-    background: ${t.liteGrey};
-    margin-right: 10px;
-  }
-`
-const VehicleDetail = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: end;
-  margin-bottom: 27px;
-
-  .stats {
-    height: 100%;
-    margin-left: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    .trade {
-      color: ${t.primaryBlue};
-      margin-top: 36px;
-      margin-bottom: 17px;
-    }
-  }
-`
-const IconPill = styled.button`
-  margin-left: auto;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 7px 12px;
-  border-radius: 8px;
-  background: ${t.primaryExtraLite};
-  color: ${t.primaryDeepBlue};
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-
-  &:hover {
-    transform: scale(1.02);
-    transition: all 0.3s ease-out;
-  }
-
-  .icon {
-    margin-left: 8px;
-  }
-`
 const InfoSection = withStyles({
     root: {
         display: 'flex',
@@ -1601,13 +1267,6 @@ const InfoSection = withStyles({
         justifyContent: 'space-between',
         marginBottom: '20px',
         marginTop: '8px'
-    }
-})(Grid)
-const PriceSection = withStyles({
-    root: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between'
     }
 })(Grid)
 const VehicleDetails = styled.div`
@@ -1628,66 +1287,6 @@ const VehicleDetails = styled.div`
       color: ${t.primaryBlue};
       margin-top: 36px;
       margin-bottom: 17px;
-    }
-  }
-`
-const PriceCard = withStyles({
-    elevation1: {boxShadow: 'none'},
-    root: {
-        height: '100px',
-        width: '482px',
-        padding: '13px 19px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        background: `${t.alertSuccessLite}`,
-        float: 'right',
-        marginTop: '34px'
-    }
-})(Paper)
-const SalesStatus = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: end;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-
-  .status {
-    color: ${t.primaryBlue};
-  }
-
-  .cta {
-    background-color: ${t.extraLiteGrey};
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
-`
-const Features = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-bottom: 40px;
-  margin-top: 16px;
-
-  .key-features {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 20px;
-
-    img {
-      height: 200px;
-      width: 200px;
-      object-fit: cover;
-      border-radius: 0;
-      margin-bottom: 14px;
-      margin-right: 24px;
-    }
-
-    .text {
-      color: ${t.grey};
     }
   }
 `
@@ -1753,3 +1352,4 @@ const Statistic = styled.div`
     font-weight: bold;
   }
 `
+

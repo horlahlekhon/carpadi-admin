@@ -1,4 +1,5 @@
 import getConfig from 'next/config';
+import router from 'next/router'
 
 const {publicRuntimeConfig} = getConfig();
 
@@ -23,7 +24,7 @@ function post(url, body, contentType = 'application/json') {
         crossDomain: true,
         method: 'POST',
         headers: {'Content-Type': contentType, ...authHeader(url)},
-        body: JSON.stringify(body)
+        body: contentType === 'application/json' ? JSON.stringify(body) : body,
     };
     return fetch(url, requestOptions).then(handleResponse);
 }
@@ -74,10 +75,15 @@ function handleResponse(response) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
         if (!response.ok) {
-            const error = (data && data.detail) || (data && data.messages && data.messages[0]) || (data && data.car && data.car[0]) || response.statusText;
+            const error = (data && data.detail) || (data && data.error) || (data && data.messages && data.messages[0]) || (data && data.car && data.car[0]) || (data && data.vin && data.vin[0]) || response.statusText;
+            if (response.status === 404) {
+                router.push('/errors/not-found')
+            }
+            if (response.status >= 500) {
+                router.push('/errors/server-error')
+            }
             return Promise.reject(error);
         }
-
         return data;
     });
 }
