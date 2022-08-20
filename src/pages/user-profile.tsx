@@ -32,7 +32,8 @@ function UserProfilePage() {
                     alt="James Dalles"
                 />}
                 {!user?.profile_picture &&
-                    <Avatar className='image'>{user?.first_name.slice(0, 1) + user?.last_name.slice(0, 1)}</Avatar>}
+                    <Avatar
+                        className='image'>{String(user?.first_name).slice(0, 1) + String(user?.last_name).slice(0, 1)}</Avatar>}
                 <Flex>
                     <Typography variant='h4'
                                 className='mx-auto'><b>{user?.first_name} {user?.last_name}</b></Typography>

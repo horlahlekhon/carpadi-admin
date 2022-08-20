@@ -51,7 +51,7 @@ function TopBar() {
                     src="/images/Big-Default-Car.png"
                     alt="James Dalles"
                 />}
-                {!currentUser?.profile_picture && <Avatar className='image'>{currentUser?.first_name.slice(0,1)+currentUser?.last_name.slice(0,1)}</Avatar>}
+                {!currentUser?.profile_picture && <Avatar className='image'>{String(currentUser?.first_name).slice(0,1)+String(currentUser?.last_name).slice(0,1)}</Avatar>}
                 <div
                     className="text">{!!currentUser ? `${currentUser.first_name} ${currentUser.last_name}` : "N/A"}</div>
             </User>
