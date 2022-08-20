@@ -24,7 +24,9 @@ import {uploadFile} from "../../../../services/upload";
 import ntc from "../../../../lib/ntc";
 import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
-import {retrieveInspection} from "../../../../services/inspection";
+import {createInspection, retrieveInspection} from "../../../../services/inspection";
+import {authService} from "../../../../services/auth";
+
 
 function CarProfilePage() {
     const router = useRouter()
@@ -74,6 +76,14 @@ function CarProfilePage() {
         "description": null,
         "name": null,
         "licence_plate": null
+    })
+    const [newInspection, setNewInspection] = useState({
+        "owners_name": null,
+        "inspection_date": null,
+        "owners_phone": null,
+        "address": null,
+        "inspector": null,
+        "car": null
     })
     const [inspection, setInspection] = useState({
         "id": null,
@@ -318,6 +328,37 @@ function CarProfilePage() {
         }
     }
 
+    const updateInspectionFields = (field, value) => {
+        let obj = {...newInspection}
+        obj[field] = value;
+        setNewInspection(obj)
+    }
+
+    function addInspection(): void {
+        const data = {
+            ...newInspection,
+            inspector: authService?.userValue?.id,
+            car: car?.id
+        }
+        setIsSaving(true)
+        createInspection(data)
+            .then((res) => {
+                if (res.status) {
+                    toast.success("Created Inspection Successfully")
+                    retrieveCar(String(router.query.id))
+                } else {
+                    toast.error(res?.data)
+                }
+            })
+            .catch((err) => {
+                toast.error(err)
+            })
+            .finally(() => {
+                setIsSaving(false)
+                modalOpen(false)
+            })
+    }
+
     useEffect(() => {
         setCarId(String(router.query.id))
         retrieveCar(String(router.query.id))
@@ -369,14 +410,27 @@ function CarProfilePage() {
                         </Typography>
                     </div>
                     <div className="button-group">
-                        <Button
-                            text="Vehicle Inspection Report"
-                            width={210}
-                            outlined={true}
-                            marginRight="16px"
-                            disabled={!car?.inspection?.id}
-                            onClick={() => viewInspectionReport()}
-                        />
+                        {car?.inspection?.id &&
+                            <Button
+                                text="Vehicle Inspection Report"
+                                width={210}
+                                outlined={true}
+                                marginRight="16px"
+                                disabled={!car?.inspection?.id}
+                                onClick={() => viewInspectionReport()}
+                            />
+                        }
+
+                        {!car?.inspection?.id &&
+                            <Button
+                                text="Add Inspection Report"
+                                width={210}
+                                outlined={true}
+                                marginRight="16px"
+                                onClick={() => showModal('createInspection', 'Add Inspection')}
+                            />
+                        }
+
                         <Button
                             text="Delete Car Profile"
                             width={160}
@@ -563,6 +617,67 @@ function CarProfilePage() {
                             : ''}{' '}
                         &nbsp;
                     </Typography>
+                    {modalView === 'createInspection' && (
+                        <>
+                            <InputGrid>
+                                <Flex style={{marginBottom: '5px'}}>
+                                    <HeaderText style={{marginTop: 10}}>Enter Inspection Date</HeaderText>
+                                    <TextField
+                                        type='datetime-local'
+                                        className="text-field"
+                                        fullWidth
+                                        variant='standard'
+                                        value={newInspection?.inspection_date}
+                                        onChange={(e) => updateInspectionFields('inspection_date', e.target.value)}
+                                    />
+                                </Flex>
+                            </InputGrid>
+                            <InputGrid style={{marginTop: 5}}>
+                                <Flex style={{marginBottom: '5px'}}>
+                                    <HeaderText style={{marginTop: 10}}>Enter Owners Name</HeaderText>
+                                    <TextField
+                                        className="text-field"
+                                        fullWidth
+                                        variant='standard'
+                                        value={newInspection?.owners_name}
+                                        onChange={(e) => updateInspectionFields('owners_name', e.target.value)}
+                                    />
+                                </Flex>
+                                <Flex style={{marginBottom: '5px'}}>
+                                    <HeaderText style={{marginTop: 10}}>Enter Owners Phone Number</HeaderText>
+                                    <TextField
+                                        className="text-field"
+                                        fullWidth
+                                        variant='standard'
+                                        value={newInspection?.owners_phone}
+                                        onChange={(e) => updateInspectionFields('owners_phone', e.target.value)}
+                                    />
+                                </Flex>
+                            </InputGrid>
+                            <Flex style={{marginBottom: '5px'}}>
+                                <HeaderText style={{marginTop: 10}}>Enter Owners Address</HeaderText>
+                                <TextField
+                                    className="text-field"
+                                    fullWidth
+                                    variant='standard'
+                                    multiline
+                                    rows={2}
+                                    maxRows={4}
+                                    value={newInspection?.address}
+                                    onChange={(e) => updateInspectionFields('address', e.target.value)}
+                                />
+                            </Flex>
+                            <Button
+                                text={isSaving ? "Saving..." : "Add Inspection"}
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={40}
+                                disabled={isSaving}
+                                onClick={() => addInspection()}
+                            />
+                        </>
+                    )}
                     {modalView === 'editDetails' && (
                         <>
                             <HeaderText style={{marginBottom: 10, marginTop: 20}}>Select Car Brand</HeaderText>
@@ -1237,8 +1352,4 @@ const Statistic = styled.div`
     font-weight: bold;
   }
 `
-
-function viewInspectionReport(): void {
-    throw new Error('Function not implemented.')
-}
 
