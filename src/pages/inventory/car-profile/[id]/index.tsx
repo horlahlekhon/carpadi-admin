@@ -355,7 +355,7 @@ function CarProfilePage() {
             })
             .finally(() => {
                 setIsSaving(false)
-                modalOpen(false)
+                setModalState(false)
             })
     }
 
