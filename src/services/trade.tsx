@@ -1,8 +1,5 @@
-import {BehaviorSubject} from 'rxjs';
 import getConfig from 'next/config';
-import Router from 'next/router'
 import {fetchWrapper} from '../helpers/fetchWrapper';
-
 const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
@@ -78,7 +75,7 @@ const deleteSingleTrade = (id) => {
 }
 
 const retrieveUserTrades = (merchantId, status = 'purchased') => {
-    return fetchWrapper.get(`${baseUrl}/trades?limit=${50}&offset=${0}&merchant=${merchantId}&trade_status=${status}`)
+    return fetchWrapper.get(`${baseUrl}/trade-units?limit=${50}&offset=${0}&merchant=${merchantId}&trade_status=${status}`)
         .then((response) => {
             return {status: true, data: response}
         })

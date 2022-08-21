@@ -1,6 +1,12 @@
 import Moment from "moment";
 
-export const formatDate = (date) => Moment(date).format('DD-MM-YYYY')
+export const formatDate = (date) => {
+    if (date) {
+        Moment(date).format('DD-MM-YYYY')
+    } else {
+        return date
+    }
+}
 
 export const humanReadableDate = (date) => Moment(date).format('dddd, MMMM Do YYYY')
 

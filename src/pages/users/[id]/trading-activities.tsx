@@ -89,7 +89,7 @@ function TradingActivitiesPage() {
         }
     }
 
-    
+
     const updateTrades = (status = ActivityStatus.ACTIVE) => {
         setActivityTab(status)
         // @ts-ignore
@@ -154,13 +154,14 @@ function TradingActivitiesPage() {
                                     <ActivityCard key={i}>
                                         <img
                                             src={trade?.car?.image}
-                                            alt={trade?.car?.make}
+                                            alt={trade?.trade_car?.manufacturer}
                                             className="image"
                                         />
                                         <div className='content'>
                                             <div className='header'>
                                                 <Image src="/images/Toyota-Full.png" height={11} width={40}/>
-                                                <div className='text'>{trade?.car?.make} {trade?.car?.model}</div>
+                                                <div
+                                                    className='text'>{trade?.trade_car?.manufacturer} {trade?.trade_car?.model} {trade?.trade_car?.year}</div>
                                             </div>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={4}>
@@ -174,34 +175,34 @@ function TradingActivitiesPage() {
                                                     <ActivityCardItem>
                                                         <div>Total Bought Slot</div>
                                                         <div
-                                                            className='value'>{(trade?.slots_available || 0) - (trade?.remaining_slots || 0)}</div>
+                                                            className='value'>{trade?.slots_quantity}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Total Slot Price</div>
                                                         <div
-                                                            className='value'>&#8358; {formatNumber(trade?.sold_slots_price)}</div>
+                                                            className='value'>&#8358; {formatNumber(Number(trade?.unit_value || 0) * Number(trade?.slots_quantity))}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Estimated ROT Per Slot</div>
                                                         <div
-                                                            className='value'>&#8358; {formatNumber(trade?.return_on_trade_per_unit)}</div>
+                                                            className='value'>&#8358; {formatNumber(trade?.estimated_rot)}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
-                                                        <div>Trading Vehicle ID</div>
-                                                        <div className='value'>{trimString(trade?.car?.id)}</div>
+                                                        <div>Trading Car ID</div>
+                                                        <div className='value'>{trimString(trade?.trade_car?.id)}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
-                                                        <div>Trade Duration</div>
+                                                        <div>Trading Share Percentage</div>
                                                         <div
-                                                            className='value'>In {Math.ceil((trade?.estimated_sales_duration || 0) / 30)} Months
+                                                            className='value'>{formatNumber(trade?.share_percentage)}%
                                                         </div>
                                                     </ActivityCardItem>
                                                 </Grid>
@@ -209,12 +210,12 @@ function TradingActivitiesPage() {
                                         </div>
                                         <div className='btn-group'>
                                             <Button text={'View Trade'} width={'100%'}
-                                                    onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.id}`)}/>
+                                                    onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.trade}`)}/>
                                             <Button text={'Manage Unit'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation(`/trade/${trade?.id}/manage-trade?status=${trade?.trade_status}`)}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
                                                     color={t.primaryDeepBlue}
-                                                    onClick={() => handleNavigation(`/inventory/car-profile/${trade?.car?.id}?status=car listings`)}/>
+                                                    onClick={() => handleNavigation(`/inventory/car-profile/${trade?.trade_car?.id}?status=car listings`)}/>
                                         </div>
                                     </ActivityCard>
                                 ))}
@@ -223,13 +224,14 @@ function TradingActivitiesPage() {
                                     <ActivityCard key={i}>
                                         <img
                                             src={trade?.car?.image}
-                                            alt={trade?.car?.make}
+                                            alt={trade?.trade_car?.manufacturer}
                                             className="image"
                                         />
                                         <div className='content'>
                                             <div className='header'>
                                                 <Image src="/images/Toyota-Full.png" height={11} width={40}/>
-                                                <div className='text'>{trade?.car?.make} {trade?.car?.model}</div>
+                                                <div
+                                                    className='text'>{trade?.trade_car?.manufacturer} {trade?.trade_car?.model} {trade?.trade_car?.year}</div>
                                             </div>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={4}>
@@ -243,34 +245,34 @@ function TradingActivitiesPage() {
                                                     <ActivityCardItem>
                                                         <div>Total Bought Slot</div>
                                                         <div
-                                                            className='value'>{(trade?.slots_available || 0) - (trade?.remaining_slots || 0)}</div>
+                                                            className='value'>{trade?.slots_quantity}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Total Slot Price</div>
                                                         <div
-                                                            className='value'>&#8358; {formatNumber(trade?.sold_slots_price)}</div>
+                                                            className='value'>&#8358; {formatNumber(Number(trade?.unit_value || 0) * Number(trade?.slots_quantity))}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
-                                                        <div>Received ROT Per Slot</div>
+                                                        <div>Estimated ROT Per Slot</div>
                                                         <div
-                                                            className='value'>&#8358; {formatNumber(trade?.return_on_trade_per_unit)}</div>
+                                                            className='value'>&#8358; {formatNumber(trade?.estimated_rot)}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
-                                                        <div>Trading Vehicle ID</div>
-                                                        <div className='value'>{trimString(trade?.car?.id)}</div>
+                                                        <div>Trading Car ID</div>
+                                                        <div className='value'>{trimString(trade?.trade_car?.id)}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Trade Sold Date</div>
                                                         <div
-                                                            className='value'>{formatDate(trade.modified)}
+                                                            className='value'>{formatDate(trade?.trade_sold_date) || 'NA'}
                                                         </div>
                                                     </ActivityCardItem>
                                                 </Grid>
@@ -278,12 +280,12 @@ function TradingActivitiesPage() {
                                         </div>
                                         <div className='btn-group'>
                                             <Button text={'View Trade'} width={'100%'}
-                                                    onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.id}`)}/>
+                                                    onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.trade}`)}/>
                                             <Button text={'Manage Unit'} width={'100%'} outlined={true}
-                                                    onClick={() => handleNavigation(`/trade/${trade.id}/manage-trade?status=${trade.trade_status}`)}/>
+                                                    onClick={() => handleNavigation(`/trade/${trade.trade}/manage-trade?status=${trade.trade_status}`)}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
                                                     color={t.primaryDeepBlue}
-                                                    onClick={() => handleNavigation(`/inventory/car-profile/${trade?.car?.id}?status=car listings`)}/>
+                                                    onClick={() => handleNavigation(`/inventory/car-profile/${trade?.trade_car?.id}?status=car listings`)}/>
                                         </div>
                                     </ActivityCard>
                                 ))}
@@ -292,54 +294,57 @@ function TradingActivitiesPage() {
                                     <ActivityCard key={i}>
                                         <img
                                             src={trade?.car?.image}
-                                            alt={trade?.car?.make}
+                                            alt={trade?.trade_car?.manufacturer}
                                             className="image"
                                         />
                                         <div className='content'>
                                             <div className='header'>
-                                                <Image src="/images/Toyota-Full.png" height={11} width={40}/>
-                                                <div className='text'>{trade?.car?.make} {trade?.car?.model}</div>
+                                                <img src="/images/Toyota-Full.png" height={11} width={40}
+                                                     alt={trade?.trade_car?.manufacturer}/>
+                                                <div
+                                                    className='text'>{trade?.trade_car?.manufacturer} {trade?.trade_car?.model} {trade?.trade_car?.year}</div>
                                             </div>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Refund Status</div>
                                                         <div
-                                                            className='value'>&#8358; {'Refunded'}</div>
+                                                            className='value'>&#8358; {trade?.payment_transaction_ref ? 'Refunded' : 'Pending'}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Total Bought Slot</div>
                                                         <div
-                                                            className='value'>{(trade?.slots_available || 0) - (trade?.remaining_slots || 0)}</div>
+                                                            className='value'>{trade?.slots_quantity || 'NA'}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Total Slot Price</div>
                                                         <div
-                                                            className='value'>&#8358; {formatNumber(trade?.sold_slots_price)}</div>
+                                                            className='value'>&#8358; {formatNumber(Number(trade?.unit_value || 0) * Number(trade?.slots_quantity))}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
                                                         <div>Estimated ROT Per Slot</div>
                                                         <div
-                                                            className='value'>&#8358; {formatNumber(trade?.return_on_trade_per_unit)}</div>
+                                                            className='value'>&#8358; {formatNumber(trade?.estimated_rot)}</div>
                                                     </ActivityCardItem>
                                                 </Grid>
                                                 <Grid item xs={4}>
                                                     <ActivityCardItem>
-                                                        <div>Trading Vehicle ID</div>
-                                                        <div className='value'>{trimString(trade?.car?.id)}</div>
-                                                    </ActivityCardItem>
-                                                </Grid>
-                                                <Grid item xs={4}>
-                                                    <ActivityCardItem>
-                                                        <div>Trade Sold Date</div>
+                                                        <div>Trading Car ID</div>
                                                         <div
-                                                            className='value'>{formatDate(trade.modified)}
+                                                            className='value'>{trimString(trade?.trade_car?.id)}</div>
+                                                    </ActivityCardItem>
+                                                </Grid>
+                                                <Grid item xs={4}>
+                                                    <ActivityCardItem>
+                                                        <div>Trade Closed Date</div>
+                                                        <div
+                                                            className='value'>NA
                                                         </div>
                                                     </ActivityCardItem>
                                                 </Grid>
@@ -347,12 +352,12 @@ function TradingActivitiesPage() {
                                         </div>
                                         <div className='btn-group'>
                                             <Button text={'View Trade'} width={'100%'}
-                                                    onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.id}`)}/>
+                                                    onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.trade}`)}/>
                                             <Button text={'Manage Unit'} width={'100%'} outlined={true}
-                                                    onClick={() => handleNavigation(`/trade/${trade.id}/manage-trade?status=${trade.trade_status}`)}/>
+                                                    onClick={() => handleNavigation(`/trade/${trade.trade}/manage-trade?status=${trade.trade_status}`)}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
                                                     color={t.primaryDeepBlue}
-                                                    onClick={() => handleNavigation(`/inventory/car-profile/${trade?.car?.id}?status=car listings`)}/>
+                                                    onClick={() => handleNavigation(`/inventory/car-profile/${trade?.trade_car?.id}?status=car listings`)}/>
                                         </div>
                                     </ActivityCard>
                                 ))}
