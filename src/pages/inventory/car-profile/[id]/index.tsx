@@ -901,44 +901,49 @@ function CarProfilePage() {
                                     />
                                 </Grid>
                             </InfoSection>
-                            <ModalSplitContainer>
-                                <div className="right">
-                                    <div className="title">Inspection Summary</div>
-                                    <div className="content">
-                                        <Grid item xs={12} style={{marginTop: -10}}>
-                                            <Statistic>
-                                                <div className="key">Status</div>
-                                                <div className="value">{inspection?.status}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Owner’s Name</div>
-                                                <div
-                                                    className="value">{trimString(inspection?.owners_name, 25) || 'NA'}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Inspection Date</div>
-                                                <div className="value">{formatDate(inspection?.inspection_date)}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Owners Phone</div>
-                                                <div className="value">{inspection?.owners_phone}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Owners Review</div>
-                                                <div className="value">{inspection?.owners_review}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Inspection Verdict</div>
-                                                <div className="value">{inspection?.inspection_verdict}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Address</div>
-                                                <div className="value">{inspection?.address}</div>
-                                            </Statistic>
-                                        </Grid>
-                                    </div>
+                            <div style={{
+                                width: '80%',
+                                marginRight: 'auto',
+                                marginLeft: 'auto',
+                                padding: '16px',
+                                border: `2px dashed ${t.lightGrey}`,
+                                borderRadius: '10px'
+                            }}>
+                                {/*<Typography variant='h6'>Inspection Summary</Typography>*/}
+                                <div className="content">
+                                    <Grid item xs={12} style={{marginTop: -10}}>
+                                        <Statistic>
+                                            <div className="key">Status</div>
+                                            <div className="value">{inspection?.status}</div>
+                                        </Statistic>
+                                        <Statistic>
+                                            <div className="key">Owner’s Name</div>
+                                            <div
+                                                className="value">{trimString(inspection?.owners_name, 25) || 'NA'}</div>
+                                        </Statistic>
+                                        <Statistic>
+                                            <div className="key">Inspection Date</div>
+                                            <div className="value">{formatDate(inspection?.inspection_date)}</div>
+                                        </Statistic>
+                                        <Statistic>
+                                            <div className="key">Owners Phone</div>
+                                            <div className="value">{inspection?.owners_phone}</div>
+                                        </Statistic>
+                                        <Statistic>
+                                            <div className="key">Owners Review</div>
+                                            <div className="value">{inspection?.owners_review || 'NA'}</div>
+                                        </Statistic>
+                                        <Statistic>
+                                            <div className="key">Inspection Verdict</div>
+                                            <div className="value">{inspection?.inspection_verdict}</div>
+                                        </Statistic>
+                                        <Statistic>
+                                            <div className="key">Address</div>
+                                            <div className="value">{inspection?.address}</div>
+                                        </Statistic>
+                                    </Grid>
                                 </div>
-                            </ModalSplitContainer>
+                            </div>
                         </div>
                     )}
                 </ModalBody>

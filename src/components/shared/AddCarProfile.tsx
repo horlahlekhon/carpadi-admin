@@ -216,7 +216,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                     <>
                         <HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>
                         <TextField placeholder='Number Plate' label='Number Plate'
-                                   style={{width: 330, marginBottom: 30}} variant='standard'
+                                   style={{width: 330, marginBottom: 30}}
                                    value={licence_plate} onChange={(e) => setPlate(e.target.value)}/>
                         <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Info</HeaderText>
                         <InputGrid>
