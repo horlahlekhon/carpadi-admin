@@ -21,6 +21,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
     const [transmissionType, setTransmissionType] = useState('')
     const [seatNumber, setSeatNumber] = useState(4)
     const [vin, setVin] = useState(null)
+    const [licence_plate, setPlate] = useState(null)
     const [car, setCar] = useState({
             "engine": null,
             "transmission": null,
@@ -129,6 +130,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             "vin": vin,
             "car_pictures": uploadedPictures.map(a => a.secure_url),
             "colour": carColor,
+            "licence_plate": licence_plate
         }
         createCar(data)
             .then((response) => {
@@ -213,9 +215,9 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                 {modalView === 'fetchedCarProfile' && (
                     <>
                         <HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>
-                        <TextField placeholder='VIN (Number Plate)' label='VIN (Number Plate)'
+                        <TextField placeholder='Number Plate' label='Number Plate'
                                    style={{width: 330, marginBottom: 30}} variant='standard'
-                                   value={trimString(car?.vin) || 'NA'} disabled/>
+                                   value={licence_plate} onChange={(e) => setPlate(e.target.value)}/>
                         <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Info</HeaderText>
                         <InputGrid>
                             <TextField
@@ -262,9 +264,9 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 className="text-field"
                                 fullWidth
                                 disabled
-                                label="Vehicle Age"
-                                placeholder="Vehicle Age"
-                                value={car?.age || 'NA'}
+                                label="Vehicle Engine"
+                                placeholder="Vehicle Engine"
+                                value={car?.engine || 'NA'}
                                 variant='standard'
                             />
                             <FormControl fullWidth>
