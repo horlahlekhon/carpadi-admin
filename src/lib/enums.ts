@@ -4,6 +4,7 @@ enum CarStates {
     INSPECTED = 'inspected',
     NEW = 'new',
     FAILED_INSPECTION = "failed_inspection",
+    ONGOING_INSPECTION = "ongoing_inspection",
     AVAILABLE = "available",
     ONGOING_TRADE = "ongoing_trade",
     BOUGHT = "bought",
