@@ -210,7 +210,7 @@ function TradingActivitiesPage() {
                                         <div className='btn-group'>
                                             <Button text={'View Trade'} width={'100%'}
                                                     onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.id}`)}/>
-                                            <Button text={'Manage Trade'} width={'100%'} outlined={true}
+                                            <Button text={'Manage Unit'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation(`/trade/${trade?.id}/manage-trade?status=${trade?.trade_status}`)}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
                                                     color={t.primaryDeepBlue}
@@ -279,7 +279,7 @@ function TradingActivitiesPage() {
                                         <div className='btn-group'>
                                             <Button text={'View Trade'} width={'100%'}
                                                     onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.id}`)}/>
-                                            <Button text={'Manage Trade'} width={'100%'} outlined={true}
+                                            <Button text={'Manage Unit'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation(`/trade/${trade.id}/manage-trade?status=${trade.trade_status}`)}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
                                                     color={t.primaryDeepBlue}
@@ -348,7 +348,7 @@ function TradingActivitiesPage() {
                                         <div className='btn-group'>
                                             <Button text={'View Trade'} width={'100%'}
                                                     onClick={() => handleNavigation(`/users/${userId}/view-trade?status=active&tradeId=${trade?.id}`)}/>
-                                            <Button text={'Manage Trade'} width={'100%'} outlined={true}
+                                            <Button text={'Manage Unit'} width={'100%'} outlined={true}
                                                     onClick={() => handleNavigation(`/trade/${trade.id}/manage-trade?status=${trade.trade_status}`)}/>
                                             <Button text={'Car Profile'} width={'100%'} bgColor={t.extraLiteGrey}
                                                     color={t.primaryDeepBlue}
