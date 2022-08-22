@@ -12,6 +12,7 @@ import ntc from "../../lib/ntc";
 import {trimString} from "../../helpers/formatters";
 import {createCar} from "../../services/car";
 import {UploadTypes} from "../../lib/enums";
+import {getColorName} from "../../helpers/utils";
 
 const AddCarProfile = ({modalOpen = true, onClick}) => {
     const router = useRouter()
@@ -69,27 +70,35 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
     };
 
     const handleFileChange = event => {
-        const fileUploaded = event.target.files[0];
+        const fileUploaded = event.target.files;
         handleFile(fileUploaded);
     };
 
-    const handleFile = (file) => {
-        setisUploading(true)
-        uploadFile(file, UploadTypes.CAR, vin)
-            .then((res) => {
-                if (res.status) {
-                    const arr = [...uploadedPictures, res.data];
-                    setUploadedPictures(arr)
-                } else {
-                    toast.error(res.data)
-                }
-            })
-            .catch((error) => {
-                toast.error(error)
-            })
-            .finally(() => {
-                setisUploading(false)
-            })
+    const handleFile = (files) => {
+        files = Array.from(files)
+        const arr = files.map((a) => {
+            return {
+                secure_url: URL.createObjectURL(a),
+                file: a
+            }
+        })
+        setUploadedPictures([...uploadedPictures, ...arr])
+        // setisUploading(true)
+        // uploadFile(file, UploadTypes.CAR, vin)
+        //     .then((res) => {
+        //         if (res.status) {
+        //             const arr = [...uploadedPictures, res.data];
+        //             setUploadedPictures(arr)
+        //         } else {
+        //             toast.error(res.data)
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         toast.error(error)
+        //     })
+        //     .finally(() => {
+        //         setisUploading(false)
+        //     })
     }
 
     const fetchCar = () => {
@@ -112,38 +121,62 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
     }
 
     function removePicture(id) {
-        const arr = uploadedPictures.filter(a => a.public_id !== id);
+        const arr = uploadedPictures.filter(a => a.secure_url !== id);
         setUploadedPictures(arr)
     }
 
     function setColor(colorCode) {
-        const result = ntc.name(colorCode)
-        if (result.length >= 2 && result[1]) {
-            setCarColor(String(result[1]))
-        } else {
-            toast.error('We are having issues determining that color, try selecting another shade.')
-        }
+        setCarColor(colorCode)
     }
 
     function saveCarProfile() {
+        setLoading(true)
+        setisUploading(true)
         const data = {
             "vin": vin,
-            "car_pictures": uploadedPictures.map(a => a.secure_url),
+            "car_pictures": [],
             "colour": carColor,
             "licence_plate": licence_plate
         }
-        createCar(data)
-            .then((response) => {
-                if (response.status) {
-                    toast.success('Created Successfully!')
-                    onClick()
-                } else {
-                    toast.error(response.data)
+        uploadedPictures.forEach(async (picture) => {
+            uploadFile(picture?.file, UploadTypes.CAR, vin)
+                .then((res) => {
+                    if (res.status) {
+                        console.log(res.data?.secure_url)
+                        data.car_pictures.push(res.data?.secure_url)
+                    } else {
+                        toast.error(res.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+            const res = await uploadFile(picture?.file, UploadTypes.CAR, vin);
+            if (res.status) {
+                data.car_pictures.push(res.data?.secure_url)
+                if (data.car_pictures.length === uploadedPictures.length) {
+                    createCar(data)
+                        .then((response) => {
+                            if (response.status) {
+                                toast.success('Created Successfully!')
+                                onClick()
+                            } else {
+                                toast.error(response.data)
+                            }
+                        })
+                        .catch((error) => {
+                            toast.error(error)
+                        })
+                        .finally(() => {
+                            setisUploading(false)
+                            setLoading(false)
+                        })
                 }
-            })
-            .catch((error) => {
-                toast.error(error)
-            })
+            } else {
+                toast.error(res.data)
+            }
+        })
+
     }
 
     // @ts-ignore
@@ -233,7 +266,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 className="text-field"
                                 fullWidth
                                 placeholder="Color"
-                                label={carColor !== '' ? carColor : 'Color'}
+                                label={carColor !== '' ? getColorName(carColor) : 'Color'}
                                 type='color'
                                 variant='standard'
                                 onChange={(e) => setColor(e.target.value)}
@@ -339,6 +372,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             marginLeft="auto"
                             marginRight="auto"
                             marginTop={40}
+                            disabled={!licence_plate || !carColor}
                             onClick={() => setModalView('uploadCarImages')}
                         />
                     </>
@@ -350,7 +384,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 <div className='image' key={idx}>
                                     <img src={image.secure_url} className="image"/>
                                     <img src="/icons/Delete-Circular-Green.svg" className='delete'
-                                         onClick={() => removePicture(image.public_id)}/>
+                                         onClick={() => removePicture(image.secure_url)}/>
                                 </div>
                             ))}
                         </ImageGrid>
@@ -364,6 +398,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                     type="file"
                                     accept="image/*"
                                     ref={hiddenFileInput}
+                                    multiple={true}
                                     onChange={handleFileChange}
                                     style={{display: 'none'}}
                                 />

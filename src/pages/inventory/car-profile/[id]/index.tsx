@@ -126,28 +126,31 @@ function CarProfilePage() {
     };
 
     const handleFileChange = event => {
-        const fileUploaded = event.target.files[0];
+        const fileUploaded = event.target.files;
         handleFile(fileUploaded);
     };
 
-    const handleFile = (file) => {
-        setIsSaving(true)
-        uploadFile(file)
-            .then((res) => {
-                if (res.status) {
-                    let arr = car.pictures
-                    arr.push(res.data?.secure_url)
-                    setCarData({...car, pictures: arr})
-                } else {
-                    toast.error(res.data)
-                }
-            })
-            .catch((error) => {
-                toast.error(error)
-            })
-            .finally(() => {
-                setIsSaving(false)
-            })
+    const handleFile = (files) => {
+        let arr = Array.from(files)
+        arr.forEach((file) => {
+            setIsSaving(true)
+            uploadFile(file)
+                .then((res) => {
+                    if (res.status) {
+                        let arr = car.pictures
+                        arr.push(res.data?.secure_url)
+                        setCarData({...car, pictures: arr})
+                    } else {
+                        toast.error(res.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+                .finally(() => {
+                    setIsSaving(false)
+                })
+        })
     }
 
     function deleteCarProfile() {
@@ -817,6 +820,7 @@ function CarProfilePage() {
                                         type="file"
                                         accept="image/*"
                                         ref={hiddenFileInput}
+                                        multiple={true}
                                         onChange={handleFileChange}
                                         style={{display: 'none'}}
                                     />
