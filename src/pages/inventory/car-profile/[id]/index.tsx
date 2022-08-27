@@ -562,7 +562,7 @@ function CarProfilePage() {
                         </Detail>
                         <Detail>
                             <div className="key">Color</div>
-                            <div className="value">{car?.colour || 'NA'}</div>
+                            <div className="value">{getColorName(car?.colour) || 'NA'}</div>
                         </Detail>
                         <Detail>
                             <div className="key">Body Type</div>
