@@ -5,7 +5,7 @@ import {
     Modal,
     TextField,
     Select,
-    FormControl, Grid
+    FormControl, Grid, InputLabel
 } from '@material-ui/core'
 import {t} from '../../../../styles/theme'
 import {useRouter} from 'next/router'
@@ -17,7 +17,7 @@ import Checkbox from "../../../../components/shared/Checkbox";
 import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
 import {deleteCar, retrieveSingleCar, updateCar} from "../../../../services/car";
-import {CarStates, InspectionStates} from "../../../../lib/enums";
+import {CarStates, CarTransmissionTypes, FuelTypes, InspectionStates} from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
 import CPToast from "../../../../components/shared/CPToast";
 import {uploadFile} from "../../../../services/upload";
@@ -26,6 +26,7 @@ import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
 import {createInspection, retrieveInspection} from "../../../../services/inspection";
 import {authService} from "../../../../services/auth";
+import {getColorName} from "../../../../helpers/utils";
 
 
 function CarProfilePage() {
@@ -293,13 +294,14 @@ function CarProfilePage() {
     }
 
     function setColor(colorCode) {
-        const result = ntc.name(colorCode)
-        if (result.length >= 2 && result[1]) {
-            // @ts-ignore
-            setCarData({...car, 'colour': String(result[1])})
-        } else {
-            toast.error('We are having issues determining that color, try selecting another shade.')
-        }
+        // const result = ntc.name(colorCode)
+        // if (result.length >= 2 && result[1]) {
+        //     // @ts-ignore
+        //     setCarData({...car, 'colour': String(result[1])})
+        // } else {
+        //     toast.error('We are having issues determining that color, try selecting another shade.')
+        // }
+        setCarData({...car, 'colour': colorCode})
     }
 
     function setField(fieldName, value) {
@@ -683,23 +685,23 @@ function CarProfilePage() {
                     )}
                     {modalView === 'editDetails' && (
                         <>
-                            <HeaderText style={{marginBottom: 10, marginTop: 20}}>Select Car Brand</HeaderText>
-                            <FormControl style={{width: 330, marginBottom: 30}}>
-                                <Select
-                                    value={carBrand}
-                                    onChange={(event) =>
-                                        setCarBrand(String(event.target.value))
-                                    }
-                                    displayEmpty
-                                    inputProps={{'aria-label': 'Without label'}}
-                                >
-                                    <option value="" disabled>
-                                        Car Brand
-                                    </option>
-                                    <option value={'Toyota Rav4'}>Toyota Rav4</option>
-                                    <option value={'Toyoya Sequoia'}>Toyoya Sequoia</option>
-                                </Select>
-                            </FormControl>
+                            {/*<HeaderText style={{marginBottom: 10, marginTop: 20}}>Select Car Brand</HeaderText>*/}
+                            {/*<FormControl style={{width: 330, marginBottom: 30}}>*/}
+                            {/*    <Select*/}
+                            {/*        value={carBrand}*/}
+                            {/*        onChange={(event) =>*/}
+                            {/*            setCarBrand(String(event.target.value))*/}
+                            {/*        }*/}
+                            {/*        displayEmpty*/}
+                            {/*        inputProps={{'aria-label': 'Without label'}}*/}
+                            {/*    >*/}
+                            {/*        <option value="" disabled>*/}
+                            {/*            Car Brand*/}
+                            {/*        </option>*/}
+                            {/*        <option value={'Toyota Rav4'}>Toyota Rav4</option>*/}
+                            {/*        <option value={'Toyoya Sequoia'}>Toyoya Sequoia</option>*/}
+                            {/*    </Select>*/}
+                            {/*</FormControl>*/}
                             <HeaderText style={{marginBottom: 10, marginTop: 10}}>Car Profile Details</HeaderText>
                             <InputGrid>
                                 <TextField
@@ -715,7 +717,7 @@ function CarProfilePage() {
                                     className="text-field"
                                     fullWidth
                                     placeholder="Color"
-                                    label={car.colour || 'Color'}
+                                    label={getColorName(car.colour) || 'Color'}
                                     type='color'
                                     variant='standard'
                                     onChange={(e) => setColor(e.target.value)}
@@ -723,27 +725,35 @@ function CarProfilePage() {
                             </InputGrid>
                             <InputGrid>
                                 <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label">Transmission</InputLabel>
                                     <Select
-                                        value={car?.information?.transmission}
+                                        value={car?.information?.transmission.toString().toLowerCase()}
                                         onChange={(event) =>
                                             setInfoField('transmission', event.target.value)}
                                         displayEmpty
                                         inputProps={{'aria-label': 'Without label'}}
+                                        variant='standard'
+                                        label='Transmission'
+                                        placeholder='Transmission'
                                     >
                                         <option value="" disabled>
                                             Transmission Type
                                         </option>
-                                        <option value={'MANUAL'}
-                                                selected={String(car?.information?.transmission).toLowerCase() === 'manual'}>Manual
+                                        <option value={CarTransmissionTypes.MANUAL}
+                                                selected={String(car?.information?.transmission).toLowerCase() === CarTransmissionTypes.MANUAL.toLowerCase()}>Manual
                                         </option>
-                                        <option value={'AUTOMATIC'}
-                                                selected={String(car?.information?.transmission).toLowerCase() === 'automatic'}>Automatic
+                                        <option value={CarTransmissionTypes.AUTOMATIC}
+                                                selected={String(car?.information?.transmission).toLowerCase() === CarTransmissionTypes.AUTOMATIC.toLowerCase()}>Automatic
+                                        </option>
+                                        <option value={CarTransmissionTypes.STANDARD}
+                                                selected={String(car?.information?.transmission).toLowerCase() === CarTransmissionTypes.STANDARD.toLowerCase()}>Standard
                                         </option>
                                     </Select>
                                 </FormControl>
                                 <FormControl fullWidth>
+                                    <InputLabel id="demo-simple-select-label">Fuel Type</InputLabel>
                                     <Select
-                                        value={car?.information?.fuel_type}
+                                        value={car?.information?.fuel_type.toString().toLowerCase()}
                                         onChange={(event) =>
                                             setInfoField('fuel_type', event.target.value)}
                                         displayEmpty
@@ -752,11 +762,23 @@ function CarProfilePage() {
                                         <option value="" disabled>
                                             Fuel Type
                                         </option>
-                                        <option value={'PETROL'}
-                                                selected={String(car?.information?.fuel_type).toLowerCase() === 'petrol'}>Petrol
+                                        <option value={FuelTypes.PETROL}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === FuelTypes.PETROL}>Petrol
                                         </option>
-                                        <option value={'DIESEL'}
-                                                selected={String(car?.information?.fuel_type).toLowerCase() === 'diesel'}>Diesel
+                                        <option value={FuelTypes.DIESEL}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === FuelTypes.DIESEL}>Diesel
+                                        </option>
+                                        <option value={FuelTypes.HYBRID}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === FuelTypes.HYBRID}>Hybrid
+                                        </option>
+                                        <option value={FuelTypes.LPG}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === FuelTypes.LPG}>LPG
+                                        </option>
+                                        <option value={FuelTypes.CNG}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === FuelTypes.CNG}>CNG
+                                        </option>
+                                        <option value={FuelTypes.ELECTRIC}
+                                                selected={String(car?.information?.fuel_type).toLowerCase() === FuelTypes.ELECTRIC}>Electric
                                         </option>
                                     </Select>
                                 </FormControl>

@@ -53,7 +53,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
         },
         uploadCarImages: {
             title: 'Upload Car Images',
-            description: 'Upload minimum of 5 images to complete profile '
+            description: 'Upload minimum of 3 images to complete profile '
         }
     }
 
@@ -310,6 +310,9 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                     }
                                     displayEmpty
                                     inputProps={{'aria-label': 'Without label'}}
+                                    label='Number of Seats'
+                                    placeholder='Number of Seats'
+                                    variant='standard'
                                 >
                                     <option value="" disabled>
                                         Number of Seats
@@ -408,12 +411,12 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             </div>
                         </ImageUpload>
                         <Button
-                            text="Create Car Profile"
+                            text={isLoading ? 'Saving ...' : 'Create Car Profile'}
                             width={510}
                             marginLeft="auto"
                             marginRight="auto"
                             marginTop={50}
-                            disabled={uploadedPictures.length < 5}
+                            disabled={(uploadedPictures.length < 3) || isLoading}
                             onClick={() => saveCarProfile()}
                         />
                     </>

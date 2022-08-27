@@ -27,6 +27,7 @@ enum CarMaintenanceTypes {
 enum CarTransmissionTypes {
     MANUAL = "manual",
     AUTOMATIC = "automatic",
+    STANDARD = "standard",
 }
 
 enum FuelTypes {
