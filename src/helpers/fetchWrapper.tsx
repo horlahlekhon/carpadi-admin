@@ -75,11 +75,11 @@ function handleResponse(response) {
     return response.text().then(text => {
         const data = text && JSON.parse(text);
         if (!response.ok) {
-            const error = (data && data.detail) || (data && data.error) || (data && data.messages && data.messages[0]) || (data && data.car && data.car[0]) || (data && data.vin && data.vin[0]) || response.statusText;
+            const error = (data && data.detail) || (data && data.error) || (data && data.messages && data.messages[0]) || (data && data.car && data.car[0]) || (data && data.vin && (typeof data.vin === 'string' ? data.vin : data.vin[0])) || response.statusText;
             if (response.status === 404) {
                 router.push('/errors/not-found')
             }
-            if (response.status >= 500) {
+            if (response.status > 499) {
                 router.push('/errors/server-error')
             }
             return Promise.reject(error);

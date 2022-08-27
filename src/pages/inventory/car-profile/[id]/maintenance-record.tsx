@@ -35,11 +35,9 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
     const router = useRouter()
     const [carId, setCarId] = useState(null)
     const status = String(router.query.status).toLowerCase() || 'NA'
-    const [isPageEmpty, setPageState] = useState(true)
     const [spareParts, setSpareParts] = useState([])
     const [expenses, setExpenses] = useState([])
     const [maintenances, setMaintenances] = useState([])
-    const [sparePartsList, setSparePartsList] = useState([])
     const [description, setDescription] = useState('')
     const [sparePart, setSparePart] = useState(refSparePart)
     const [expense, setExpense] = useState(refExpense)
@@ -99,6 +97,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
     const hiddenFileInput = useRef(null);
     const [expenseList, setExpenseList] = useState([])
     const [partsList, setPartsList] = useState([])
+    const [partIdx, setPartIdx] = useState(0)
 
 
     const showModal = (viewName: string, title: string, customTagline: string = null!) => {
@@ -114,15 +113,14 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
         router.push(`${action}`)
     }
 
-    const handleChange = (prop) => (event) => {
-        setSparePart({...sparePart, [prop]: event.target.value})
+    const handleChange = (prop, value, idx) => {
+        let spp = [...spareParts]
+        spp[idx][prop] = value;
+        setSpareParts(spp)
     }
 
 
     const saveSparePartRecord = () => {
-        if (sparePart?.name !== '' && sparePart?.part_picture !== '') {
-            addSparePart()
-        }
 
         if (spareParts.length < 1) {
             toast.error("Ensure you have added at least a spare part!")
@@ -130,26 +128,51 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
         }
         spareParts.forEach((spareP) => {
             if (editMode) {
-                updateMaintenance({
-                    "maintenance": {
-                        "name": spareP.name,
-                        "estimated_price": spareP.partPrice,
-                        "description": description,
-                    },
-                    "car": carId,
-                    "type": CarMaintenanceTypes.SPARE_PART,
-                }, spareP?.id)
-                    .then((res) => {
-                        if (res.status) {
-                            toast.success(`Updated part: ${spareP?.name}`)
-                            retrieveCarMaintenance(carId)
-                        } else {
-                            toast.error(res.data)
-                        }
+                if (spareP?.id) {
+                    updateMaintenance({
+                        "maintenance": {
+                            "name": spareP.name,
+                            "estimated_price": spareP.partPrice,
+                            "description": description,
+                            "picture": spareP.part_picture,
+                        },
+                        "car": carId,
+                        "type": CarMaintenanceTypes.SPARE_PART,
+                    }, spareP?.id)
+                        .then((res) => {
+                            if (res.status) {
+                                toast.success(`Updated part: ${spareP?.name}`)
+                                retrieveCarMaintenance(carId)
+                            } else {
+                                toast.error(res.data)
+                            }
+                        })
+                        .catch((error) => {
+                            toast.error(error)
+                        })
+                } else {
+                    createMaintenance({
+                        "maintenance": {
+                            "name": spareP.name,
+                            "estimated_price": spareP.partPrice,
+                            "description": description,
+                            "picture": spareP.part_picture,
+                        },
+                        "car": carId,
+                        "type": CarMaintenanceTypes.SPARE_PART,
                     })
-                    .catch((error) => {
-                        toast.error(error)
-                    })
+                        .then((res) => {
+                            if (res.status) {
+                                toast.success(`Updated part: ${spareP?.name}`)
+                                retrieveCarMaintenance(carId)
+                            } else {
+                                toast.error(res.data)
+                            }
+                        })
+                        .catch((error) => {
+                            toast.error(error)
+                        })
+                }
             } else {
                 createMaintenance(
                     {
@@ -157,6 +180,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                             "name": spareP.name,
                             "estimated_price": spareP.partPrice,
                             "description": description,
+                            "picture": spareP.part_picture,
                         },
                         "type": CarMaintenanceTypes.SPARE_PART,
                         "car": carId
@@ -182,26 +206,49 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
         setModalState(false)
         expenses.forEach((ex) => {
             if (editMode) {
-                updateMaintenance({
-                    "maintenance": {
-                        "name": ex.expense,
-                        "estimated_price": ex.cost,
-                        "description": description,
-                    },
-                    "car": carId,
-                    "type": CarMaintenanceTypes.EXPENSE,
-                }, ex?.id)
-                    .then((res) => {
-                        if (res.status) {
-                            toast.success(`Updated expense: ${ex.expense}`)
-                            retrieveCarMaintenance(carId)
-                        } else {
-                            toast.error(res.data)
-                        }
+                if (ex?.id) {
+                    updateMaintenance({
+                        "maintenance": {
+                            "name": ex.expense,
+                            "estimated_price": ex.cost,
+                            "description": description,
+                        },
+                        "car": carId,
+                        "type": CarMaintenanceTypes.EXPENSE,
+                    }, ex?.id)
+                        .then((res) => {
+                            if (res.status) {
+                                toast.success(`Updated expense: ${ex.expense}`)
+                                retrieveCarMaintenance(carId)
+                            } else {
+                                toast.error(res.data)
+                            }
+                        })
+                        .catch((error) => {
+                            toast.error(error)
+                        })
+                } else {
+                    createMaintenance({
+                        "maintenance": {
+                            "name": ex.expense,
+                            "estimated_price": ex.cost,
+                            "description": description,
+                        },
+                        "car": carId,
+                        "type": CarMaintenanceTypes.EXPENSE,
                     })
-                    .catch((error) => {
-                        toast.error(error)
-                    })
+                        .then((res) => {
+                            if (res.status) {
+                                toast.success(`Updated expense: ${ex.expense}`)
+                                retrieveCarMaintenance(carId)
+                            } else {
+                                toast.error(res.data)
+                            }
+                        })
+                        .catch((error) => {
+                            toast.error(error)
+                        })
+                }
             } else {
                 createMaintenance({
                     "maintenance": {
@@ -228,10 +275,10 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
     }
 
     const addSparePart = () => {
-        if (sparePart?.part_picture === '' || sparePart?.part_picture === null) {
-            toast.error("Please add spare part image")
-            return
-        }
+        // if (sparePart?.part_picture === '' || sparePart?.part_picture === null) {
+        //     toast.error("Please add spare part image")
+        //     return
+        // }
         const arr = [...spareParts, sparePart];
         setSpareParts(arr)
         setSparePart(refSparePart)
@@ -264,11 +311,9 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
             retrieveMaintenances(50, 0, id)
                 .then((response) => {
                     if (response.status) {
-                        setMaintenances(response.data.results)
-                        const exs = maintenances.filter(a => a.type === CarMaintenanceTypes.EXPENSE)
-                        const prts = maintenances.filter(a => a.type === CarMaintenanceTypes.SPARE_PART)
-                        setExpenseList(exs)
-                        setPartsList(prts)
+                        setMaintenances(response?.data?.results)
+                        const exs = response?.data?.results.filter(a => a.type === CarMaintenanceTypes.EXPENSE)
+                        const prts = response?.data?.results.filter(a => a.type === CarMaintenanceTypes.SPARE_PART)
                         setSpareParts(prts.map(a => {
                             return {
                                 name: a?.maintenance_data?.name,
@@ -278,6 +323,8 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 id: a?.maintenance_data?.id,
                             }
                         }))
+                        setExpenseList(exs)
+                        setPartsList(prts)
                     } else {
                         toast.error(response.data)
                     }
@@ -311,7 +358,8 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
     }, [])
 
     const calculateTotal = () => {
-        return maintenances.reduce((a, b) => Number(a?.cost || 0) + Number(b?.cost || 0), 0)
+        const costs = maintenances.map(x => parseFloat(x.cost))
+        return costs.reduce((a, b) => a + b, 0)
     }
 
     const handleFileClick = event => {
@@ -328,7 +376,9 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
         uploadFile(file)
             .then((res) => {
                 if (res.status) {
-                    setSparePart({...sparePart, part_picture: res.data?.secure_url})
+                    let spp = [...spareParts]
+                    spp[partIdx]['part_picture'] = res.data?.secure_url;
+                    setSpareParts(spp)
                 } else {
                     toast.error(res.data)
                 }
@@ -406,13 +456,13 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                         </VehicleDetails>
                         <div className='flex'>
                             {maintenances.length > 0 && (<>
-                                <Button text="Manage Maintenance" width={160} outlined={true} marginRight={10}
+                                <Button text="Manage Maintenance" width={200} outlined={true} marginRight={10}
                                         onClick={() => {
                                             setEditMode(true)
                                             showModal("createSparePart", "Manage Maintenance Record")
                                         }}/>
                             </>)}
-                            <Button text="Go to Car Profile" width={150} outlined={true} marginRight={10}
+                            <Button text="Go to Car Profile" width={180} outlined={true} marginRight={10}
                                     onClick={() => handleNavigation(`/inventory/car-profile/${carId}?status=${status}`)}/>
                             {maintenances.length > 0 && (
                                 <>
@@ -633,53 +683,53 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                         <Add className="icon"/>
                                     </IconPill>
                                 </FlexRow>
-                                <InputGrid>
-                                    <TextField
-                                        className="text-field"
-                                        fullWidth
-                                        placeholder="Spare Part"
-                                        value={sparePart.name}
-                                        onChange={handleChange('name')}
-                                    />
-                                    <div className="input">
-                                        <div className="text">Upload Image</div>
-                                        <Button
-                                            text={isSaving ? 'Uploading...' : 'Upload'}
-                                            outlined={true}
-                                            width={71}
-                                            height={28}
-                                            borderRadius="8px"
-                                            onClick={() => handleFileClick(event)}
-                                        />
-                                    </div>
-                                </InputGrid>
-                                <div style={{display: 'flex', flexDirection: 'column'}}>
-                                    <HeaderText variant="inherit" style={{marginBottom: 8}}>
-                                        Costing
-                                    </HeaderText>
-                                    <InputGrid style={{background: 'white'}}>
-                                        <FlexRow>
-                                            <div className="currency-box">&#8358;</div>
-                                            <TextField
-                                                placeholder="Enter cost"
-                                                style={{width: 400}}
-                                                value={sparePart.partPrice}
-                                                onChange={handleChange('partPrice')}
-                                                type={'number'}
-                                            ></TextField>
-                                        </FlexRow>
-                                        {/*<FlexRow>*/}
-                                        {/*    <div className="currency-box">&#8358;</div>*/}
-                                        {/*    <TextField*/}
-                                        {/*        placeholder="Enter repair cost"*/}
-                                        {/*        style={{width: 400}}*/}
-                                        {/*        value={sparePart.repairCost}*/}
-                                        {/*        onChange={handleChange('repairCost')}*/}
-                                        {/*        type={'number'}*/}
-                                        {/*    ></TextField>*/}
-                                        {/*</FlexRow>*/}
-                                    </InputGrid>
-                                </div>
+                                {/*<InputGrid>*/}
+                                {/*    <TextField*/}
+                                {/*        className="text-field"*/}
+                                {/*        fullWidth*/}
+                                {/*        placeholder="Spare Part"*/}
+                                {/*        value={sparePart.name}*/}
+                                {/*        onChange={handleChange('name')}*/}
+                                {/*    />*/}
+                                {/*    <div className="input">*/}
+                                {/*        <div className="text">Upload Image</div>*/}
+                                {/*        <Button*/}
+                                {/*            text={isSaving ? 'Uploading...' : 'Upload'}*/}
+                                {/*            outlined={true}*/}
+                                {/*            width={71}*/}
+                                {/*            height={28}*/}
+                                {/*            borderRadius="8px"*/}
+                                {/*            onClick={() => handleFileClick(event)}*/}
+                                {/*        />*/}
+                                {/*    </div>*/}
+                                {/*</InputGrid>*/}
+                                {/*<div style={{display: 'flex', flexDirection: 'column'}}>*/}
+                                {/*    <HeaderText variant="inherit" style={{marginBottom: 8}}>*/}
+                                {/*        Costing*/}
+                                {/*    </HeaderText>*/}
+                                {/*    <InputGrid style={{background: 'white'}}>*/}
+                                {/*        <FlexRow>*/}
+                                {/*            <div className="currency-box">&#8358;</div>*/}
+                                {/*            <TextField*/}
+                                {/*                placeholder="Enter cost"*/}
+                                {/*                style={{width: 400}}*/}
+                                {/*                value={sparePart.partPrice}*/}
+                                {/*                onChange={handleChange('partPrice')}*/}
+                                {/*                type={'number'}*/}
+                                {/*            ></TextField>*/}
+                                {/*        </FlexRow>*/}
+                                {/*        /!*<FlexRow>*!/*/}
+                                {/*        /!*    <div className="currency-box">&#8358;</div>*!/*/}
+                                {/*        /!*    <TextField*!/*/}
+                                {/*        /!*        placeholder="Enter repair cost"*!/*/}
+                                {/*        /!*        style={{width: 400}}*!/*/}
+                                {/*        /!*        value={sparePart.repairCost}*!/*/}
+                                {/*        /!*        onChange={handleChange('repairCost')}*!/*/}
+                                {/*        /!*        type={'number'}*!/*/}
+                                {/*        /!*    ></TextField>*!/*/}
+                                {/*        /!*</FlexRow>*!/*/}
+                                {/*    </InputGrid>*/}
+                                {/*</div>*/}
                                 {spareParts.map((sp, id) => (
                                     <div key={id}>
                                         <InputGrid style={{marginTop: 14}}>
@@ -688,20 +738,23 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                 fullWidth
                                                 placeholder="Spare Part"
                                                 variant='standard'
-                                                disabled
                                                 value={sp.name}
+                                                onChange={(e) => handleChange('name', e.target.value, id)}
                                             />
                                             <div className="input">
                                                 <div
                                                     className="text">{`${trimString(sp?.part_picture, 15)}...` || 'NA.png'}</div>
                                                 <Button
-                                                    text="Delete"
+                                                    text={sp?.part_picture ? "Delete" : "Upload"}
                                                     outlined={true}
                                                     width={71}
                                                     height={28}
-                                                    bgColor={t.alertError}
+                                                    bgColor={sp?.part_picture ? t.alertError : t.primaryDeepBlue}
                                                     borderRadius="8px"
-                                                    onClick={() => deleteSparePart(sp.name)}
+                                                    onClick={() => {
+                                                        setPartIdx(id)
+                                                        sp?.part_picture ? deleteSparePart(sp.name) : handleFileClick(event)
+                                                    }}
                                                 />
                                             </div>
                                         </InputGrid>
@@ -715,8 +768,8 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                     <TextField
                                                         placeholder="Enter cost"
                                                         style={{width: 400}} variant='standard'
-                                                        disabled
                                                         value={sp.partPrice}
+                                                        onChange={(e) => handleChange('partPrice', e.target.value, id)}
                                                     ></TextField>
                                                 </FlexRow>
                                                 {/*<FlexRow>*/}
