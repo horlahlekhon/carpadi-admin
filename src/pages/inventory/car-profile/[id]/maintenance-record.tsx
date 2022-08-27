@@ -320,7 +320,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 estimated_price: a?.maintenance_data?.estimated_price,
                                 partPrice: a?.maintenance_data?.estimated_price,
                                 part_picture: a?.maintenance_data?.part_picture,
-                                id: a?.maintenance_data?.id,
+                                id: a?.id,
                             }
                         }))
                         setExpenseList(exs)
