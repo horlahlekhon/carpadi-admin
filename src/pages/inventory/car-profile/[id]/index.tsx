@@ -488,9 +488,11 @@ function CarProfilePage() {
                             </div>
                             <Button text="Create Sales Profile" width='100%' outlined={true}
                                     disabled={!car?.inspection || car?.inspection?.status !== InspectionStates.COMPLETED}
+                                    title={(!car?.inspection || car?.inspection?.status !== InspectionStates.COMPLETED) ? 'Inspection must be completed' : ''}
                                     onClick={() => setCreateSale(true)}/>
                             <Button text="Maintenance Record" width='100%' outlined={true} marginTop={16}
                                     disabled={!car?.inspection || car?.inspection?.status === InspectionStates.PENDING}
+                                    title={(!car?.inspection || car?.inspection?.status === InspectionStates.PENDING) ? 'Inspection must be completed' : ''}
                                     marginBottom={30}
                                     onClick={() => handleNavigation(`/inventory/car-profile/${car.id}/maintenance-record?status=${status}`)}/>
                             <CheckItem style={{background: status === 'car listings' ? t.alertSuccessLite : ''}}>
@@ -499,7 +501,7 @@ function CarProfilePage() {
                             </CheckItem>
                             <CheckItem style={{background: status === 'under inspection' ? t.alertSuccessLite : ''}}>
                                 <span>Under Inspection</span>
-                                <Checkbox color='primary' checked={car.status === CarStates.INSPECTED.valueOf()}
+                                <Checkbox color='primary' checked={car.status === CarStates.ONGOING_INSPECTION.valueOf()}
                                           disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'available for trade' ? t.alertSuccessLite : ''}}>
@@ -507,7 +509,7 @@ function CarProfilePage() {
                                     <span className='title'>Available for Trade</span>
                                     <span className='success'>controlled by created trade</span>
                                 </div>
-                                <Checkbox color='primary' checked={car.status === CarStates.AVAILABLE.valueOf()}
+                                <Checkbox color='primary' checked={car.status === CarStates.AVAILABLE.valueOf() || car.status === CarStates.INSPECTED.valueOf()}
                                           disabled/>
                             </CheckItem>
                             <CheckItem style={{background: status === 'ongoing trade' ? t.alertSuccessLite : ''}}>
@@ -587,6 +589,7 @@ function CarProfilePage() {
                         {['car listings'].includes(status) && (
                             <Button text='Create Trade' width='100%' marginTop={30}
                                     disabled={car?.status !== CarStates.AVAILABLE}
+                                    title={(car?.status !== CarStates.AVAILABLE) ? 'Inspection must be completed' : ''}
                                     onClick={() => setCreateTrade(true)}
                             />
                         )}
