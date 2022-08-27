@@ -19,7 +19,7 @@ import {createMaintenance, retrieveMaintenances, updateMaintenance} from "../../
 import CPToast from "../../../../components/shared/CPToast";
 import {uploadFile} from "../../../../services/upload";
 
-function SingleUnderInspectionMaintenancePage() {
+function SingleUnderInspectionMaintenancePage({pageId}) {
     const refSparePart = {
         "name": '',
         "partPrice": 0,
@@ -318,9 +318,9 @@ function SingleUnderInspectionMaintenancePage() {
     }
 
     useEffect(() => {
-        setCarId(String(router.query.id))
-        retrieveCar(String(router.query.id))
-        retrieveCarMaintenance(String(router.query.id))
+        setCarId(pageId)
+        retrieveCar(pageId)
+        retrieveCarMaintenance(pageId)
     }, [])
 
     const calculateTotal = () => {
@@ -355,494 +355,500 @@ function SingleUnderInspectionMaintenancePage() {
     }
 
     return (
-        <Container>
-            <CPToast/>
-            <input
-                type="file"
-                accept="image/*"
-                ref={hiddenFileInput}
-                onChange={handleFileChange}
-                style={{display: 'none'}}
-            />
-            <Header>
-                <Typography variant="h4">
-                    <b>{trimString(carId)}</b>
-                </Typography>
-            </Header>
-            <Breadcrumbs>
-                <img
-                    src="/icons/Inventory-Black.svg"
-                    width={'20px'}
-                    height={'18px'}
-                    style={{marginRight: '12px'}}
-                />
-                <div
-                    onClick={() => {
-                        handleNavigation('/inventory')
-                    }}
-                >
-                    <span className="text">Inventory</span>
-                    <span className="separator"></span>
-                </div>
-                <div>
-                    <span className="text" style={{textTransform: 'capitalize'}}>{status}</span>
-                    <span className="separator"></span>
-                </div>
-                <div>
-                    <span className="text">{trimString(carId)}</span>
-                    <span className="separator"></span>
-                </div>
-            </Breadcrumbs>
-            <Body>
-                <TopTab>
-                    <VehicleDetails>
-                        <img
-                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
-                            height={91}
-                            width={125}
-                            style={{borderRadius: '8px'}}
-                            alt={car?.information?.manufacturer}
-                        />
-                        <div className="stats">
-                            <img
-                                src="/images/Toyota-Full.png"
-                                width={80}
-                                height={20}
-                                style={{marginBottom: -10}}
-                            />
-                            <Typography variant="h6" className="trade">
-                                {trimString(car?.information?.id)}
-                            </Typography>
-                            <Typography variant="h6">{car?.name}</Typography>
-                        </div>
-                    </VehicleDetails>
-                    <div className='flex'>
-                        {maintenances.length > 0 && (<>
-                            <Button text="Manage Maintenance" width={160} outlined={true} marginRight={10}
-                                    onClick={() => {
-                                        setEditMode(true)
-                                        showModal("createSparePart", "Manage Maintenance Record")
-                                    }}/>
-                        </>)}
-                        <Button text="Go to Car Profile" width={150} outlined={true} marginRight={10}
-                                onClick={() => handleNavigation(`/inventory/car-profile/${carId}?status=${status}`)}/>
-                        {maintenances.length > 0 && (
-                            <>
-                                <PriceCard>
-                                    <Typography variant="body1">Total Maintenance Cost</Typography>
-                                    <Typography variant="h5">₦ {formatNumber(calculateTotal())}</Typography>
-                                </PriceCard>
-                            </>
-                        )}
-                    </div>
-                </TopTab>
-                {maintenances.length > 0 && (
-                    <>
-                        <Typography variant='h5' style={{
-                            marginTop: 24,
-                            borderBottom: `1px solid ${t.extraLiteGrey}`
-                        }}>Description</Typography>
-                        <p>
-                            {car?.description || 'NA'}
-                        </p>
-                    </>
-                )}
-                {maintenances.length < 1 && (
-                    <>
-                        <CenteredFlex style={{height: 'calc(100vh - 400px)'}}>
-                            <div className='content'>
-                                <Image src='/images/MaintenanceRecord.png' alt='Upload' height={120} width={120}/>
-                                <div style={{marginTop: 10}}>
-                                    No Maintenance Record
-                                </div>
-                                <Button text='Create Record' outlined={true} width={128} marginTop={40}
-                                        onClick={() => showModal('createRecord', 'Record Maintenance', '')}/>
-                            </div>
-                        </CenteredFlex>
-                    </>
-                )}
-            </Body>
-            {maintenances.length > 0 && (
-                <>
-                    <Grid container style={{marginTop: 4}} spacing={3}>
-                        <Grid item xs={7}>
-                            <Body style={{padding: 15}}>
-                                <Typography variant='h6'>Spare Parts</Typography>
-                                <Grid container spacing={2}>
-                                    {sparePartsList.map((sp, idx) => (
-                                        <Grid item xs={6} key={idx}>
-                                            <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                                                <img src={sp?.part_picture} alt={sp?.name} height={93} width={93}/>
-                                                <div style={{marginLeft: 10, fontWeight: 700}}>{sp?.name}</div>
-                                            </div>
-                                            <PriceCard
-                                                style={{width: '100%', background: t.primaryLite, marginTop: '15px'}}>
-                                                <Typography variant="body1">Spare Part Cost</Typography>
-                                                <Typography
-                                                    variant="h5">₦ {formatNumber(sp?.estimated_price)}</Typography>
-                                            </PriceCard>
-                                            <PriceCard
-                                                style={{width: '100%', background: t.extraLiteGrey, marginTop: '15px'}}>
-                                                <Typography variant="body1">Repair Cost</Typography>
-                                                <Typography variant="h5">₦ NA</Typography>
-                                            </PriceCard>
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </Body>
-                        </Grid>
-                        <Grid item xs={5}>
-                            <Body style={{padding: 15}}>
-                                <Typography variant='h6'>Expenses</Typography>
-                                {maintenances.map((ex, i) => (
-                                    <Expense key={i}>
-                                        <div className="key">{ex?.maintenance_data?.name || 'NA'}</div>
-                                        <div className="value">&#8358; {formatNumber(ex.cost)}</div>
-                                    </Expense>
-                                ))}
-                            </Body>
-                        </Grid>
-                    </Grid></>
-            )}
-            <Modal
-                open={modalOpen}
-                onClose={() => {
-                    setModalState(false)
-                }}
-            >
-                <ModalBody>
-                    <ModalBodyHeader>
-                        <Typography variant="h5" style={{fontWeight: 600}}>
-                            {modalTitle}
-                        </Typography>
-                        <Image
-                            src="/icons/Cancel-Black.svg"
-                            width={25}
-                            height={25}
-                            onClick={() => setModalState(false)}
-                            style={{cursor: 'pointer'}}
-                        />
-                    </ModalBodyHeader>
-                    <Typography variant="inherit" style={{marginBottom: 20}}>
-                        {modalTitle !== ''
-                            ? modalTagline
-                            : ''}{' '}
-                        &nbsp;
-                    </Typography>
-                    {modalView === 'createRecord' && (
-                        <div style={{display: 'flex', flexDirection: 'row'}}>
-                            <div style={{
-                                width: 390,
-                                height: 200,
-                                background: t.alertSuccessLite,
-                                padding: 20,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                marginRight: 20
-                            }}>
-                                <Typography variant='h6' color='primary'>Expenses</Typography>
-                                <p>Cras vel leo gravida, porttitor ex vitae, blandit lectus.</p>
-                                <div style={{marginTop: 'auto'}}>
-                                    <div style={{
-                                        fontWeight: 600,
-                                        float: 'right',
-                                        cursor: 'pointer',
-                                        color: t.primaryDeepBlue
-                                    }} onClick={() => showModal("createExpense", "Create Expenses Maintenance Record")}>
-                                        Proceed &#62;
-                                    </div>
-                                </div>
-                            </div>
-                            <div style={{
-                                width: 390,
-                                height: 200,
-                                background: t.primaryExtraLite,
-                                padding: 20,
-                                display: 'flex',
-                                flexDirection: 'column'
-                            }}>
-                                <Typography variant='h6' color='primary'>Spare Parts</Typography>
-                                <p>Cras vel leo gravida, porttitor ex vitae, blandit lectus.</p>
-                                <div style={{marginTop: 'auto'}}>
-                                    <div style={{
-                                        fontWeight: 600,
-                                        float: 'right',
-                                        cursor: 'pointer',
-                                        color: t.primaryDeepBlue
-                                    }}
-                                         onClick={() => {
-                                             setEditMode(false)
-                                             showModal("createSparePart", "Create Spare Part Maintenance Record")
-                                         }}>
-                                        Proceed &#62;
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                    {modalView === 'createSparePart' && (
-                        <>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Maintenance Record For
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12}>
-                                    <VehicleDetails2 style={{width: 700}}>
-                                        <img
-                                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                            alt={car?.information?.make}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                {trimString(car?.id)}
-                                            </Typography>
-                                            <Typography variant="h6">{car?.name}</Typography>
-                                        </div>
-                                    </VehicleDetails2>
-                                </Grid>
-                            </InfoSection>
-                            <HeaderText style={{marginBottom: 12}}>
-                                Description
-                            </HeaderText>
-                            <TextField
-                                fullWidth
-                                placeholder="Damaged brakes and clutch, needing replacement..."
-                                style={{marginBottom: 18}}
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                            ></TextField>
-                            <FlexRow style={{marginBottom: 20}}>
-                                <HeaderText>Spare Part</HeaderText>
-                                <IconPill onClick={addSparePart}>
-                                    Add Spare Part
-                                    <Add className="icon"/>
-                                </IconPill>
-                            </FlexRow>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Spare Part"
-                                    value={sparePart.name}
-                                    onChange={handleChange('name')}
-                                />
-                                <div className="input">
-                                    <div className="text">Upload Image</div>
-                                    <Button
-                                        text={isSaving ? 'Uploading...' : 'Upload'}
-                                        outlined={true}
-                                        width={71}
-                                        height={28}
-                                        borderRadius="8px"
-                                        onClick={() => handleFileClick(event)}
-                                    />
-                                </div>
-                            </InputGrid>
-                            <div style={{display: 'flex', flexDirection: 'column'}}>
-                                <HeaderText variant="inherit" style={{marginBottom: 8}}>
-                                    Costing
-                                </HeaderText>
-                                <InputGrid style={{background: 'white'}}>
-                                    <FlexRow>
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Enter spare part price"
-                                            style={{width: 400}}
-                                            value={sparePart.partPrice}
-                                            onChange={handleChange('partPrice')}
-                                            type={'number'}
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow>
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Enter repair cost"
-                                            style={{width: 400}}
-                                            value={sparePart.repairCost}
-                                            onChange={handleChange('repairCost')}
-                                            type={'number'}
-                                        ></TextField>
-                                    </FlexRow>
-                                </InputGrid>
-                            </div>
-                            {spareParts.map((sp, id) => (
-                                <div key={id}>
-                                    <InputGrid style={{marginTop: 14}}>
-                                        <TextField
-                                            className="text-field"
-                                            fullWidth
-                                            placeholder="Spare Part"
-                                            variant='standard'
-                                            disabled
-                                            value={sp.name}
-                                        />
-                                        <div className="input">
-                                            <div
-                                                className="text">{`${trimString(sp?.part_picture, 15)}...` || 'NA.png'}</div>
-                                            <Button
-                                                text="Delete"
-                                                outlined={true}
-                                                width={71}
-                                                height={28}
-                                                bgColor={t.alertError}
-                                                borderRadius="8px"
-                                                onClick={() => deleteSparePart(sp.name)}
-                                            />
-                                        </div>
-                                    </InputGrid>
-                                    <div style={{display: 'flex', flexDirection: 'column'}}>
-                                        <HeaderText variant="inherit" style={{marginBottom: 8}}>
-                                            Costing
-                                        </HeaderText>
-                                        <InputGrid style={{background: 'white'}}>
-                                            <FlexRow>
-                                                <div className="currency-box">&#8358;</div>
-                                                <TextField
-                                                    placeholder="Enter spare part price"
-                                                    style={{width: 400}} variant='standard'
-                                                    disabled
-                                                    value={sp.partPrice}
-                                                ></TextField>
-                                            </FlexRow>
-                                            <FlexRow>
-                                                <div className="currency-box">&#8358;</div>
-                                                <TextField
-                                                    placeholder="Enter repair cost"
-                                                    style={{width: 400}} variant='standard'
-                                                    disabled
-                                                    value={sp.repairCost}
-                                                ></TextField>
-                                            </FlexRow>
-                                        </InputGrid>
-                                    </div>
-                                </div>
-                            ))}
-                            <Button
-                                text="Create Maintenance Record"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={50}
-                                onClick={() =>
-                                    saveSparePartRecord()
-                                }
-                            />
-                        </>
-                    )}
-                    {modalView === 'createExpense' && (
-                        <>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Maintenance Record For
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12}>
-                                    <VehicleDetails2 style={{width: 700}}>
-                                        <img
-                                            src={car?.pictures.length > 0 ? car.pictures[0] : null}
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                            alt={car?.information?.make}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography variant="h5" className="trade">
-                                                {trimString(carId)}
-                                            </Typography>
-                                            <Typography variant="h6">{car?.name}</Typography>
-                                        </div>
-                                    </VehicleDetails2>
-                                </Grid>
-                            </InfoSection>
-                            <HeaderText style={{marginBottom: 12}}>
-                                Description
-                            </HeaderText>
-                            <TextField
-                                fullWidth
-                                placeholder="Damaged brakes and clutch, needing replacement..."
-                                style={{marginBottom: 18}}
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                            ></TextField>
-                            <FlexRow style={{marginBottom: 20}}>
-                                <HeaderText>Expenses</HeaderText>
-                                <IconPill onClick={addExpense}>
-                                    Add Expense
-                                    <Add className="icon"/>
-                                </IconPill>
-                            </FlexRow>
-                            <div style={{display: 'flex', flexDirection: 'column'}}>
-                                {expenses.map((exp, idx) => (
-                                    <InputGrid style={{background: 'white'}} key={idx}>
-                                        <FlexRow className='reverse'>
-                                            <div className="currency-box">&#8358;</div>
-                                            <TextField
-                                                placeholder="Expense"
-                                                label="Expense"
-                                                variant='standard'
-                                                style={{width: 400}}
-                                                type={'text'}
-                                                value={expenses[idx].expense}
-                                                onChange={(e) => updateExpense(idx, 'expense', e.target.value)}
-                                            ></TextField>
-                                        </FlexRow>
-                                        <FlexRow className='reverse'>
-                                            <div className="currency-box" onClick={() => deleteExpense(idx)}
-                                                 style={{
-                                                     color: t.alertError,
-                                                     background: 'white',
-                                                     cursor: 'pointer'
-                                                 }}>&#10006;</div>
-                                            <TextField
-                                                placeholder="Cost"
-                                                label="Cost"
-                                                variant='standard'
-                                                style={{width: 400}}
-                                                type={'number'}
-                                                value={expenses[idx].cost}
-                                                onChange={(e) => updateExpense(idx, 'cost', e.target.value)}
-                                            ></TextField>
-                                        </FlexRow>
-                                    </InputGrid>
-                                ))}
-                            </div>
-                            <Button
-                                text="Create Maintenance Record"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={50}
-                                onClick={() =>
-                                    saveExpenseRecord()
-                                }
-                            />
-                        </>
-                    )}
-                </ModalBody>
-            </Modal>
-        </Container>
+       <MainLayout>
+           <Container>
+               <CPToast/>
+               <input
+                   type="file"
+                   accept="image/*"
+                   ref={hiddenFileInput}
+                   onChange={handleFileChange}
+                   style={{display: 'none'}}
+               />
+               <Header>
+                   <Typography variant="h4">
+                       <b>{trimString(carId)}</b>
+                   </Typography>
+               </Header>
+               <Breadcrumbs>
+                   <img
+                       src="/icons/Inventory-Black.svg"
+                       width={'20px'}
+                       height={'18px'}
+                       style={{marginRight: '12px'}}
+                   />
+                   <div
+                       onClick={() => {
+                           handleNavigation('/inventory')
+                       }}
+                   >
+                       <span className="text">Inventory</span>
+                       <span className="separator"></span>
+                   </div>
+                   <div>
+                       <span className="text" style={{textTransform: 'capitalize'}}>{status}</span>
+                       <span className="separator"></span>
+                   </div>
+                   <div>
+                       <span className="text">{trimString(carId)}</span>
+                       <span className="separator"></span>
+                   </div>
+               </Breadcrumbs>
+               <Body>
+                   <TopTab>
+                       <VehicleDetails>
+                           <img
+                               src={car?.pictures.length > 0 ? car.pictures[0] : null}
+                               height={91}
+                               width={125}
+                               style={{borderRadius: '8px'}}
+                               alt={car?.information?.manufacturer}
+                           />
+                           <div className="stats">
+                               <img
+                                   src="/images/Toyota-Full.png"
+                                   width={80}
+                                   height={20}
+                                   style={{marginBottom: -10}}
+                               />
+                               <Typography variant="h6" className="trade">
+                                   {trimString(car?.information?.id)}
+                               </Typography>
+                               <Typography variant="h6">{car?.name}</Typography>
+                           </div>
+                       </VehicleDetails>
+                       <div className='flex'>
+                           {maintenances.length > 0 && (<>
+                               <Button text="Manage Maintenance" width={160} outlined={true} marginRight={10}
+                                       onClick={() => {
+                                           setEditMode(true)
+                                           showModal("createSparePart", "Manage Maintenance Record")
+                                       }}/>
+                           </>)}
+                           <Button text="Go to Car Profile" width={150} outlined={true} marginRight={10}
+                                   onClick={() => handleNavigation(`/inventory/car-profile/${carId}?status=${status}`)}/>
+                           {maintenances.length > 0 && (
+                               <>
+                                   <PriceCard>
+                                       <Typography variant="body1">Total Maintenance Cost</Typography>
+                                       <Typography variant="h5">₦ {formatNumber(calculateTotal())}</Typography>
+                                   </PriceCard>
+                               </>
+                           )}
+                       </div>
+                   </TopTab>
+                   {maintenances.length > 0 && (
+                       <>
+                           <Typography variant='h5' style={{
+                               marginTop: 24,
+                               borderBottom: `1px solid ${t.extraLiteGrey}`
+                           }}>Description</Typography>
+                           <p>
+                               {car?.description || 'NA'}
+                           </p>
+                       </>
+                   )}
+                   {maintenances.length < 1 && (
+                       <>
+                           <CenteredFlex style={{height: 'calc(100vh - 400px)'}}>
+                               <div className='content'>
+                                   <Image src='/images/MaintenanceRecord.png' alt='Upload' height={120} width={120}/>
+                                   <div style={{marginTop: 10}}>
+                                       No Maintenance Record
+                                   </div>
+                                   <Button text='Create Record' outlined={true} width={128} marginTop={40}
+                                           onClick={() => showModal('createRecord', 'Record Maintenance', '')}/>
+                               </div>
+                           </CenteredFlex>
+                       </>
+                   )}
+               </Body>
+               {maintenances.length > 0 && (
+                   <>
+                       <Grid container style={{marginTop: 4}} spacing={3}>
+                           <Grid item xs={7}>
+                               <Body style={{padding: 15}}>
+                                   <Typography variant='h6'>Spare Parts</Typography>
+                                   <Grid container spacing={2}>
+                                       {sparePartsList.map((sp, idx) => (
+                                           <Grid item xs={6} key={idx}>
+                                               <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                                                   <img src={sp?.part_picture} alt={sp?.name} height={93} width={93}/>
+                                                   <div style={{marginLeft: 10, fontWeight: 700}}>{sp?.name}</div>
+                                               </div>
+                                               <PriceCard
+                                                   style={{width: '100%', background: t.primaryLite, marginTop: '15px'}}>
+                                                   <Typography variant="body1">Spare Part Cost</Typography>
+                                                   <Typography
+                                                       variant="h5">₦ {formatNumber(sp?.estimated_price)}</Typography>
+                                               </PriceCard>
+                                               <PriceCard
+                                                   style={{width: '100%', background: t.extraLiteGrey, marginTop: '15px'}}>
+                                                   <Typography variant="body1">Repair Cost</Typography>
+                                                   <Typography variant="h5">₦ NA</Typography>
+                                               </PriceCard>
+                                           </Grid>
+                                       ))}
+                                   </Grid>
+                               </Body>
+                           </Grid>
+                           <Grid item xs={5}>
+                               <Body style={{padding: 15}}>
+                                   <Typography variant='h6'>Expenses</Typography>
+                                   {maintenances.map((ex, i) => (
+                                       <Expense key={i}>
+                                           <div className="key">{ex?.maintenance_data?.name || 'NA'}</div>
+                                           <div className="value">&#8358; {formatNumber(ex.cost)}</div>
+                                       </Expense>
+                                   ))}
+                               </Body>
+                           </Grid>
+                       </Grid></>
+               )}
+               <Modal
+                   open={modalOpen}
+                   onClose={() => {
+                       setModalState(false)
+                   }}
+               >
+                   <ModalBody>
+                       <ModalBodyHeader>
+                           <Typography variant="h5" style={{fontWeight: 600}}>
+                               {modalTitle}
+                           </Typography>
+                           <Image
+                               src="/icons/Cancel-Black.svg"
+                               width={25}
+                               height={25}
+                               onClick={() => setModalState(false)}
+                               style={{cursor: 'pointer'}}
+                           />
+                       </ModalBodyHeader>
+                       <Typography variant="inherit" style={{marginBottom: 20}}>
+                           {modalTitle !== ''
+                               ? modalTagline
+                               : ''}{' '}
+                           &nbsp;
+                       </Typography>
+                       {modalView === 'createRecord' && (
+                           <div style={{display: 'flex', flexDirection: 'row'}}>
+                               <div style={{
+                                   width: 390,
+                                   height: 200,
+                                   background: t.alertSuccessLite,
+                                   padding: 20,
+                                   display: 'flex',
+                                   flexDirection: 'column',
+                                   marginRight: 20
+                               }}>
+                                   <Typography variant='h6' color='primary'>Expenses</Typography>
+                                   <p>Cras vel leo gravida, porttitor ex vitae, blandit lectus.</p>
+                                   <div style={{marginTop: 'auto'}}>
+                                       <div style={{
+                                           fontWeight: 600,
+                                           float: 'right',
+                                           cursor: 'pointer',
+                                           color: t.primaryDeepBlue
+                                       }} onClick={() => showModal("createExpense", "Create Expenses Maintenance Record")}>
+                                           Proceed &#62;
+                                       </div>
+                                   </div>
+                               </div>
+                               <div style={{
+                                   width: 390,
+                                   height: 200,
+                                   background: t.primaryExtraLite,
+                                   padding: 20,
+                                   display: 'flex',
+                                   flexDirection: 'column'
+                               }}>
+                                   <Typography variant='h6' color='primary'>Spare Parts</Typography>
+                                   <p>Cras vel leo gravida, porttitor ex vitae, blandit lectus.</p>
+                                   <div style={{marginTop: 'auto'}}>
+                                       <div style={{
+                                           fontWeight: 600,
+                                           float: 'right',
+                                           cursor: 'pointer',
+                                           color: t.primaryDeepBlue
+                                       }}
+                                            onClick={() => {
+                                                setEditMode(false)
+                                                showModal("createSparePart", "Create Spare Part Maintenance Record")
+                                            }}>
+                                           Proceed &#62;
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       )}
+                       {modalView === 'createSparePart' && (
+                           <>
+                               <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                   Maintenance Record For
+                               </HeaderText>
+                               <InfoSection container spacing={3}>
+                                   <Grid item xs={12}>
+                                       <VehicleDetails2 style={{width: 700}}>
+                                           <img
+                                               src={car?.pictures.length > 0 ? car.pictures[0] : null}
+                                               width={185}
+                                               height={135}
+                                               style={{borderRadius: '8px'}}
+                                               alt={car?.information?.make}
+                                           />
+                                           <div className="stats">
+                                               <img
+                                                   src="/images/Toyota-Full.png"
+                                                   width={80}
+                                                   height={22}
+                                                   style={{marginBottom: -15}}
+                                               />
+                                               <Typography variant="h5" className="trade">
+                                                   {trimString(car?.id)}
+                                               </Typography>
+                                               <Typography variant="h6">{car?.name}</Typography>
+                                           </div>
+                                       </VehicleDetails2>
+                                   </Grid>
+                               </InfoSection>
+                               <HeaderText style={{marginBottom: 12}}>
+                                   Description
+                               </HeaderText>
+                               <TextField
+                                   fullWidth
+                                   placeholder="Damaged brakes and clutch, needing replacement..."
+                                   style={{marginBottom: 18}}
+                                   value={description}
+                                   onChange={(e) => setDescription(e.target.value)}
+                               ></TextField>
+                               <FlexRow style={{marginBottom: 20}}>
+                                   <HeaderText>Spare Part</HeaderText>
+                                   <IconPill onClick={addSparePart}>
+                                       Add Spare Part
+                                       <Add className="icon"/>
+                                   </IconPill>
+                               </FlexRow>
+                               <InputGrid>
+                                   <TextField
+                                       className="text-field"
+                                       fullWidth
+                                       placeholder="Spare Part"
+                                       value={sparePart.name}
+                                       onChange={handleChange('name')}
+                                   />
+                                   <div className="input">
+                                       <div className="text">Upload Image</div>
+                                       <Button
+                                           text={isSaving ? 'Uploading...' : 'Upload'}
+                                           outlined={true}
+                                           width={71}
+                                           height={28}
+                                           borderRadius="8px"
+                                           onClick={() => handleFileClick(event)}
+                                       />
+                                   </div>
+                               </InputGrid>
+                               <div style={{display: 'flex', flexDirection: 'column'}}>
+                                   <HeaderText variant="inherit" style={{marginBottom: 8}}>
+                                       Costing
+                                   </HeaderText>
+                                   <InputGrid style={{background: 'white'}}>
+                                       <FlexRow>
+                                           <div className="currency-box">&#8358;</div>
+                                           <TextField
+                                               placeholder="Enter spare part price"
+                                               style={{width: 400}}
+                                               value={sparePart.partPrice}
+                                               onChange={handleChange('partPrice')}
+                                               type={'number'}
+                                           ></TextField>
+                                       </FlexRow>
+                                       <FlexRow>
+                                           <div className="currency-box">&#8358;</div>
+                                           <TextField
+                                               placeholder="Enter repair cost"
+                                               style={{width: 400}}
+                                               value={sparePart.repairCost}
+                                               onChange={handleChange('repairCost')}
+                                               type={'number'}
+                                           ></TextField>
+                                       </FlexRow>
+                                   </InputGrid>
+                               </div>
+                               {spareParts.map((sp, id) => (
+                                   <div key={id}>
+                                       <InputGrid style={{marginTop: 14}}>
+                                           <TextField
+                                               className="text-field"
+                                               fullWidth
+                                               placeholder="Spare Part"
+                                               variant='standard'
+                                               disabled
+                                               value={sp.name}
+                                           />
+                                           <div className="input">
+                                               <div
+                                                   className="text">{`${trimString(sp?.part_picture, 15)}...` || 'NA.png'}</div>
+                                               <Button
+                                                   text="Delete"
+                                                   outlined={true}
+                                                   width={71}
+                                                   height={28}
+                                                   bgColor={t.alertError}
+                                                   borderRadius="8px"
+                                                   onClick={() => deleteSparePart(sp.name)}
+                                               />
+                                           </div>
+                                       </InputGrid>
+                                       <div style={{display: 'flex', flexDirection: 'column'}}>
+                                           <HeaderText variant="inherit" style={{marginBottom: 8}}>
+                                               Costing
+                                           </HeaderText>
+                                           <InputGrid style={{background: 'white'}}>
+                                               <FlexRow>
+                                                   <div className="currency-box">&#8358;</div>
+                                                   <TextField
+                                                       placeholder="Enter spare part price"
+                                                       style={{width: 400}} variant='standard'
+                                                       disabled
+                                                       value={sp.partPrice}
+                                                   ></TextField>
+                                               </FlexRow>
+                                               <FlexRow>
+                                                   <div className="currency-box">&#8358;</div>
+                                                   <TextField
+                                                       placeholder="Enter repair cost"
+                                                       style={{width: 400}} variant='standard'
+                                                       disabled
+                                                       value={sp.repairCost}
+                                                   ></TextField>
+                                               </FlexRow>
+                                           </InputGrid>
+                                       </div>
+                                   </div>
+                               ))}
+                               <Button
+                                   text="Create Maintenance Record"
+                                   width={510}
+                                   marginLeft="auto"
+                                   marginRight="auto"
+                                   marginTop={50}
+                                   onClick={() =>
+                                       saveSparePartRecord()
+                                   }
+                               />
+                           </>
+                       )}
+                       {modalView === 'createExpense' && (
+                           <>
+                               <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                   Maintenance Record For
+                               </HeaderText>
+                               <InfoSection container spacing={3}>
+                                   <Grid item xs={12}>
+                                       <VehicleDetails2 style={{width: 700}}>
+                                           <img
+                                               src={car?.pictures.length > 0 ? car.pictures[0] : null}
+                                               width={185}
+                                               height={135}
+                                               style={{borderRadius: '8px'}}
+                                               alt={car?.information?.make}
+                                           />
+                                           <div className="stats">
+                                               <img
+                                                   src="/images/Toyota-Full.png"
+                                                   width={80}
+                                                   height={22}
+                                                   style={{marginBottom: -15}}
+                                               />
+                                               <Typography variant="h5" className="trade">
+                                                   {trimString(carId)}
+                                               </Typography>
+                                               <Typography variant="h6">{car?.name}</Typography>
+                                           </div>
+                                       </VehicleDetails2>
+                                   </Grid>
+                               </InfoSection>
+                               <HeaderText style={{marginBottom: 12}}>
+                                   Description
+                               </HeaderText>
+                               <TextField
+                                   fullWidth
+                                   placeholder="Damaged brakes and clutch, needing replacement..."
+                                   style={{marginBottom: 18}}
+                                   value={description}
+                                   onChange={(e) => setDescription(e.target.value)}
+                               ></TextField>
+                               <FlexRow style={{marginBottom: 20}}>
+                                   <HeaderText>Expenses</HeaderText>
+                                   <IconPill onClick={addExpense}>
+                                       Add Expense
+                                       <Add className="icon"/>
+                                   </IconPill>
+                               </FlexRow>
+                               <div style={{display: 'flex', flexDirection: 'column'}}>
+                                   {expenses.map((exp, idx) => (
+                                       <InputGrid style={{background: 'white'}} key={idx}>
+                                           <FlexRow className='reverse'>
+                                               <div className="currency-box">&#8358;</div>
+                                               <TextField
+                                                   placeholder="Expense"
+                                                   label="Expense"
+                                                   variant='standard'
+                                                   style={{width: 400}}
+                                                   type={'text'}
+                                                   value={expenses[idx].expense}
+                                                   onChange={(e) => updateExpense(idx, 'expense', e.target.value)}
+                                               ></TextField>
+                                           </FlexRow>
+                                           <FlexRow className='reverse'>
+                                               <div className="currency-box" onClick={() => deleteExpense(idx)}
+                                                    style={{
+                                                        color: t.alertError,
+                                                        background: 'white',
+                                                        cursor: 'pointer'
+                                                    }}>&#10006;</div>
+                                               <TextField
+                                                   placeholder="Cost"
+                                                   label="Cost"
+                                                   variant='standard'
+                                                   style={{width: 400}}
+                                                   type={'number'}
+                                                   value={expenses[idx].cost}
+                                                   onChange={(e) => updateExpense(idx, 'cost', e.target.value)}
+                                               ></TextField>
+                                           </FlexRow>
+                                       </InputGrid>
+                                   ))}
+                               </div>
+                               <Button
+                                   text="Create Maintenance Record"
+                                   width={510}
+                                   marginLeft="auto"
+                                   marginRight="auto"
+                                   marginTop={50}
+                                   onClick={() =>
+                                       saveExpenseRecord()
+                                   }
+                               />
+                           </>
+                       )}
+                   </ModalBody>
+               </Modal>
+           </Container>
+       </MainLayout>
     )
 }
 
-export default SingleUnderInspectionMaintenancePage
-
-SingleUnderInspectionMaintenancePage.getLayout = function getLayout(page) {
-    return <MainLayout>{page}</MainLayout>
+export async function getServerSideProps({params}) {
+    return {
+        props: {
+            pageId: params.id
+        }
+    }
 }
+
+export default SingleUnderInspectionMaintenancePage
 
 const ModalBody = styled.div`
   position: absolute;
