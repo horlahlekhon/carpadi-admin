@@ -5,6 +5,6 @@ export function getColorName(colorCode) {
     if (result.length >= 2 && result[1]) {
         return String(result[1])
     } else {
-        colorCode
+        return colorCode
     }
 }

@@ -2,7 +2,7 @@ import Moment from "moment";
 
 export const formatDate = (date) => {
     if (date) {
-        Moment(date).format('DD-MM-YYYY')
+        return Moment(date).format('DD-MM-YYYY')
     } else {
         return date
     }
