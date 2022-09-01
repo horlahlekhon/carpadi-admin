@@ -493,7 +493,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                     <div style={{marginTop: 10}}>
                                         No Maintenance Record
                                     </div>
-                                    <Button text='Create Record' outlined={true} width={128} marginTop={40}
+                                    <Button text='Create Record' outlined={true} width={138} marginTop={40}
                                             onClick={() => showModal('createRecord', 'Record Maintenance', '')}/>
                                 </div>
                             </CenteredFlex>
@@ -747,8 +747,8 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                 <Button
                                                     text={sp?.part_picture ? "Delete" : "Upload"}
                                                     outlined={true}
-                                                    width={71}
-                                                    height={28}
+                                                    width={75}
+                                                    height={30}
                                                     bgColor={sp?.part_picture ? t.alertError : t.primaryDeepBlue}
                                                     borderRadius="8px"
                                                     onClick={() => {
