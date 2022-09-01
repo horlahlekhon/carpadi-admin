@@ -27,6 +27,7 @@ import CreateSale from "../../../../components/shared/CreateSale";
 import {createInspection, retrieveInspection} from "../../../../services/inspection";
 import {authService} from "../../../../services/auth";
 import {getColorName} from "../../../../helpers/utils";
+import Moment from "moment";
 
 
 function CarProfilePage({pageId}) {
@@ -342,6 +343,7 @@ function CarProfilePage({pageId}) {
     function addInspection(): void {
         const data = {
             ...newInspection,
+            inspection_date: Moment(newInspection?.inspection_date).toISOString(),
             inspector: authService?.userValue?.id,
             car: car?.id
         }
@@ -427,7 +429,7 @@ function CarProfilePage({pageId}) {
                                 />
                             }
 
-                            {true &&
+                            {!car?.inspection?.id &&
                                 <Button
                                     text="Add Inspection Report"
                                     width={210}
@@ -639,7 +641,7 @@ function CarProfilePage({pageId}) {
                                     <Flex style={{marginBottom: '5px'}}>
                                         <HeaderText style={{marginTop: 10}}>Enter Inspection Date</HeaderText>
                                         <TextField
-                                            type='datetime-local'
+                                            type='date'
                                             className="text-field"
                                             fullWidth
                                             variant='standard'
