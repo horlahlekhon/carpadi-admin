@@ -18,7 +18,7 @@ const createMaintenance = (data) => {
 }
 
 const updateMaintenance = (data, id) => {
-    return fetchWrapper.put(`${baseUrl}/maintenances/${id}`, data)
+    return fetchWrapper.put(`${baseUrl}/maintenances/${id}/`, data)
         .then((response) => {
             return {status: true, data: response}
         })

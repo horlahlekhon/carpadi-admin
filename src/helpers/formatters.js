@@ -8,6 +8,22 @@ export const formatDate = (date) => {
     }
 }
 
+export const formatDateTime = (date) => {
+    if (date) {
+        return Moment(date).format('DD-MM-YYYY, hh:mm A')
+    } else {
+        return date
+    }
+}
+
+export const formatTime = (date) => {
+    if (date) {
+        return Moment(date).format('hh:mm A')
+    } else {
+        return date
+    }
+}
+
 export const humanReadableDate = (date) => Moment(date).format('dddd, MMMM Do YYYY')
 
 export const formatNumber = (value) => {

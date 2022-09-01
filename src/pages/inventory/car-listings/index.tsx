@@ -130,6 +130,7 @@ function CarListingsPage() {
                                 <TableCell>No</TableCell>
                                 <TableCell align="left">Image</TableCell>
                                 <TableCell align="left">VIN</TableCell>
+                                <TableCell align="left">Status</TableCell>
                                 <TableCell align="left">Make</TableCell>
                                 <TableCell align="left">Model</TableCell>
                                 <TableCell align="left">Year</TableCell>
@@ -153,6 +154,8 @@ function CarListingsPage() {
                                                  height={48}/>
                                         </TableCell>
                                         <TableCell align="left">{row.vin}</TableCell>
+                                        <TableCell align="left"
+                                                   style={{textTransform: 'uppercase'}}>{row?.status}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.name}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.model}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.year}</TableCell>

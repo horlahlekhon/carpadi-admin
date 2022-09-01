@@ -9,6 +9,7 @@ import Button from '../../components/shared/Button'
 import {retrieveActivities} from "../../services/activity";
 import {toast} from "react-hot-toast";
 import CPToast from "../../components/shared/CPToast";
+import {formatDate, formatDateTime, formatTime} from "../../helpers/formatters";
 
 function NotificationsPage() {
     const router = useRouter()
@@ -124,9 +125,13 @@ function NotificationsPage() {
                                                     />
                                                 </ActivityImage>
                                                 <ActivityItemText>
-                                                    <div>
+                                                    <div style={{marginRight: '4px'}}>
                                                         {activity?.description.replace('Activity Type:', '')}
                                                     </div>
+                                                    <ActivityItemDate>
+                                                        <div>{formatDate(activity?.activity_entity?.created)}</div>
+                                                        <div>{formatTime(activity?.activity_entity?.created)}</div>
+                                                    </ActivityItemDate>
                                                 </ActivityItemText>
                                             </ActivityItem>
                                         ))}
@@ -150,8 +155,8 @@ function NotificationsPage() {
                                                         {activity?.description.replace('Activity Type:', '')}
                                                     </div>
                                                     <ActivityItemDate>
-                                                        <div>11/03/2022</div>
-                                                        <div>12:30</div>
+                                                        <div>{formatDate(activity?.activity_entity?.created)}</div>
+                                                        <div>{formatTime(activity?.activity_entity?.created)}</div>
                                                     </ActivityItemDate>
                                                 </ActivityItemText>
                                             </ActivityItem>
@@ -175,6 +180,10 @@ function NotificationsPage() {
                                                     <div>
                                                         {activity?.description.replace('Activity Type:', '')}
                                                     </div>
+                                                    <ActivityItemDate>
+                                                        <div>{formatDate(activity?.activity_entity?.created)}</div>
+                                                        <div>{formatTime(activity?.activity_entity?.created)}</div>
+                                                    </ActivityItemDate>
                                                 </ActivityItemText>
                                             </ActivityItem>
                                         ))}

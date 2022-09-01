@@ -12,9 +12,9 @@ import {tradeService} from '../../../services/trade'
 import trade from "../index";
 import CPToast from "../../../components/shared/CPToast";
 
-function TradeProfilePage() {
+function TradeProfilePage({pageId}) {
     const router = useRouter()
-    const tradeId = String(router.query.id) || 'NA'
+    const tradeId = pageId || 'NA'
     const tradeType = router.query.type || 'NA'
     const [modalOpen, setModalState] = useState(false)
     const [modalView, setModalView] = useState('')
@@ -120,607 +120,615 @@ function TradeProfilePage() {
     }
     const formatNumber = (number) => Number(number).toLocaleString()
     return (
-        <Container>
-            <CPToast/>
-            <Header>
-                <Typography variant="h4">
-                    <b>Trade</b>
-                </Typography>
-            </Header>
-            <Breadcrumbs>
-                <img
-                    src="/icons/Trade-Black.svg"
-                    width={'20px'}
-                    height={'18px'}
-                    style={{marginRight: '12px'}}
-                />
-                <div
-                    onClick={() => {
+        <MainLayout>
+            <Container>
+                <CPToast/>
+                <Header>
+                    <Typography variant="h4">
+                        <b>Trade</b>
+                    </Typography>
+                </Header>
+                <Breadcrumbs>
+                    <img
+                        src="/icons/Trade-Black.svg"
+                        width={'20px'}
+                        height={'18px'}
+                        style={{marginRight: '12px'}}
+                    />
+                    <div
+                        onClick={() => {
+                            handleNavigation('/trade')
+                        }}
+                    >
+                        <span className="text">Trade</span>
+                        <span className="separator"></span>
+                    </div>
+                    <div onClick={() => {
                         handleNavigation('/trade')
-                    }}
-                >
-                    <span className="text">Trade</span>
-                    <span className="separator"></span>
-                </div>
-                <div onClick={() => {
-                    handleNavigation('/trade')
-                }}>
-                    <span className="text">{tradeType}</span>
-                    <span className="separator"></span>
-                </div>
-                <div
-                    onClick={() => {
-                        handleNavigation(`sales/${tradeId}`)
-                    }}
-                >
-                    <span className="text">{tradeId}</span>
-                    <span className="separator"></span>
-                </div>
-            </Breadcrumbs>
-            <Body>
-                <ActionBar>
-                    <div className="trading-info">
-                        <Typography
-                            variant="body1"
-                            className="trading-id-title"
-                            component="div"
-                        >
-                            Trading ID
-                        </Typography>
-                        <Typography variant="h5" className="trading-id">
-                            {tradeId.substring(tradeId.length - 7)}
-                        </Typography>
+                    }}>
+                        <span className="text">{tradeType}</span>
+                        <span className="separator"></span>
                     </div>
-                    <div className="button-group">
-                        <Button
-                            text="Delete Trade"
-                            width={150}
-                            outlined={true}
-                            marginRight="16px"
-                            bgColor={t.alertError}
-                            disabled={
-                                String(tradeType).toLowerCase() === 'active' ||
-                                String(tradeType).toLowerCase() === 'sold'
-                            }
-                            onClick={() => {
-                                showModal('deleteTrade', '')
-                            }}
-                        />
-                        <Button
-                            text="Manage Trade"
-                            width={150}
-                            outlined={true}
-                            marginRight="16px"
-                            onClick={() => {
-                                handleNavigation(
-                                    `/trade/${tradeId}/manage-trade?status=${tradeType}`
-                                )
-                            }}
-                        />
-                        <Button
-                            text="Edit Trade"
-                            width={150}
-                            outlined={true}
-                            marginRight="16px"
-                            disabled={String(tradeType).toLowerCase() === 'sold'}
-                            onClick={() => showModal('editTrade', 'Edit Trade')}
-                        />
-                        <Button
-                            text="Go to Car Profile"
-                            width={150}
-                            outlined={true}
-                            onClick={() =>
-                                handleNavigation(
-                                    `/inventory/car-profile/${tradeData.car.id}?status=car listings`
-                                )
-                            }
-                        />
+                    <div
+                        onClick={() => {
+                            handleNavigation(`sales/${tradeId}`)
+                        }}
+                    >
+                        <span className="text">{tradeId}</span>
+                        <span className="separator"></span>
                     </div>
-                </ActionBar>
-                <SplitContainer>
-                    <div className="left">
-                        <div className="vehicle-details">
+                </Breadcrumbs>
+                <Body>
+                    <ActionBar>
+                        <div className="trading-info">
                             <Typography
-                                variant="h6"
-                                className="title"
-                                style={{marginBottom: 20}}
+                                variant="body1"
+                                className="trading-id-title"
+                                component="div"
                             >
-                                Created Trade for
+                                Trading ID
                             </Typography>
-                            <VehicleDetails style={{marginBottom: 70}}>
-                                <img
-                                    src={tradeData.car.image}
-                                    height={135}
-                                    width={185}
-                                    style={{borderRadius: '8px'}}
-                                    alt={String(tradeData.id)}
-                                />
-                                <div className="stats">
+                            <Typography variant="h5" className="trading-id">
+                                {tradeId.substring(tradeId.length - 7)}
+                            </Typography>
+                        </div>
+                        <div className="button-group">
+                            <Button
+                                text="Delete Trade"
+                                width={150}
+                                outlined={true}
+                                marginRight="16px"
+                                bgColor={t.alertError}
+                                disabled={
+                                    String(tradeType).toLowerCase() === 'active' ||
+                                    String(tradeType).toLowerCase() === 'sold'
+                                }
+                                onClick={() => {
+                                    showModal('deleteTrade', '')
+                                }}
+                            />
+                            <Button
+                                text="Manage Trade"
+                                width={150}
+                                outlined={true}
+                                marginRight="16px"
+                                onClick={() => {
+                                    handleNavigation(
+                                        `/trade/${tradeId}/manage-trade?status=${tradeType}`
+                                    )
+                                }}
+                            />
+                            <Button
+                                text="Edit Trade"
+                                width={150}
+                                outlined={true}
+                                marginRight="16px"
+                                disabled={String(tradeType).toLowerCase() === 'sold'}
+                                onClick={() => showModal('editTrade', 'Edit Trade')}
+                            />
+                            <Button
+                                text="Go to Car Profile"
+                                width={150}
+                                outlined={true}
+                                onClick={() =>
+                                    handleNavigation(
+                                        `/inventory/car-profile/${tradeData.car.id}?status=car listings`
+                                    )
+                                }
+                            />
+                        </div>
+                    </ActionBar>
+                    <SplitContainer>
+                        <div className="left">
+                            <div className="vehicle-details">
+                                <Typography
+                                    variant="h6"
+                                    className="title"
+                                    style={{marginBottom: 20}}
+                                >
+                                    Created Trade for
+                                </Typography>
+                                <VehicleDetails style={{marginBottom: 70}}>
                                     <img
-                                        src="/images/Toyota-Full.png"
-                                        width={80}
-                                        height={22}
-                                        style={{marginBottom: -15}}
+                                        src={tradeData.car.image}
+                                        height={135}
+                                        width={185}
+                                        style={{borderRadius: '8px'}}
+                                        alt={String(tradeData.id)}
+                                    />
+                                    <div className="stats">
+                                        <img
+                                            src="/images/Toyota-Full.png"
+                                            width={80}
+                                            height={22}
+                                            style={{marginBottom: -15}}
+                                        />
+                                        <Typography
+                                            variant="h5"
+                                            noWrap
+                                            className="trade"
+                                            style={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                width: '250px'
+                                            }}
+                                        >
+                                            Trade ID {tradeId.substring(tradeId.length - 7)}
+                                        </Typography>
+                                        <Typography
+                                            variant="h6"
+                                            noWrap
+                                            style={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                width: '250px'
+                                            }}
+                                            title={`${tradeData.car.make}-${tradeData.car.model}`}
+                                        >
+                                            {tradeData.car.make}-{tradeData.car.model}
+                                        </Typography>
+                                    </div>
+                                </VehicleDetails>
+                            </div>
+
+                            <div className="trade-info">
+                                <Typography variant="h6" className="title">
+                                    Trade Information
+                                </Typography>
+                                <Statistic>
+                                    <div className="key">Total Trading Slots</div>
+                                    <div className="value">{tradeData.slots_available}</div>
+                                </Statistic>
+                                <Statistic>
+                                    <div className="key">Price Per Slot</div>
+                                    <div className="value">
+                                        &#8358; {formatNumber(tradeData.price_per_slot)}
+                                    </div>
+                                </Statistic>
+                                <Statistic>
+                                    <div className="key">ROT Per Slot</div>
+                                    <div className="value">
+                                        &#8358; {formatNumber(tradeData.return_on_trade_per_unit)}
+                                    </div>
+                                </Statistic>
+                                <Statistic>
+                                    <div className="key">Trading Duration in Months</div>
+                                    <div className="value">
+                                        {Math.ceil(tradeData.estimated_sales_duration / 30)} Months
+                                    </div>
+                                </Statistic>
+                                <Statistic>
+                                    <div className="key">Car Value</div>
+                                    <div className="value">
+                                        &#8358; {formatNumber(tradeData.car.bought_price + tradeData?.car?.maintenance_cost)}
+                                    </div>
+                                </Statistic>
+                                <Statistic>
+                                    <div className="key">Minimum Selling Price</div>
+                                    <div className="value">
+                                        &#8358; {formatNumber(tradeData.min_sale_price)}
+                                    </div>
+                                </Statistic>
+                                <Statistic>
+                                    <div className="key">Total Miantenance on Car</div>
+                                    <div className="value">
+                                        &#8358; {formatNumber(tradeData.car?.maintenance_cost)}
+                                    </div>
+                                </Statistic>
+                            </div>
+                        </div>
+                        <div className="right">
+                            <Typography variant="h6" className="title">
+                                Trade Analytics
+                            </Typography>
+                            <Grid container spacing={3}>
+                                <Grid item xs={6}>
+                                    <PriceCard>
+                                        <Typography variant="body1">Sold Slot</Typography>
+                                        <Typography variant="h5">
+                                            {tradeData.slots_available - tradeData.remaining_slots}
+                                        </Typography>
+                                    </PriceCard>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <PriceCard>
+                                        <Typography variant="body1">Remaining Slot</Typography>
+                                        <Typography variant="h5">
+                                            {tradeData.remaining_slots}
+                                        </Typography>
+                                    </PriceCard>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <PriceCard>
+                                        <Typography variant="body1">Total Users Trading</Typography>
+                                        <Typography variant="h5">
+                                            {tradeData.total_users_trading}
+                                        </Typography>
+                                    </PriceCard>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <PriceCard>
+                                        <Typography variant="body1">
+                                            Projected Carpai Profit on Trade
+                                        </Typography>
+                                        <Typography
+                                            variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
+                                    </PriceCard>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <PriceCard style={{background: t.alertSuccessLite}}>
+                                        <Typography variant="body1">Sold Slot Price + ROT</Typography>
+                                        <Typography variant="h5">
+                                            &#8358;{' '}
+                                            {formatNumber(
+                                                Number(tradeData.sold_slots_price) +
+                                                Number(tradeData.return_on_trade)
+                                            )}
+                                        </Typography>
+                                    </PriceCard>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Statistic>
+                                        <div className="key">Initial + ROT</div>
+                                        <div className="value">
+                                            &#8358;{' '}
+                                            {formatNumber(
+                                                tradeData.car.bought_price + tradeData.return_on_trade
+                                            )}
+                                        </div>
+                                    </Statistic>
+                                    <Statistic>
+                                        <div className="key">Sold Slot Price</div>
+                                        <div className="value">
+                                            &#8358; {formatNumber(tradeData.sold_slots_price)}
+                                        </div>
+                                    </Statistic>
+                                </Grid>
+                                {String(tradeType).toLowerCase() !== 'sold' && (
+                                    <>
+                                        <Grid item xs={12}>
+                                            <PriceCard>
+                                                <Typography variant="body1">
+                                                    Estimated Carpadi Profit on sales
+                                                </Typography>
+                                                <Typography
+                                                    variant="h5">&#8358; {formatNumber(tradeData?.estimated_return_on_trade)}</Typography>
+                                            </PriceCard>
+                                        </Grid>
+                                        {/*<Grid item xs={12}>*/}
+                                        {/*    <PriceCard style={{background: t.alertSuccessLite}}>*/}
+                                        {/*        <Typography variant="body1">*/}
+                                        {/*            Estimated Carpadi maximum Profit on sales*/}
+                                        {/*        </Typography>*/}
+                                        {/*        <Typography variant="h5">&#8358; NA</Typography>*/}
+                                        {/*    </PriceCard>*/}
+                                        {/*</Grid>*/}
+                                    </>
+                                )}
+                                {String(tradeType).toLowerCase() === 'sold' && (
+                                    <>
+                                        {editDetails && (
+                                            <>
+                                                <Typography
+                                                    variant="h6"
+                                                    className="title"
+                                                    style={{
+                                                        marginTop: 20,
+                                                        marginLeft: 5,
+                                                        marginBottom: 24
+                                                    }}
+                                                >
+                                                    Enter Actual Sold Price
+                                                </Typography>
+                                                <FlexRow>
+                                                    <div className="currency-box">&#8358;</div>
+                                                    <TextField
+                                                        placeholder="Enter price"
+                                                        label="Enter price"
+                                                        fullWidth
+                                                        type="number"
+                                                        value={tradeData.sold_slots_price}
+                                                        onChange={handleTradeChange('sold_slots_price')}
+                                                    ></TextField>
+                                                </FlexRow>
+                                                <Button
+                                                    text="Calculate and Save"
+                                                    width="90%"
+                                                    marginLeft="auto"
+                                                    marginRight="auto"
+                                                    marginTop={40}
+                                                    onClick={() => saveTrade()}
+                                                />
+                                            </>
+                                        )}
+                                        {!editDetails && (
+                                            <>
+                                                <Grid item xs={12}>
+                                                    <PriceCard style={{background: t.alertSuccessLite}}>
+                                                        <Typography variant="body1">
+                                                            Trade Margin
+                                                        </Typography>
+                                                        <Typography
+                                                            variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
+                                                    </PriceCard>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <PriceCard
+                                                        style={{background: t.alertValidationLite}}
+                                                    >
+                                                        <Typography variant="body1">
+                                                            Actual Sold Price
+                                                        </Typography>
+                                                        <div
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'row',
+                                                                justifyContent: 'space-between',
+                                                                alignItems: 'center'
+                                                            }}
+                                                        >
+                                                            <Typography variant="h5">
+                                                                &#8358; {formatNumber(tradeData.sold_slots_price)}
+                                                            </Typography>
+                                                            <Button
+                                                                text="Edit Sold Price"
+                                                                width={175}
+                                                                onClick={() => setEditDetails(true)}
+                                                            />
+                                                        </div>
+                                                    </PriceCard>
+                                                </Grid>
+                                            </>
+                                        )}
+                                    </>
+                                )}
+                            </Grid>
+                        </div>
+                    </SplitContainer>
+                </Body>
+                <Modal
+                    open={modalOpen}
+                    onClose={() => {
+                        setModalState(false)
+                    }}
+                >
+                    <ModalBody>
+                        <ModalBodyHeader>
+                            <Typography variant="h5" style={{fontWeight: 600}}>
+                                {modalTitle}
+                            </Typography>
+                            <Image
+                                src="/icons/Cancel-Black.svg"
+                                width={25}
+                                height={25}
+                                onClick={() => setModalState(false)}
+                                style={{cursor: 'pointer'}}
+                            />
+                        </ModalBodyHeader>
+                        <Typography variant="inherit" style={{marginBottom: 20}}>
+                            {modalTitle !== ''
+                                ? ' Kindly provide the following information below.'
+                                : ''}{' '}
+                            &nbsp;
+                        </Typography>
+                        {modalView === 'deleteTrade' && (
+                            <>
+                                <Info>
+                                    <img
+                                        src="/icons/Trash-Red.svg"
+                                        alt="Trash"
+                                        height={40}
+                                        width={40}
                                     />
                                     <Typography
-                                        variant="h5"
-                                        noWrap
-                                        className="trade"
-                                        style={{
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            width: '250px'
-                                        }}
+                                        variant="h6"
+                                        style={{marginTop: 48, marginBottom: 16}}
                                     >
-                                        Trade ID {tradeId.substring(tradeId.length - 7)}
+                                        Delete Trade
                                     </Typography>
                                     <Typography
-                                        variant="h6"
-                                        noWrap
-                                        style={{
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            width: '250px'
-                                        }}
-                                        title={`${tradeData.car.make}-${tradeData.car.model}`}
+                                        variant="subtitle2"
+                                        style={{maxWidth: 206, marginBottom: 39}}
                                     >
-                                        {tradeData.car.make}-{tradeData.car.model}
+                                        You are about to delete this trade. Car profile would be left
+                                        with no trade.
                                     </Typography>
-                                </div>
-                            </VehicleDetails>
-                        </div>
-
-                        <div className="trade-info">
-                            <Typography variant="h6" className="title">
-                                Trade Information
-                            </Typography>
-                            <Statistic>
-                                <div className="key">Total Trading Slots</div>
-                                <div className="value">{tradeData.slots_available}</div>
-                            </Statistic>
-                            <Statistic>
-                                <div className="key">Price Per Slot</div>
-                                <div className="value">
-                                    &#8358; {formatNumber(tradeData.price_per_slot)}
-                                </div>
-                            </Statistic>
-                            <Statistic>
-                                <div className="key">ROT Per Slot</div>
-                                <div className="value">
-                                    &#8358; {formatNumber(tradeData.return_on_trade_per_unit)}
-                                </div>
-                            </Statistic>
-                            <Statistic>
-                                <div className="key">Trading Duration in Months</div>
-                                <div className="value">
-                                    {Math.ceil(tradeData.estimated_sales_duration / 30)} Months
-                                </div>
-                            </Statistic>
-                            <Statistic>
-                                <div className="key">Car Value</div>
-                                <div className="value">
-                                    &#8358; {formatNumber(tradeData.car.bought_price + tradeData?.car?.maintenance_cost)}
-                                </div>
-                            </Statistic>
-                            <Statistic>
-                                <div className="key">Minimum Selling Price</div>
-                                <div className="value">
-                                    &#8358; {formatNumber(tradeData.min_sale_price)}
-                                </div>
-                            </Statistic>
-                            <Statistic>
-                                <div className="key">Total Miantenance on Car</div>
-                                <div className="value">
-                                    &#8358; {formatNumber(tradeData.car?.maintenance_cost)}
-                                </div>
-                            </Statistic>
-                        </div>
-                    </div>
-                    <div className="right">
-                        <Typography variant="h6" className="title">
-                            Trade Analytics
-                        </Typography>
-                        <Grid container spacing={3}>
-                            <Grid item xs={6}>
-                                <PriceCard>
-                                    <Typography variant="body1">Sold Slot</Typography>
-                                    <Typography variant="h5">
-                                        {tradeData.slots_available - tradeData.remaining_slots}
-                                    </Typography>
-                                </PriceCard>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <PriceCard>
-                                    <Typography variant="body1">Remaining Slot</Typography>
-                                    <Typography variant="h5">
-                                        {tradeData.remaining_slots}
-                                    </Typography>
-                                </PriceCard>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <PriceCard>
-                                    <Typography variant="body1">Total Users Trading</Typography>
-                                    <Typography variant="h5">
-                                        {tradeData.total_users_trading}
-                                    </Typography>
-                                </PriceCard>
-                            </Grid>
-                            <Grid item xs={6}>
-                                <PriceCard>
-                                    <Typography variant="body1">
-                                        Projected Carpai Profit on Trade
-                                    </Typography>
-                                    <Typography variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
-                                </PriceCard>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <PriceCard style={{background: t.alertSuccessLite}}>
-                                    <Typography variant="body1">Sold Slot Price + ROT</Typography>
-                                    <Typography variant="h5">
-                                        &#8358;{' '}
-                                        {formatNumber(
-                                            Number(tradeData.sold_slots_price) +
-                                            Number(tradeData.return_on_trade)
-                                        )}
-                                    </Typography>
-                                </PriceCard>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Statistic>
-                                    <div className="key">Initial + ROT</div>
-                                    <div className="value">
-                                        &#8358;{' '}
-                                        {formatNumber(
-                                            tradeData.car.bought_price + tradeData.return_on_trade
-                                        )}
-                                    </div>
-                                </Statistic>
-                                <Statistic>
-                                    <div className="key">Sold Slot Price</div>
-                                    <div className="value">
-                                        &#8358; {formatNumber(tradeData.sold_slots_price)}
-                                    </div>
-                                </Statistic>
-                            </Grid>
-                            {String(tradeType).toLowerCase() !== 'sold' && (
-                                <>
-                                    <Grid item xs={12}>
-                                        <PriceCard>
-                                            <Typography variant="body1">
-                                                Estimated Carpadi Profit on sales
-                                            </Typography>
-                                            <Typography variant="h5">&#8358; {formatNumber(tradeData?.estimated_return_on_trade)}</Typography>
-                                        </PriceCard>
-                                    </Grid>
-                                    {/*<Grid item xs={12}>*/}
-                                    {/*    <PriceCard style={{background: t.alertSuccessLite}}>*/}
-                                    {/*        <Typography variant="body1">*/}
-                                    {/*            Estimated Carpadi maximum Profit on sales*/}
-                                    {/*        </Typography>*/}
-                                    {/*        <Typography variant="h5">&#8358; NA</Typography>*/}
-                                    {/*    </PriceCard>*/}
-                                    {/*</Grid>*/}
-                                </>
-                            )}
-                            {String(tradeType).toLowerCase() === 'sold' && (
-                                <>
-                                    {editDetails && (
-                                        <>
-                                            <Typography
-                                                variant="h6"
-                                                className="title"
-                                                style={{
-                                                    marginTop: 20,
-                                                    marginLeft: 5,
-                                                    marginBottom: 24
-                                                }}
-                                            >
-                                                Enter Actual Sold Price
-                                            </Typography>
-                                            <FlexRow>
-                                                <div className="currency-box">&#8358;</div>
-                                                <TextField
-                                                    placeholder="Enter price"
-                                                    label="Enter price"
-                                                    fullWidth
-                                                    type="number"
-                                                    value={tradeData.sold_slots_price}
-                                                    onChange={handleTradeChange('sold_slots_price')}
-                                                ></TextField>
-                                            </FlexRow>
-                                            <Button
-                                                text="Calculate and Save"
-                                                width="90%"
-                                                marginLeft="auto"
-                                                marginRight="auto"
-                                                marginTop={40}
-                                                onClick={() => saveTrade()}
+                                    <Button
+                                        text="Yes, Delete"
+                                        width={174}
+                                        onClick={() => deleteTrade()}
+                                    />
+                                </Info>
+                            </>
+                        )}
+                        {modalView === 'editTrade' && (
+                            <>
+                                <HeaderText variant="inherit" style={{marginTop: '40px'}}>
+                                    Creating Trade for
+                                </HeaderText>
+                                <InfoSection container spacing={3}>
+                                    <Grid item xs={12} style={{display: 'flex'}}>
+                                        <VehicleDetails style={{width: 700}}>
+                                            <img
+                                                src={tradeData.car.image}
+                                                width={185}
+                                                height={135}
+                                                style={{borderRadius: '8px'}}
                                             />
-                                        </>
-                                    )}
-                                    {!editDetails && (
-                                        <>
+                                            <div className="stats">
+                                                <img
+                                                    src="/images/Toyota-Full.png"
+                                                    width={80}
+                                                    height={22}
+                                                    style={{marginBottom: -15}}
+                                                />
+                                                <Typography
+                                                    variant="h5"
+                                                    noWrap
+                                                    className="trade"
+                                                    style={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        width: '250px'
+                                                    }}
+                                                >
+                                                    Trade ID {tradeId}
+                                                </Typography>
+                                                <Typography
+                                                    variant="h6">{tradeData.car.make}-{tradeData.car.model}</Typography>
+                                            </div>
+                                        </VehicleDetails>
+                                        <Button
+                                            text="Go to Car Profile"
+                                            width={150}
+                                            outlined={true}
+                                            onClick={() =>
+                                                handleNavigation(
+                                                    `/inventory/car-profile/${tradeData.car.id}?status=car listings`
+                                                )
+                                            }
+                                        />
+                                    </Grid>
+                                </InfoSection>
+                                <ModalSplitContainer>
+                                    <div className="left">
+                                        <div className="title">Trade Information</div>
+                                        <TextField
+                                            className="input"
+                                            placeholder="Slot Quantity"
+                                            label="Slot Quantity"
+                                            value={tradeData.slots_available}
+                                            onChange={handleTradeChange('slots_available')}
+                                        />
+                                        <FlexRow className="input">
+                                            <div className="currency-box">&#8358;</div>
+                                            <TextField
+                                                placeholder="Price per slot"
+                                                label="Price per slot"
+                                                fullWidth
+                                                disabled
+                                                value={tradeData.price_per_slot}
+                                                onChange={handleTradeChange('price_per_slot')}
+                                            ></TextField>
+                                        </FlexRow>
+                                        <FlexRow className="input">
+                                            <div className="currency-box">%</div>
+                                            <TextField
+                                                placeholder="Estimated ROT per slot"
+                                                label="Estimated ROT per slot"
+                                                fullWidth
+                                                disabled
+                                                value={tradeData.return_on_trade_per_unit}
+                                                onChange={handleTradeChange('return_on_trade_per_unit')}
+                                            ></TextField>
+                                        </FlexRow>
+                                        <TextField
+                                            className="input"
+                                            placeholder="Trading Duration in Days"
+                                            label="Trading Duration in Days"
+                                            value={tradeData.estimated_sales_duration}
+                                            onChange={handleTradeChange('estimated_sales_duration')}
+                                        />
+                                        <div
+                                            className="title"
+                                            style={{marginBottom: 20, marginTop: 40}}
+                                        >
+                                            Carpadi Commission
+                                        </div>
+                                        <FlexRow className="input">
+                                            <div className="currency-box">&#8358;</div>
+                                            <TextField
+                                                placeholder="Bought price"
+                                                label="Bought price"
+                                                fullWidth disabled
+                                                value={tradeData.car.bought_price}></TextField>
+                                        </FlexRow>
+                                        <FlexRow className="input">
+                                            <div className="currency-box">&#8358;</div>
+                                            <TextField
+                                                placeholder="Minimum selling price"
+                                                label="Minimum selling price"
+                                                fullWidth
+                                                disabled
+                                                value={tradeData.min_sale_price}
+                                                onChange={handleTradeChange('min_sale_price')}
+                                            ></TextField>
+                                        </FlexRow>
+                                    </div>
+                                    <div className="right">
+                                        <div className="title">Trade Summary</div>
+                                        <div className="content">
                                             <Grid item xs={12}>
                                                 <PriceCard style={{background: t.alertSuccessLite}}>
                                                     <Typography variant="body1">
-                                                        Trade Margin
+                                                        Total Slot Price + Total ROT
                                                     </Typography>
-                                                    <Typography
-                                                        variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
+                                                    <Typography variant="h5">
+                                                        &#8358;{' '}
+                                                        {formatNumber(
+                                                            Number(tradeData.price_per_slot) *
+                                                            Number(tradeData.slots_available) +
+                                                            Number(tradeData.return_on_trade)
+                                                        )}
+                                                    </Typography>
                                                 </PriceCard>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <PriceCard
-                                                    style={{background: t.alertValidationLite}}
-                                                >
-                                                    <Typography variant="body1">
-                                                        Actual Sold Price
-                                                    </Typography>
+                                                <Statistic>
+                                                    <div className="key">Initial + ROT</div>
                                                     <div
-                                                        style={{
-                                                            display: 'flex',
-                                                            flexDirection: 'row',
-                                                            justifyContent: 'space-between',
-                                                            alignItems: 'center'
-                                                        }}
-                                                    >
-                                                        <Typography variant="h5">
-                                                            &#8358; {formatNumber(tradeData.sold_slots_price)}
-                                                        </Typography>
-                                                        <Button
-                                                            text="Edit Sold Price"
-                                                            width={175}
-                                                            onClick={() => setEditDetails(true)}
-                                                        />
-                                                    </div>
+                                                        className="value">&#8358; {formatNumber(tradeData.car.bought_price + tradeData.return_on_trade)}</div>
+                                                </Statistic>
+                                                <Statistic>
+                                                    <div className="key">Sold Slot Price</div>
+                                                    <div
+                                                        className="value">&#8358; {formatNumber(tradeData.sold_slots_price + tradeData.return_on_trade)}</div>
+                                                </Statistic>
+                                                <PriceCard style={{marginTop: 40}}>
+                                                    <Typography variant="body1">
+                                                        Estimated Carpadi minimum Profit on Sales
+                                                    </Typography>
+                                                    <Typography variant="h5">&#8358; NA</Typography>
                                                 </PriceCard>
+                                                {/*<PriceCard*/}
+                                                {/*    style={{*/}
+                                                {/*        background: t.alertSuccessLite,*/}
+                                                {/*        marginTop: 20*/}
+                                                {/*    }}*/}
+                                                {/*>*/}
+                                                {/*    <Typography variant="body1">*/}
+                                                {/*        Estimated Carpadi maximum Profit on Sales*/}
+                                                {/*    </Typography>*/}
+                                                {/*    <Typography variant="h5">&#8358; NA</Typography>*/}
+                                                {/*</PriceCard>*/}
                                             </Grid>
-                                        </>
-                                    )}
-                                </>
-                            )}
-                        </Grid>
-                    </div>
-                </SplitContainer>
-            </Body>
-            <Modal
-                open={modalOpen}
-                onClose={() => {
-                    setModalState(false)
-                }}
-            >
-                <ModalBody>
-                    <ModalBodyHeader>
-                        <Typography variant="h5" style={{fontWeight: 600}}>
-                            {modalTitle}
-                        </Typography>
-                        <Image
-                            src="/icons/Cancel-Black.svg"
-                            width={25}
-                            height={25}
-                            onClick={() => setModalState(false)}
-                            style={{cursor: 'pointer'}}
-                        />
-                    </ModalBodyHeader>
-                    <Typography variant="inherit" style={{marginBottom: 20}}>
-                        {modalTitle !== ''
-                            ? ' Kindly provide the following information below.'
-                            : ''}{' '}
-                        &nbsp;
-                    </Typography>
-                    {modalView === 'deleteTrade' && (
-                        <>
-                            <Info>
-                                <img
-                                    src="/icons/Trash-Red.svg"
-                                    alt="Trash"
-                                    height={40}
-                                    width={40}
-                                />
-                                <Typography
-                                    variant="h6"
-                                    style={{marginTop: 48, marginBottom: 16}}
-                                >
-                                    Delete Trade
-                                </Typography>
-                                <Typography
-                                    variant="subtitle2"
-                                    style={{maxWidth: 206, marginBottom: 39}}
-                                >
-                                    You are about to delete this trade. Car profile would be left
-                                    with no trade.
-                                </Typography>
-                                <Button
-                                    text="Yes, Delete"
-                                    width={174}
-                                    onClick={() => deleteTrade()}
-                                />
-                            </Info>
-                        </>
-                    )}
-                    {modalView === 'editTrade' && (
-                        <>
-                            <HeaderText variant="inherit" style={{marginTop: '40px'}}>
-                                Creating Trade for
-                            </HeaderText>
-                            <InfoSection container spacing={3}>
-                                <Grid item xs={12} style={{display: 'flex'}}>
-                                    <VehicleDetails style={{width: 700}}>
-                                        <img
-                                            src={tradeData.car.image}
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                        />
-                                        <div className="stats">
-                                            <img
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
-                                            />
-                                            <Typography
-                                                variant="h5"
-                                                noWrap
-                                                className="trade"
-                                                style={{
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    width: '250px'
-                                                }}
-                                            >
-                                                Trade ID {tradeId}
-                                            </Typography>
-                                            <Typography
-                                                variant="h6">{tradeData.car.make}-{tradeData.car.model}</Typography>
                                         </div>
-                                    </VehicleDetails>
-                                    <Button
-                                        text="Go to Car Profile"
-                                        width={150}
-                                        outlined={true}
-                                        onClick={() =>
-                                            handleNavigation(
-                                                `/inventory/car-profile/${tradeData.car.id}?status=car listings`
-                                            )
-                                        }
-                                    />
-                                </Grid>
-                            </InfoSection>
-                            <ModalSplitContainer>
-                                <div className="left">
-                                    <div className="title">Trade Information</div>
-                                    <TextField
-                                        className="input"
-                                        placeholder="Slot Quantity"
-                                        label="Slot Quantity"
-                                        value={tradeData.slots_available}
-                                        onChange={handleTradeChange('slots_available')}
-                                    />
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Price per slot"
-                                            label="Price per slot"
-                                            fullWidth
-                                            disabled
-                                            value={tradeData.price_per_slot}
-                                            onChange={handleTradeChange('price_per_slot')}
-                                        ></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">%</div>
-                                        <TextField
-                                            placeholder="Estimated ROT per slot"
-                                            label="Estimated ROT per slot"
-                                            fullWidth
-                                            disabled
-                                            value={tradeData.return_on_trade_per_unit}
-                                            onChange={handleTradeChange('return_on_trade_per_unit')}
-                                        ></TextField>
-                                    </FlexRow>
-                                    <TextField
-                                        className="input"
-                                        placeholder="Trading Duration in Days"
-                                        label="Trading Duration in Days"
-                                        value={tradeData.estimated_sales_duration}
-                                        onChange={handleTradeChange('estimated_sales_duration')}
-                                    />
-                                    <div
-                                        className="title"
-                                        style={{marginBottom: 20, marginTop: 40}}
-                                    >
-                                        Carpadi Commission
                                     </div>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Bought price"
-                                            label="Bought price"
-                                            fullWidth disabled
-                                            value={tradeData.car.bought_price}></TextField>
-                                    </FlexRow>
-                                    <FlexRow className="input">
-                                        <div className="currency-box">&#8358;</div>
-                                        <TextField
-                                            placeholder="Minimum selling price"
-                                            label="Minimum selling price"
-                                            fullWidth
-                                            disabled
-                                            value={tradeData.min_sale_price}
-                                            onChange={handleTradeChange('min_sale_price')}
-                                        ></TextField>
-                                    </FlexRow>
-                                </div>
-                                <div className="right">
-                                    <div className="title">Trade Summary</div>
-                                    <div className="content">
-                                        <Grid item xs={12}>
-                                            <PriceCard style={{background: t.alertSuccessLite}}>
-                                                <Typography variant="body1">
-                                                    Total Slot Price + Total ROT
-                                                </Typography>
-                                                <Typography variant="h5">
-                                                    &#8358;{' '}
-                                                    {formatNumber(
-                                                        Number(tradeData.price_per_slot) *
-                                                        Number(tradeData.slots_available) +
-                                                        Number(tradeData.return_on_trade)
-                                                    )}
-                                                </Typography>
-                                            </PriceCard>
-                                            <Statistic>
-                                                <div className="key">Initial + ROT</div>
-                                                <div
-                                                    className="value">&#8358; {formatNumber(tradeData.car.bought_price + tradeData.return_on_trade)}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Sold Slot Price</div>
-                                                <div
-                                                    className="value">&#8358; {formatNumber(tradeData.sold_slots_price + tradeData.return_on_trade)}</div>
-                                            </Statistic>
-                                            <PriceCard style={{marginTop: 40}}>
-                                                <Typography variant="body1">
-                                                    Estimated Carpadi minimum Profit on Sales
-                                                </Typography>
-                                                <Typography variant="h5">&#8358; NA</Typography>
-                                            </PriceCard>
-                                            {/*<PriceCard*/}
-                                            {/*    style={{*/}
-                                            {/*        background: t.alertSuccessLite,*/}
-                                            {/*        marginTop: 20*/}
-                                            {/*    }}*/}
-                                            {/*>*/}
-                                            {/*    <Typography variant="body1">*/}
-                                            {/*        Estimated Carpadi maximum Profit on Sales*/}
-                                            {/*    </Typography>*/}
-                                            {/*    <Typography variant="h5">&#8358; NA</Typography>*/}
-                                            {/*</PriceCard>*/}
-                                        </Grid>
-                                    </div>
-                                </div>
-                            </ModalSplitContainer>
-                            <Button
-                                text={modalTitle}
-                                width={590}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop="40px"
-                                onClick={() => saveTrade()}
-                            />
-                        </>
-                    )}
-                </ModalBody>
-            </Modal>
-        </Container>
+                                </ModalSplitContainer>
+                                <Button
+                                    text={modalTitle}
+                                    width={590}
+                                    marginLeft="auto"
+                                    marginRight="auto"
+                                    marginTop="40px"
+                                    onClick={() => saveTrade()}
+                                />
+                            </>
+                        )}
+                    </ModalBody>
+                </Modal>
+            </Container>
+        </MainLayout>
     )
 }
 
-export default TradeProfilePage
-
-TradeProfilePage.getLayout = function getLayout(page) {
-    return <MainLayout>{page}</MainLayout>
+export async function getServerSideProps({params}) {
+    return {
+        props: {
+            pageId: params.id
+        }
+    }
 }
+
+export default TradeProfilePage
 
 const HeaderText = withStyles({
     root: {

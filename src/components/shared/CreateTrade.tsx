@@ -161,6 +161,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                 if (data.status) {
                     toast.success('Trade Created')
                     onClick()
+                    handleNavigation(`/trade/${data.data.id}`)
                 } else {
                     toast.error(data?.data || "An error occurred")
                 }

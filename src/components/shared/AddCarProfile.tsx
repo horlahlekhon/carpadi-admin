@@ -23,6 +23,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
     const [seatNumber, setSeatNumber] = useState(4)
     const [vin, setVin] = useState(null)
     const [licence_plate, setPlate] = useState(null)
+    const [bought_price, setPrice] = useState(null)
     const [car, setCar] = useState({
             "engine": null,
             "transmission": null,
@@ -136,7 +137,8 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             "vin": vin,
             "car_pictures": [],
             "colour": carColor,
-            "licence_plate": licence_plate
+            "licence_plate": licence_plate,
+            "bought_price": bought_price,
         }
         uploadedPictures.forEach(async (picture) => {
             uploadFile(picture?.file, UploadTypes.CAR, vin)
@@ -160,6 +162,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             if (response.status) {
                                 toast.success('Created Successfully!')
                                 onClick()
+                                handleNavigation(`/car-profile/${response.data.id}?status=car listings`)
                             } else {
                                 toast.error(response.data)
                             }
@@ -247,11 +250,32 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                 )}
                 {modalView === 'fetchedCarProfile' && (
                     <>
-                        <HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>
-                        <TextField placeholder='Number Plate' label='Number Plate'
-                                   style={{width: 330, marginBottom: 30}}
-                                   value={licence_plate} onChange={(e) => setPlate(e.target.value)}/>
+                        {/*<HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>*/}
+                        {/*<TextField placeholder='Number Plate' label='Number Plate'*/}
+                        {/*           style={{width: 330, marginBottom: 30}}*/}
+                        {/*           value={licence_plate} onChange={(e) => setPlate(e.target.value)}/>*/}
                         <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Info</HeaderText>
+                        <InputGrid>
+                            <TextField
+                                className="text-field"
+                                fullWidth
+                                label="Number Plate"
+                                placeholder="Number Plate"
+                                value={licence_plate}
+                                variant='standard'
+                                onChange={(e) => setPlate(e.target.value)}
+                            />
+                            <TextField
+                                className="text-field"
+                                type='number'
+                                fullWidth
+                                label="Bought Price"
+                                placeholder="Bought Price"
+                                value={bought_price}
+                                variant='standard'
+                                onChange={(e) => setPrice(e.target.value)}
+                            />
+                        </InputGrid>
                         <InputGrid>
                             <TextField
                                 className="text-field"
