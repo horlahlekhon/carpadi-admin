@@ -237,7 +237,7 @@ function UserProfilePage({pageId}) {
                                                             </div>
                                                         </div>
                                                         <div className="value"
-                                                             style={{color: tr?.transaction_type === 'credit' ? t.alertSuccess : t.alertError}}>
+                                                             style={{color: tr?.transaction_type === 'credit' ? t.alertSuccess : tr?.transaction_type === 'pending' ? t.alertValidation : tr?.transaction_type === 'failed' ? t.liteGrey : t.alertError}}>
                                                             {tr?.transaction_type === 'credit' ? '+' : '-'}&#8358;{formatNumber(tr?.amount)}
                                                         </div>
                                                     </Transaction>
