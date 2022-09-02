@@ -396,16 +396,15 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 </Table>
                             </TableContainer>
                         </TableCard>
-                        <div style={{display: 'flex', marginTop: 20}}>
-                            <Button
-                                text="Proceed"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                onClick={() => setModalView('addCarDetails')}
-                                disabled={selectedCar === null}
-                            />
-                        </div>
+                        <Button
+                            text="Proceed"
+                            width={510}
+                            marginLeft="auto"
+                            marginRight="auto"
+                            marginTop={20}
+                            onClick={() => setModalView('addCarDetails')}
+                            disabled={selectedCar === null}
+                        />
                     </>
                 )
                 }
@@ -533,15 +532,14 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 </div>
                             ))}
                         </InputGrid>
-                        <div style={{display: 'flex', marginTop: 70}}>
-                            <Button
-                                text="Proceed"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                onClick={() => setModalView('viewCarSummary')}
-                            />
-                        </div>
+                        <Button
+                            text="Proceed"
+                            width={510}
+                            marginLeft="auto"
+                            marginRight="auto"
+                            marginTop={70}
+                            onClick={() => setModalView('viewCarSummary')}
+                        />
                     </>
                 )}
                 {modalView === 'viewCarSummary' && (
@@ -630,16 +628,15 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                     />
                                 </div>
                             </SalesStatus>
-                            <div style={{display: 'flex', marginTop: 70}}>
-                                <Button
-                                    text={isLoading ? "Loading..." : "Create Sales Profile"}
-                                    width={510}
-                                    marginLeft="auto"
-                                    marginRight="auto"
-                                    disabled={isLoading}
-                                    onClick={() => saveSale()}
-                                />
-                            </div>
+                            <Button
+                                text={isLoading ? "Loading..." : "Create Sales Profile"}
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={70}
+                                disabled={isLoading}
+                                onClick={() => saveSale()}
+                            />
                         </Body>
                     </>
                 )}

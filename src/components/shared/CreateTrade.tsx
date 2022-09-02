@@ -299,16 +299,15 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                     </Table>
                                 </TableContainer>
                             </TableCard>
-                            <div style={{display: 'flex', marginTop: 20}}>
-                                <Button
-                                    text="Proceed"
-                                    width={510}
-                                    marginLeft="auto"
-                                    marginRight="auto"
-                                    onClick={() => setModalView('createTrade')}
-                                    disabled={selectedCar === null}
-                                />
-                            </div>
+                            <Button
+                                text="Proceed"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={20}
+                                onClick={() => setModalView('createTrade')}
+                                disabled={selectedCar === null}
+                            />
                         </>
                     )
                     }
