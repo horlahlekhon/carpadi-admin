@@ -71,6 +71,14 @@ enum UploadTypes {
     ANY = 'any'
 }
 
+enum ActivityTypes {
+    Transaction = "transaction",
+    TradeUnit = "trade_unit",
+    Disbursement = "disbursement",
+    CarCreation = "car_creation",
+    NewUser = "new_user",
+}
+
 export {
     CarStates,
     TradeStates,
@@ -79,5 +87,6 @@ export {
     FuelTypes,
     CarTypes,
     InspectionStates,
-    UploadTypes
+    UploadTypes,
+    ActivityTypes
 }

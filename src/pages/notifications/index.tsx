@@ -10,6 +10,7 @@ import {retrieveActivities} from "../../services/activity";
 import {toast} from "react-hot-toast";
 import CPToast from "../../components/shared/CPToast";
 import {formatDate, formatDateTime, formatTime} from "../../helpers/formatters";
+import {ActivityTypes} from "../../lib/enums";
 
 function NotificationsPage() {
     const router = useRouter()
@@ -57,6 +58,29 @@ function NotificationsPage() {
     useEffect(() => {
         retrieveActivityList()
     }, [])
+
+    function goToActivity(activity: any) {
+        switch (activity?.activity_type) {
+            case ActivityTypes.NewUser:
+                handleNavigation(`/users/${activity?.merchant}`)
+                break;
+            case ActivityTypes.CarCreation:
+                // handleNavigation(`/inventory/car-profile/0e0c0f52-d74c-4108-80f3-b13342cc4735?status=car%20listings`)
+                toast.error("Entity object empty")
+                break;
+            case ActivityTypes.Disbursement:
+                handleNavigation(`/users/${activity?.merchant}/trading-activities`)
+                break;
+            case ActivityTypes.TradeUnit:
+                handleNavigation(` / users /${activity?.merchant}/view-trade?status=active&tradeId=${activity?.activity_entity?.trade}`)
+                break;
+            case ActivityTypes.Transaction:
+                handleNavigation(`/users/${activity?.merchant}`)
+                break;
+            default:
+                handleNavigation(`/users/${activity?.merchant}/trading-activities`)
+        }
+    }
 
     return (
         <Container>
@@ -114,7 +138,7 @@ function NotificationsPage() {
                                             <ActivityItem
                                                 key={i}
                                                 onClick={() => {
-                                                    handleNavigation(`/users/${activity?.merchant}/trading-activities`)
+                                                    handleNavigation(`/users/${activity?.merchant}/view-trade?status=active&tradeId=${activity?.activity_entity?.trade}`)
                                                 }}
                                             >
                                                 <ActivityImage>
@@ -166,7 +190,7 @@ function NotificationsPage() {
                                             <ActivityItem
                                                 key={i}
                                                 onClick={() => {
-                                                    handleNavigation(`/users/${activity?.merchant}/trading-activities`)
+                                                    goToActivity(activity)
                                                 }}
                                             >
                                                 <ActivityImage>
