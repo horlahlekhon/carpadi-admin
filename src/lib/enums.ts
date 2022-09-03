@@ -79,6 +79,14 @@ enum ActivityTypes {
     NewUser = "new_user",
 }
 
+enum TransactionStates {
+    Unsettled = "unsettled",
+    Success = "success",
+    Failed = "failed",
+    Cancelled = "cancelled",
+    Pending = "pending",
+}
+
 export {
     CarStates,
     TradeStates,
@@ -88,5 +96,6 @@ export {
     CarTypes,
     InspectionStates,
     UploadTypes,
-    ActivityTypes
+    ActivityTypes,
+    TransactionStates
 }

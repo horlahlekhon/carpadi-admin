@@ -431,14 +431,16 @@ function TradeProfilePage({pageId}) {
                                                         onChange={handleTradeChange('sold_slots_price')}
                                                     ></TextField>
                                                 </FlexRow>
-                                                <Button
-                                                    text="Calculate and Save"
-                                                    width="90%"
-                                                    marginLeft="auto"
-                                                    marginRight="auto"
-                                                    marginTop={40}
-                                                    onClick={() => saveTrade()}
-                                                />
+                                                <div style={{width: '100%'}}>
+                                                    <Button
+                                                        text="Calculate and Save"
+                                                        width="90%"
+                                                        marginLeft="auto"
+                                                        marginRight="auto"
+                                                        marginTop={40}
+                                                        onClick={() => saveTrade()}
+                                                    />
+                                                </div>
                                             </>
                                         )}
                                         {!editDetails && (

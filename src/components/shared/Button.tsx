@@ -22,32 +22,30 @@ const Btn = ({
              }) => {
     return (
         <Tooltip title={title} placement='left'>
-            <span>
-                <Button
-                    variant={outlined ? 'outlined' : 'contained'}
-                    className={classes.btn}
-                    disableElevation
-                    disabled={disabled}
-                    style={{
-                        display: 'block',
-                        width: width,
-                        height: height,
-                        marginTop: marginTop,
-                        marginBottom: marginBottom,
-                        marginLeft: marginLeft,
-                        marginRight: marginRight,
-                        backgroundColor: `${outlined ? 'transparent' : disabled ? t.liteGrey : bgColor}`,
-                        border: `2px solid ${outlined ? (disabled ? t.liteGrey : bgColor) : 'transparent'}`,
-                        color: `${outlined ? (disabled ? t.lightGrey : bgColor) : color}`,
-                        borderRadius: borderRadius,
-                        fontSize: fontSize,
-                        cursor: `${disabled ? 'not-allowed' : 'pointer'}`
-                    }}
-                    onClick={onClick}
-                >
+            <Button
+                variant={outlined ? 'outlined' : 'contained'}
+                className={classes.btn}
+                disableElevation
+                disabled={disabled}
+                style={{
+                    display: 'block',
+                    width: width,
+                    height: height,
+                    marginTop: marginTop,
+                    marginBottom: marginBottom,
+                    marginLeft: marginLeft,
+                    marginRight: marginRight,
+                    backgroundColor: `${outlined ? 'transparent' : disabled ? t.liteGrey : bgColor}`,
+                    border: `2px solid ${outlined ? (disabled ? t.liteGrey : bgColor) : 'transparent'}`,
+                    color: `${outlined ? (disabled ? t.lightGrey : bgColor) : color}`,
+                    borderRadius: borderRadius,
+                    fontSize: fontSize,
+                    cursor: `${disabled ? 'not-allowed' : 'pointer'}`
+                }}
+                onClick={onClick}
+            >
                 {text || 'Button'}
             </Button>
-            </span>
         </Tooltip>
     )
 }

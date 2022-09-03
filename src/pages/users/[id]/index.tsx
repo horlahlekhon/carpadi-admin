@@ -14,6 +14,7 @@ import {merchantService} from "../../../services/merchant";
 import {walletService} from "../../../services/wallet";
 import {formatDate, formatNumber} from "../../../helpers/formatters";
 import {transactionService} from "../../../services/transaction";
+import {TransactionStates} from "../../../lib/enums";
 
 
 function UserProfilePage({pageId}) {
@@ -111,7 +112,7 @@ function UserProfilePage({pageId}) {
     const retrieveUserWalletTransactions = (id) => {
         if (id !== 'NA' && id !== undefined) {
             transactionService
-                .retrieveTransaction(50, 0, id)
+                .retrieveTransaction(75, 0, id)
                 .then((response) => {
                     if (response.status) {
                         setTransactions(response.data.results)
@@ -236,8 +237,8 @@ function UserProfilePage({pageId}) {
                                                                 <div className="date">{formatDate(tr?.created)}</div>
                                                             </div>
                                                         </div>
-                                                        <div className="value"
-                                                             style={{color: tr?.transaction_type === 'credit' ? t.alertSuccess : tr?.transaction_type === 'pending' ? t.alertValidation : tr?.transaction_type === 'failed' ? t.liteGrey : t.alertError}}>
+                                                        <div className="value" title={tr?.transaction_status}
+                                                             style={{color: tr?.transaction_status === TransactionStates.Success ? t.alertSuccess : tr?.transaction_status === TransactionStates.Pending ? t.alertValidation : tr?.transaction_status === TransactionStates.Failed ? t.alertError : t.grey}}>
                                                             {tr?.transaction_type === 'credit' ? '+' : '-'}&#8358;{formatNumber(tr?.amount)}
                                                         </div>
                                                     </Transaction>
