@@ -39,7 +39,7 @@ function NotificationsPage() {
 
     const retrieveActivityList = (type = notificationTab.valueOf()) => {
         setLoading(true)
-        retrieveActivities({activityType: type, limit: 50})
+        retrieveActivities({activityType: type, limit: 20})
             .then((response) => {
                 if (response.status) {
                     setActivities(response.data.results)
