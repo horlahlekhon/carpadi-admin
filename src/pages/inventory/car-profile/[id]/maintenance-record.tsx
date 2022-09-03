@@ -133,6 +133,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                         "maintenance": {
                             "name": spareP.name,
                             "estimated_price": spareP.partPrice,
+                            "repair_cost": spareP.repairCost,
                             "description": description,
                             "picture": spareP.part_picture,
                         },
@@ -155,6 +156,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                         "maintenance": {
                             "name": spareP.name,
                             "estimated_price": spareP.partPrice,
+                            "repair_cost": spareP.repairCost,
                             "description": description,
                             "picture": spareP.part_picture,
                         },
@@ -179,6 +181,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                         "maintenance": {
                             "name": spareP.name,
                             "estimated_price": spareP.partPrice,
+                            "repair_cost": spareP.repairCost,
                             "description": description,
                             "picture": spareP.part_picture,
                         },
@@ -319,6 +322,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 name: a?.maintenance_data?.name,
                                 estimated_price: a?.maintenance_data?.estimated_price,
                                 partPrice: a?.maintenance_data?.estimated_price,
+                                repairCost: a?.maintenance_data?.repair_cost,
                                 part_picture: a?.maintenance_data?.part_picture,
                                 id: a?.id,
                             }
@@ -539,7 +543,8 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                         marginTop: '15px'
                                                     }}>
                                                     <Typography variant="body1">Repair Cost</Typography>
-                                                    <Typography variant="h5">₦ NA</Typography>
+                                                    <Typography
+                                                        variant="h5">₦ {formatNumber(sp?.maintenance_data?.repair_cost)}</Typography>
                                                 </PriceCard>
                                             </Grid>
                                         ))}
@@ -772,15 +777,15 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                         onChange={(e) => handleChange('partPrice', e.target.value, id)}
                                                     ></TextField>
                                                 </FlexRow>
-                                                {/*<FlexRow>*/}
-                                                {/*    <div className="currency-box">&#8358;</div>*/}
-                                                {/*    <TextField*/}
-                                                {/*        placeholder="Enter repair cost"*/}
-                                                {/*        style={{width: 400}} variant='standard'*/}
-                                                {/*        disabled*/}
-                                                {/*        value={sp.repairCost}*/}
-                                                {/*    ></TextField>*/}
-                                                {/*</FlexRow>*/}
+                                                <FlexRow>
+                                                    <div className="currency-box">&#8358;</div>
+                                                    <TextField
+                                                        placeholder="Enter repair cost"
+                                                        style={{width: 400}} variant='standard'
+                                                        value={sp.repairCost}
+                                                        onChange={(e) => handleChange('repairCost', e.target.value, id)}
+                                                    ></TextField>
+                                                </FlexRow>
                                             </InputGrid>
                                         </div>
                                     </div>
