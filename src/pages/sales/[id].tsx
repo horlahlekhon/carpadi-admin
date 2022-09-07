@@ -1,6 +1,6 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {Grid, Modal, Paper, TextField, Typography} from '@material-ui/core'
+import {Grid, Modal, Paper, Switch, TextField, Typography} from '@material-ui/core'
 import {t} from '../../styles/theme'
 import {useRouter} from 'next/router'
 import Button from '../../components/shared/Button'
@@ -238,13 +238,14 @@ function SalesProfilePage({pageId}) {
     return (
         <MainLayout>
             <Container>
-                <CPToast/><input
-                type="file"
-                accept="image/*"
-                ref={hiddenFileInput2}
-                onChange={handleFileChange2}
-                style={{display: 'none'}}
-            />
+                <CPToast/>
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={hiddenFileInput2}
+                    onChange={handleFileChange2}
+                    style={{display: 'none'}}
+                />
                 <input
                     type="file"
                     accept="image/*"
@@ -291,15 +292,9 @@ function SalesProfilePage({pageId}) {
                             </Typography>
                         </div>
                         <div className="button-group">
-                            {/*<Button*/}
-                            {/*    text="Vehicle Inspection Report"*/}
-                            {/*    width={210}*/}
-                            {/*    outlined={true}*/}
-                            {/*    marginRight="16px"*/}
-                            {/*/>*/}
                             <Button
                                 text="Delete Sales Profile"
-                                width={160}
+                                width={170}
                                 outlined={true}
                                 marginRight="16px"
                                 bgColor={t.alertError}
@@ -359,11 +354,14 @@ function SalesProfilePage({pageId}) {
                         </Typography>
                         <div className="cta">
                             <span>Set As Active</span>
-                            <ToggleSwitch
-                                checked={state.saleActive}
-                                onChange={handleChange}
-                                name="saleActive"
-                            />
+                            <Switch checked={state.saleActive}
+                                    onChange={handleChange}
+                                    name="saleActive" color='primary'></Switch>
+                            {/*<ToggleSwitch*/}
+                            {/*    checked={state.saleActive}*/}
+                            {/*    onChange={handleChange}*/}
+                            {/*    name="saleActive"*/}
+                            {/*/>*/}
                         </div>
                     </SalesStatus>
                     <Typography variant="h6" color="secondary">
@@ -504,11 +502,14 @@ function SalesProfilePage({pageId}) {
                                         <HeaderText className="status">Sales Status</HeaderText>
                                         <div className="cta">
                                             <span>Set As Active</span>
-                                            <ToggleSwitch
-                                                checked={state.saleActive}
-                                                onChange={handleChange}
-                                                name="saleActive"
-                                            />
+                                            <Switch checked={state.saleActive}
+                                                    onChange={handleChange}
+                                                    name="saleActive" color='primary'></Switch>
+                                            {/*<ToggleSwitch*/}
+                                            {/*    checked={state.saleActive}*/}
+                                            {/*    onChange={handleChange}*/}
+                                            {/*    name="saleActive"*/}
+                                            {/*/>*/}
                                         </div>
                                     </SalesStatus>
                                 </FlexRow>
@@ -1056,7 +1057,7 @@ const InputGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-column-gap: 24px;
-  padding: 8 12px;
+  padding: 8px;
   height: 54px;
   background: ${t.extraLiteGrey};
   margin-bottom: 10px;
