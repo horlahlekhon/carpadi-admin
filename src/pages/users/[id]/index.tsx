@@ -225,11 +225,13 @@ function UserProfilePage({pageId}) {
                                             {transactions
                                                 .map((tr, idx) => (
                                                     <Transaction key={idx}>
-                                                        <div className="left">
+                                                        <div className="left"
+                                                             title={tr?.transaction_type === 'credit' ? 'Credit' : 'Debit'}
+                                                        >
                                                             <img
                                                                 className="icon"
                                                                 src={tr?.transaction_type === 'credit' ? "/icons/Deposit-Green.svg" : "/icons/Withdraw-Red.svg"}
-                                                                alt="Deposit"
+                                                                alt={tr?.transaction_type}
                                                             />
                                                             <div className="stacked">
                                                                 <div
@@ -254,7 +256,7 @@ function UserProfilePage({pageId}) {
                                     <ActionBar>
                                         <div className="button-group">
                                             <Button
-                                                text="Suspend User Account"
+                                                text="Suspend Account"
                                                 width={180}
                                                 outlined={true}
                                                 marginRight="16px"
@@ -264,7 +266,7 @@ function UserProfilePage({pageId}) {
                                                 onClick={() => showModal('suspendAccount', '')}
                                             />
                                             <Button
-                                                text="Delete User Account"
+                                                text="Delete Account"
                                                 width={165}
                                                 outlined={true}
                                                 marginRight="16px"
@@ -277,7 +279,7 @@ function UserProfilePage({pageId}) {
                                             />
                                             <Button
                                                 text="Trading Activities"
-                                                width={150}
+                                                width={160}
                                                 marginTop={4}
                                                 onClick={() =>
                                                     handleNavigation(`/users/${userId}/trading-activities`)
