@@ -28,7 +28,7 @@ const Btn = ({
                 disableElevation
                 disabled={disabled}
                 style={{
-                    display: 'block',
+                    display: 'flex',
                     width: width,
                     height: height,
                     marginTop: marginTop,

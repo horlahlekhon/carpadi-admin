@@ -342,7 +342,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                     </VehicleDetails>
                                     <Button
                                         text="Go to Car Profile"
-                                        width={150}
+                                        width={155}
                                         outlined={true}
                                         onClick={() => handleNavigation(`/inventory/car-profile/${selectedCar?.id}?status=${selectedCar?.status}`)}
                                     />
