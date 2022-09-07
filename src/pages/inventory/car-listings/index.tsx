@@ -155,12 +155,12 @@ function CarListingsPage() {
                                         </TableCell>
                                         <TableCell align="left">{row.vin}</TableCell>
                                         <TableCell align="left"
-                                                   style={{textTransform: 'uppercase'}}>{row?.status}</TableCell>
+                                                   style={{textTransform: 'lowercase'}}>{row?.status}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.name}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.model}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.year}</TableCell>
                                         <TableCell align="left">{row?.information?.fuel_type}</TableCell>
-                                        <TableCell align="left">
+                                        <TableCell align="left" style={{textTransform: 'lowercase'}}>
                                             {row?.information?.transmission}
                                         </TableCell>
                                         <TableCell align="left">{formatDate(row?.information?.created)}</TableCell>
