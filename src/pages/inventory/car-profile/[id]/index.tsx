@@ -376,7 +376,7 @@ function CarProfilePage({pageId}) {
         <MainLayout>
             <Container>
                 <CPToast/>
-                {createSale && <CreateSale modalOpen={true} onClick={() => setCreateSale(false)}/>}
+                {createSale && <CreateSale car={car} modalOpen={true} onClick={() => setCreateSale(false)}/>}
                 {createTrade && <CreateTrade car={car} onClick={() => setCreateTrade(false)}/>}
                 <Header>
                     <Typography variant="h4">
