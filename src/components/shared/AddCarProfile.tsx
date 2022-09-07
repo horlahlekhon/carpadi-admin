@@ -84,22 +84,6 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             }
         })
         setUploadedPictures([...uploadedPictures, ...arr])
-        // setisUploading(true)
-        // uploadFile(file, UploadTypes.CAR, vin)
-        //     .then((res) => {
-        //         if (res.status) {
-        //             const arr = [...uploadedPictures, res.data];
-        //             setUploadedPictures(arr)
-        //         } else {
-        //             toast.error(res.data)
-        //         }
-        //     })
-        //     .catch((error) => {
-        //         toast.error(error)
-        //     })
-        //     .finally(() => {
-        //         setisUploading(false)
-        //     })
     }
 
     const fetchCar = () => {
@@ -180,6 +164,12 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             }
         })
 
+    }
+
+    const setCarDetail = (key, value) => {
+        let c = {...car}
+        c[key] = value;
+        setCar(c)
     }
 
     // @ts-ignore
@@ -290,6 +280,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 className="text-field"
                                 fullWidth
                                 placeholder="Color"
+                                error={carColor === ''}
                                 label={carColor !== '' ? getColorName(carColor) : 'Color'}
                                 type='color'
                                 variant='standard'
@@ -366,11 +357,12 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             <TextField
                                 className="text-field"
                                 fullWidth
-                                disabled
                                 label="Current Mileage"
                                 placeholder="Current Mileage"
                                 value={car?.mileage || 'NA'}
                                 variant='standard'
+                                type='number'
+                                onChange={(e) => setCarDetail('mileage', e.target.value)}
                             />
                         </InputGrid>
                         <InputGrid>
@@ -399,7 +391,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             marginLeft="auto"
                             marginRight="auto"
                             marginTop={40}
-                            disabled={!licence_plate || !carColor}
+                            disabled={!licence_plate || !carColor || !car?.mileage || !bought_price}
                             onClick={() => setModalView('uploadCarImages')}
                         />
                     </>
