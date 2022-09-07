@@ -101,6 +101,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
 
 
     const showModal = (viewName: string, title: string, customTagline: string = null!) => {
+        setDescription('')
         setModalView(viewName)
         setModalTitle(title)
         if (!!customTagline || customTagline === '') {
@@ -217,7 +218,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                             "description": description,
                         },
                         "car": carId,
-                        "type": CarMaintenanceTypes.EXPENSE,
+                        "type": CarMaintenanceTypes.EXPENSE
                     }, ex?.id)
                         .then((res) => {
                             if (res.status) {
@@ -324,6 +325,14 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 partPrice: a?.maintenance_data?.estimated_price,
                                 repairCost: a?.maintenance_data?.repair_cost,
                                 part_picture: a?.maintenance_data?.part_picture,
+                                id: a?.id,
+                            }
+                        }))
+                        setExpenses(exs.map(a => {
+                            return {
+                                expense: a?.maintenance_data?.name,
+                                estimated_price: a?.maintenance_data?.estimated_price,
+                                cost: a?.maintenance_data?.estimated_price,
                                 id: a?.id,
                             }
                         }))
@@ -462,8 +471,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                             {maintenances.length > 0 && (<>
                                 <Button text="Manage Maintenance" width={200} outlined={true} marginRight={10}
                                         onClick={() => {
-                                            setEditMode(true)
-                                            showModal("createSparePart", "Manage Maintenance Record")
+                                            showModal("editRecord", "Edit Maintenance Record")
                                         }}/>
                             </>)}
                             <Button text="Go to Car Profile" width={180} outlined={true} marginRight={10}
@@ -589,6 +597,61 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 : ''}{' '}
                             &nbsp;
                         </Typography>
+                        {modalView === 'editRecord' && (
+                            <div style={{display: 'flex', flexDirection: 'row'}}>
+                                <div style={{
+                                    width: 390,
+                                    height: 200,
+                                    background: t.alertSuccessLite,
+                                    padding: 20,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    marginRight: 20
+                                }}>
+                                    <Typography variant='h6' color='primary'>Expenses</Typography>
+                                    <p>Cras vel leo gravida, porttitor ex vitae, blandit lectus.</p>
+                                    <div style={{marginTop: 'auto'}}>
+                                        <div style={{
+                                            fontWeight: 600,
+                                            float: 'right',
+                                            cursor: 'pointer',
+                                            color: t.primaryDeepBlue
+                                        }}
+                                             onClick={() => {
+                                                 setEditMode(true);
+                                                 showModal("createExpense", "Manage Expenses Maintenance Record")
+                                             }}>
+                                            Proceed &#62;
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{
+                                    width: 390,
+                                    height: 200,
+                                    background: t.primaryExtraLite,
+                                    padding: 20,
+                                    display: 'flex',
+                                    flexDirection: 'column'
+                                }}>
+                                    <Typography variant='h6' color='primary'>Spare Parts</Typography>
+                                    <p>Cras vel leo gravida, porttitor ex vitae, blandit lectus.</p>
+                                    <div style={{marginTop: 'auto'}}>
+                                        <div style={{
+                                            fontWeight: 600,
+                                            float: 'right',
+                                            cursor: 'pointer',
+                                            color: t.primaryDeepBlue
+                                        }}
+                                             onClick={() => {
+                                                 setEditMode(true)
+                                                 showModal("createSparePart", "Manage Spare Part Maintenance Record")
+                                             }}>
+                                            Proceed &#62;
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         {modalView === 'createRecord' && (
                             <div style={{display: 'flex', flexDirection: 'row'}}>
                                 <div style={{
@@ -688,53 +751,6 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                         <Add className="icon"/>
                                     </IconPill>
                                 </FlexRow>
-                                {/*<InputGrid>*/}
-                                {/*    <TextField*/}
-                                {/*        className="text-field"*/}
-                                {/*        fullWidth*/}
-                                {/*        placeholder="Spare Part"*/}
-                                {/*        value={sparePart.name}*/}
-                                {/*        onChange={handleChange('name')}*/}
-                                {/*    />*/}
-                                {/*    <div className="input">*/}
-                                {/*        <div className="text">Upload Image</div>*/}
-                                {/*        <Button*/}
-                                {/*            text={isSaving ? 'Uploading...' : 'Upload'}*/}
-                                {/*            outlined={true}*/}
-                                {/*            width={71}*/}
-                                {/*            height={28}*/}
-                                {/*            borderRadius="8px"*/}
-                                {/*            onClick={() => handleFileClick(event)}*/}
-                                {/*        />*/}
-                                {/*    </div>*/}
-                                {/*</InputGrid>*/}
-                                {/*<div style={{display: 'flex', flexDirection: 'column'}}>*/}
-                                {/*    <HeaderText variant="inherit" style={{marginBottom: 8}}>*/}
-                                {/*        Costing*/}
-                                {/*    </HeaderText>*/}
-                                {/*    <InputGrid style={{background: 'white'}}>*/}
-                                {/*        <FlexRow>*/}
-                                {/*            <div className="currency-box">&#8358;</div>*/}
-                                {/*            <TextField*/}
-                                {/*                placeholder="Enter cost"*/}
-                                {/*                style={{width: 400}}*/}
-                                {/*                value={sparePart.partPrice}*/}
-                                {/*                onChange={handleChange('partPrice')}*/}
-                                {/*                type={'number'}*/}
-                                {/*            ></TextField>*/}
-                                {/*        </FlexRow>*/}
-                                {/*        /!*<FlexRow>*!/*/}
-                                {/*        /!*    <div className="currency-box">&#8358;</div>*!/*/}
-                                {/*        /!*    <TextField*!/*/}
-                                {/*        /!*        placeholder="Enter repair cost"*!/*/}
-                                {/*        /!*        style={{width: 400}}*!/*/}
-                                {/*        /!*        value={sparePart.repairCost}*!/*/}
-                                {/*        /!*        onChange={handleChange('repairCost')}*!/*/}
-                                {/*        /!*        type={'number'}*!/*/}
-                                {/*        /!*    ></TextField>*!/*/}
-                                {/*        /!*</FlexRow>*!/*/}
-                                {/*    </InputGrid>*/}
-                                {/*</div>*/}
                                 {spareParts.map((sp, id) => (
                                     <div key={id}>
                                         <InputGrid style={{marginTop: 14}}>
@@ -853,7 +869,13 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                     {expenses.map((exp, idx) => (
                                         <InputGrid style={{background: 'white'}} key={idx}>
                                             <FlexRow className='reverse'>
-                                                <div className="currency-box">&#8358;</div>
+                                                <div className="currency-box" onClick={() => deleteExpense(idx)}
+                                                     style={{
+                                                         color: t.alertError,
+                                                         background: 'white',
+                                                         cursor: 'pointer',
+                                                         marginTop: '15px'
+                                                     }}>&#10006;</div>
                                                 <TextField
                                                     placeholder="Expense"
                                                     label="Expense"
@@ -865,17 +887,12 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                 ></TextField>
                                             </FlexRow>
                                             <FlexRow className='reverse'>
-                                                <div className="currency-box" onClick={() => deleteExpense(idx)}
-                                                     style={{
-                                                         color: t.alertError,
-                                                         background: 'white',
-                                                         cursor: 'pointer'
-                                                     }}>&#10006;</div>
+                                                <div className="currency-box">&#8358;</div>
                                                 <TextField
                                                     placeholder="Cost"
                                                     label="Cost"
                                                     variant='standard'
-                                                    style={{width: 400}}
+                                                    style={{width: 400, marginRight: '10px'}}
                                                     type={'number'}
                                                     value={expenses[idx].cost}
                                                     onChange={(e) => updateExpense(idx, 'cost', e.target.value)}
@@ -885,7 +902,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                     ))}
                                 </div>
                                 <Button
-                                    text="Create Maintenance Record"
+                                    text={editMode ? "Update Maintenance Record" : "Create Maintenance Record"}
                                     width={510}
                                     marginLeft="auto"
                                     marginRight="auto"
@@ -1131,6 +1148,8 @@ const FlexRow = styled.div`
     color: ${t.lightGrey};
     background: ${t.liteGrey};
     margin-right: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
   }
 
   &.reverse {
