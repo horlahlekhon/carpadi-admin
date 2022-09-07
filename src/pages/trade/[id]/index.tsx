@@ -208,7 +208,7 @@ function TradeProfilePage({pageId}) {
                             />
                             <Button
                                 text="Go to Car Profile"
-                                width={150}
+                                width={155}
                                 outlined={true}
                                 onClick={() =>
                                     handleNavigation(
@@ -582,7 +582,7 @@ function TradeProfilePage({pageId}) {
                                         </VehicleDetails>
                                         <Button
                                             text="Go to Car Profile"
-                                            width={150}
+                                            width={155}
                                             outlined={true}
                                             onClick={() =>
                                                 handleNavigation(
