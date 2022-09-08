@@ -44,7 +44,7 @@ const retrieveTradeUnits = (id) => {
 }
 
 const updateSingleTrade = (id, data) => {
-    return fetchWrapper.put(`${baseUrl}/trades/${id}/`, data)
+    return fetchWrapper.patch(`${baseUrl}/trades/${id}/`, data)
         .then((response) => {
             return {status: true, data: response}
         })

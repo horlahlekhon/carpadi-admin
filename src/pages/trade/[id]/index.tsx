@@ -47,7 +47,8 @@ function TradeProfilePage({pageId}) {
         bts_time: null,
         date_of_sale: null,
         sold_slots_price: 0,
-        carpadi_rot: 0
+        carpadi_rot: 0,
+        total_carpadi_rot: 0
     })
 
     useEffect(() => {
@@ -352,7 +353,7 @@ function TradeProfilePage({pageId}) {
                                             Projected Carpai Profit on Trade
                                         </Typography>
                                         <Typography
-                                            variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
+                                            variant="h5">&#8358; {formatNumber(tradeData?.total_carpadi_rot)}</Typography>
                                     </PriceCard>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -688,7 +689,7 @@ function TradeProfilePage({pageId}) {
                                                     <Typography variant="body1">
                                                         Estimated Carpadi minimum Profit on Sales
                                                     </Typography>
-                                                    <Typography variant="h5">&#8358; NA</Typography>
+                                                    <Typography variant="h5">&#8358; {formatNumber(tradeData?.estimated_return_on_trade)}</Typography>
                                                 </PriceCard>
                                                 {/*<PriceCard*/}
                                                 {/*    style={{*/}
