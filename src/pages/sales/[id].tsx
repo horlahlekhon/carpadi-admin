@@ -172,11 +172,11 @@ function SalesProfilePage({pageId}) {
 
     function saveSale() {
         updateSale(saleId, {
-            ...sale,
             car: sale?.car?.id,
             features: sale?.car_features || [],
             images: sale?.product_images || [],
-            status: state?.saleActive ? 'active' : 'inactive'
+            status: state?.saleActive ? 'active' : 'inactive',
+            selling_price: sale?.selling_price
         })
             .then((res) => {
                 if (res.status) {
@@ -354,14 +354,14 @@ function SalesProfilePage({pageId}) {
                         </Typography>
                         <div className="cta">
                             <span>Set As Active</span>
-                            <Switch checked={state.saleActive}
-                                    onChange={handleChange}
-                                    name="saleActive" color='primary'></Switch>
-                            {/*<ToggleSwitch*/}
-                            {/*    checked={state.saleActive}*/}
-                            {/*    onChange={handleChange}*/}
-                            {/*    name="saleActive"*/}
-                            {/*/>*/}
+                            {/*<Switch checked={state.saleActive}*/}
+                            {/*        onChange={handleChange}*/}
+                            {/*        name="saleActive" color='primary'></Switch>*/}
+                            <ToggleSwitch
+                                checked={state.saleActive}
+                                onChange={handleChange}
+                                name="saleActive"
+                            />
                         </div>
                     </SalesStatus>
                     <Typography variant="h6" color="secondary">
@@ -502,14 +502,14 @@ function SalesProfilePage({pageId}) {
                                         <HeaderText className="status">Sales Status</HeaderText>
                                         <div className="cta">
                                             <span>Set As Active</span>
-                                            <Switch checked={state.saleActive}
-                                                    onChange={handleChange}
-                                                    name="saleActive" color='primary'></Switch>
-                                            {/*<ToggleSwitch*/}
-                                            {/*    checked={state.saleActive}*/}
-                                            {/*    onChange={handleChange}*/}
-                                            {/*    name="saleActive"*/}
-                                            {/*/>*/}
+                                            {/*<Switch checked={state.saleActive}*/}
+                                            {/*        onChange={handleChange}*/}
+                                            {/*        name="saleActive" color='primary'></Switch>*/}
+                                            <ToggleSwitch
+                                                checked={state.saleActive}
+                                                onChange={handleChange}
+                                                name="saleActive"
+                                            />
                                         </div>
                                     </SalesStatus>
                                 </FlexRow>

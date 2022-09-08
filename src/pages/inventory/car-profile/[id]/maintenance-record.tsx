@@ -138,8 +138,8 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                             "description": description,
                             "picture": spareP.part_picture,
                         },
-                        "car": carId,
-                        "type": CarMaintenanceTypes.SPARE_PART,
+                        // "car": carId,
+                        // "type": CarMaintenanceTypes.SPARE_PART,
                     }, spareP?.id)
                         .then((res) => {
                             if (res.status) {
@@ -217,8 +217,8 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                             "estimated_price": ex.cost,
                             "description": description,
                         },
-                        "car": carId,
-                        "type": CarMaintenanceTypes.EXPENSE
+                        // "car": carId,
+                        // "type": CarMaintenanceTypes.EXPENSE
                     }, ex?.id)
                         .then((res) => {
                             if (res.status) {
