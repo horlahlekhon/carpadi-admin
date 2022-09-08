@@ -11,6 +11,8 @@ import {toast, Toaster} from 'react-hot-toast'
 import {tradeService} from '../../../services/trade'
 import trade from "../index";
 import CPToast from "../../../components/shared/CPToast";
+import {TradeStates} from "../../../lib/enums";
+import {updateCar} from "../../../services/car";
 
 function TradeProfilePage({pageId}) {
     const router = useRouter()
@@ -120,6 +122,23 @@ function TradeProfilePage({pageId}) {
             })
     }
     const formatNumber = (number) => Number(number).toLocaleString()
+
+    function saveSoldPrice(sold_slots_price: number | undefined) {
+        if (sold_slots_price) {
+            updateCar(tradeData?.car?.id, {resale_price: sold_slots_price})
+                .then((response) => {
+                    if (response.status) {
+                        toast.success('Resale price updated!')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+        }
+    }
+
     return (
         <MainLayout>
             <Container>
@@ -181,8 +200,10 @@ function TradeProfilePage({pageId}) {
                                 marginRight="16px"
                                 bgColor={t.alertError}
                                 disabled={
-                                    String(tradeType).toLowerCase() === 'active' ||
-                                    String(tradeType).toLowerCase() === 'sold'
+                                    tradeData?.trade_status === TradeStates.ONGOING ||
+                                    tradeData?.trade_status === TradeStates.PURCHASED ||
+                                    tradeData?.trade_status === TradeStates.COMPLETED ||
+                                    tradeData?.trade_status === TradeStates.CLOSED
                                 }
                                 onClick={() => {
                                     showModal('deleteTrade', '')
@@ -204,7 +225,10 @@ function TradeProfilePage({pageId}) {
                                 width={150}
                                 outlined={true}
                                 marginRight="16px"
-                                disabled={String(tradeType).toLowerCase() === 'sold'}
+                                disabled={
+                                    tradeData?.trade_status === TradeStates.PURCHASED ||
+                                    tradeData?.trade_status === TradeStates.COMPLETED ||
+                                    tradeData?.trade_status === TradeStates.CLOSED}
                                 onClick={() => showModal('editTrade', 'Edit Trade')}
                             />
                             <Button
@@ -385,7 +409,7 @@ function TradeProfilePage({pageId}) {
                                         </div>
                                     </Statistic>
                                 </Grid>
-                                {String(tradeType).toLowerCase() !== 'sold' && (
+                                {(tradeData?.trade_status !== TradeStates.PURCHASED && tradeData?.trade_status !== TradeStates.COMPLETED) && (
                                     <>
                                         <Grid item xs={12}>
                                             <PriceCard>
@@ -406,7 +430,7 @@ function TradeProfilePage({pageId}) {
                                         {/*</Grid>*/}
                                     </>
                                 )}
-                                {String(tradeType).toLowerCase() === 'sold' && (
+                                {(tradeData?.trade_status === TradeStates.PURCHASED || tradeData?.trade_status === TradeStates.COMPLETED) && (
                                     <>
                                         {editDetails && (
                                             <>
@@ -438,8 +462,20 @@ function TradeProfilePage({pageId}) {
                                                         width="90%"
                                                         marginLeft="auto"
                                                         marginRight="auto"
-                                                        marginTop={40}
-                                                        onClick={() => saveTrade()}
+                                                        marginTop={20}
+                                                        onClick={() => saveSoldPrice(tradeData?.sold_slots_price)}
+                                                    />
+                                                </div> 
+                                                <div style={{width: '100%'}}>
+                                                    <Button
+                                                        text="Cancel"
+                                                        width="90%"
+                                                        marginLeft="auto"
+                                                        marginRight="auto"
+                                                        marginTop={10}
+                                                        outlined={true}
+                                                        bgColor={t.alertError}
+                                                        onClick={() => setEditDetails(false)}
                                                     />
                                                 </div>
                                             </>
@@ -452,7 +488,7 @@ function TradeProfilePage({pageId}) {
                                                             Trade Margin
                                                         </Typography>
                                                         <Typography
-                                                            variant="h5">&#8358; {formatNumber(tradeData?.carpadi_rot)}</Typography>
+                                                            variant="h5">&#8358; {formatNumber(tradeData?.total_carpadi_rot)}</Typography>
                                                     </PriceCard>
                                                 </Grid>
                                                 <Grid item xs={12}>
@@ -689,7 +725,8 @@ function TradeProfilePage({pageId}) {
                                                     <Typography variant="body1">
                                                         Estimated Carpadi minimum Profit on Sales
                                                     </Typography>
-                                                    <Typography variant="h5">&#8358; {formatNumber(tradeData?.estimated_return_on_trade)}</Typography>
+                                                    <Typography
+                                                        variant="h5">&#8358; {formatNumber(tradeData?.estimated_return_on_trade)}</Typography>
                                                 </PriceCard>
                                                 {/*<PriceCard*/}
                                                 {/*    style={{*/}
