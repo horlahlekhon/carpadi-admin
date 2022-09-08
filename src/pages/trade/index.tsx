@@ -361,8 +361,8 @@ function TradesPage({response}) {
                                         </TableCell>
                                         <TableCell align="left">{row.id.substring(row.id.length - 7)}</TableCell>
                                         <TableCell align="left">{row.slots_available}</TableCell>
-                                        <TableCell align="left">{row.slots_available - row.remaining_slots}</TableCell>
                                         <TableCell align="left">{row.remaining_slots}</TableCell>
+                                        <TableCell align="left">{row.slots_available - row.remaining_slots}</TableCell>
                                         <TableCell align="left">
                                             &#8358; {row.price_per_slot.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </TableCell>
