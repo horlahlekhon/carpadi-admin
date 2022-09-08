@@ -143,7 +143,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
         if (searchTerm === '' || searchTerm === undefined || searchTerm === null) {
             setCars(refCars)
         } else {
-            const filteredCars = [...refCars].filter(x => (x?.information?.model.toString().toLowerCase().includes(searchTerm.toLowerCase()) || x?.information?.make.toString().toLowerCase().includes(searchTerm.toLowerCase())))
+            const filteredCars = [...refCars].filter(x => (String(x?.information?.brand?.model).toLowerCase().includes(searchTerm.toLowerCase()) || String(x?.information?.brand?.name).toLowerCase().includes(searchTerm.toLowerCase())))
             setCars(filteredCars)
         }
     }
