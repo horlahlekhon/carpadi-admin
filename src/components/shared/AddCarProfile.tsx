@@ -146,7 +146,9 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             if (response.status) {
                                 toast.success('Created Successfully!')
                                 onClick()
-                                handleNavigation(`/car-profile/${response.data.id}?status=car listings`)
+                                if (response.data?.id) {
+                                    handleNavigation(`/car-profile/${response.data.id}?status=car listings`)
+                                }
                             } else {
                                 toast.error(response.data)
                             }
