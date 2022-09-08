@@ -17,7 +17,7 @@ import Checkbox from "../../../../components/shared/Checkbox";
 import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
 import {deleteCar, retrieveSingleCar, updateCar} from "../../../../services/car";
-import {CarStates, CarTransmissionTypes, FuelTypes, InspectionStates} from "../../../../lib/enums";
+import {CarStates, CarTransmissionTypes, FuelTypes, InspectionStates, TradeStates} from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
 import CPToast from "../../../../components/shared/CPToast";
 import {uploadFile} from "../../../../services/upload";
@@ -596,14 +596,14 @@ function CarProfilePage({pageId}) {
                                 <div className="key">Vehicle Age</div>
                                 <div className="value">{formatNumber(car?.information?.age) || 'NA'} Years</div>
                             </Detail>
-                            {['car listings'].includes(status) && (
+                            {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL].includes(car?.status) && (
                                 <Button text='Create Trade' width='100%' marginTop={30}
                                         disabled={car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)}
                                         title={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) ? 'Vehicle must be available for trade' : ''}
                                         onClick={() => setCreateTrade(true)}
                                 />
                             )}
-                            {['available for trade', 'ongoing trade', 'sold'].includes(status) && (
+                            {[CarStates.ONGOING_TRADE, CarStates.BOUGHT, CarStates.SOLD].includes(car?.status) && (
                                 <Button text='View Trade' width='100%' marginTop={30}
                                         onClick={() => handleNavigation(`/trade/${carId}`)}/>
                             )}
