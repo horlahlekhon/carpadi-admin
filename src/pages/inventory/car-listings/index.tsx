@@ -36,7 +36,7 @@ function CarListingsPage() {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
-        retrieveCarList(newPage - 1)
+        retrieveCarList((newPage - 1) * rowsPerPage)
     }
 
     const handleNavigation = (action: string) => {
@@ -67,6 +67,7 @@ function CarListingsPage() {
     const classes = useStyles()
 
     const retrieveCarList = (page = 0) => {
+        setCars([])
         retrieveCars(rowsPerPage, page, CarStates.ALL)
             .then((response) => {
                 if (response.status) {
@@ -147,7 +148,7 @@ function CarListingsPage() {
                                         key={idx}
                                     >
                                         <TableCell component="th" scope="row">
-                                            {idx}
+                                            {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                         </TableCell>
                                         <TableCell component="th" scope="row">
                                             <img src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
