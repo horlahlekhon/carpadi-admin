@@ -58,7 +58,8 @@ function TradeProfilePage({pageId}) {
     }, [])
 
     const handleTradeChange = (prop) => (event) => {
-        setTradeData({...tradeData, [prop]: event.target.value})
+        const pps = prop === 'slots_available' ? (Number(tradeData?.car?.bought_price) / Number(event.target.value)).toFixed(2) : tradeData.price_per_slot
+        setTradeData({...tradeData, [prop]: event.target.value, 'price_per_slot': pps})
     }
 
     const showModal = (viewName: string, title: string) => {
@@ -465,7 +466,7 @@ function TradeProfilePage({pageId}) {
                                                         marginTop={20}
                                                         onClick={() => saveSoldPrice(tradeData?.sold_slots_price)}
                                                     />
-                                                </div> 
+                                                </div>
                                                 <div style={{width: '100%'}}>
                                                     <Button
                                                         text="Cancel"
@@ -637,6 +638,7 @@ function TradeProfilePage({pageId}) {
                                             placeholder="Slot Quantity"
                                             label="Slot Quantity"
                                             value={tradeData.slots_available}
+                                            type='number'
                                             onChange={handleTradeChange('slots_available')}
                                         />
                                         <FlexRow className="input">
@@ -704,11 +706,7 @@ function TradeProfilePage({pageId}) {
                                                     </Typography>
                                                     <Typography variant="h5">
                                                         &#8358;{' '}
-                                                        {formatNumber(
-                                                            Number(tradeData.price_per_slot) *
-                                                            Number(tradeData.slots_available) +
-                                                            Number(tradeData.return_on_trade)
-                                                        )}
+                                                        {formatNumber(tradeData?.min_sale_price)}
                                                     </Typography>
                                                 </PriceCard>
                                                 <Statistic>
