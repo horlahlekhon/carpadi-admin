@@ -19,6 +19,7 @@ function TradeProfilePage({pageId}) {
     const tradeId = pageId || 'NA'
     const tradeType = router.query.type || 'NA'
     const [modalOpen, setModalState] = useState(false)
+    const [isLoading, setLoading] = useState(false)
     const [modalView, setModalView] = useState('')
     const [modalTitle, setModalTitle] = useState('')
     const [editDetails, setEditDetails] = useState(false)
@@ -33,7 +34,8 @@ function TradeProfilePage({pageId}) {
             image: '/images/Big-Default-Car.png',
             make: null,
             model: null,
-            maintenance_cost: 0
+            maintenance_cost: 0,
+            resale_price: 0
         },
         return_on_trade_per_unit: 0,
         total_users_trading: 0,
@@ -67,11 +69,9 @@ function TradeProfilePage({pageId}) {
         setModalTitle(title)
         setModalState(true)
     }
-
     const handleNavigation = (action: string) => {
         router.push(`${action}`)
     }
-
     const deleteTrade = () => {
         setModalState(false)
         tradeService
@@ -112,7 +112,6 @@ function TradeProfilePage({pageId}) {
                 setEditDetails(false)
             })
     }
-
     const retrieveTrade = () => {
         tradeService
             .retrieveSingleTrade(tradeId)
@@ -143,6 +142,70 @@ function TradeProfilePage({pageId}) {
                     toast.error(error.data)
                 })
         }
+    }
+
+    function completeTrade() {
+        setLoading(true)
+        tradeService
+            .updateSingleTrade(tradeId, {
+                trade_status: TradeStates.COMPLETED
+            })
+            .then((response) => {
+                if (response.status) {
+                    toast.success('Trade marked as completed')
+                    retrieveTrade()
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }
+
+    function settleTrade() {
+        tradeService
+            .disburseTradeROT(tradeId, {
+                car: tradeData?.car?.id
+            })
+            .then((response) => {
+                if (response.status) {
+                    toast.success('Trade settlement initiated!')
+                    retrieveTrade()
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
+    }
+
+    function rollbackTrade() {
+        tradeService
+            .rollbackTrade(tradeId, {
+                car: tradeData?.car?.id
+            })
+            .then((response) => {
+                if (response.status) {
+                    toast.success('Trade settlement rolled back!')
+                    retrieveTrade()
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     return (
@@ -200,17 +263,42 @@ function TradeProfilePage({pageId}) {
                         </div>
                         <div className="button-group">
                             <Button
+                                text="Complete Trade"
+                                width={150}
+                                outlined={true}
+                                marginRight="10px"
+                                marginLeft="16px"
+                                bgColor={t.alertSuccess}
+                                disabled={tradeData?.trade_status !== TradeStates.PURCHASED || tradeData?.remaining_slots > 0 || isLoading}
+                                title='All trade slots must be purchased or trade is already completed'
+                                onClick={() => {
+                                    completeTrade()
+                                }}
+                            />
+                            <Button
+                                text="Settle Trade"
+                                width={150}
+                                outlined={true}
+                                marginRight="10px"
+                                disabled={tradeData?.trade_status !== TradeStates.COMPLETED || tradeData?.remaining_slots > 0 || isLoading}
+                                title='Trade must be completed'
+                                onClick={() => {
+                                    settleTrade()
+                                }}
+                            />
+                            <Button
                                 text="Delete Trade"
                                 width={150}
                                 outlined={true}
-                                marginRight="16px"
+                                marginRight="10px"
                                 bgColor={t.alertError}
                                 disabled={
                                     tradeData?.trade_status === TradeStates.ONGOING ||
                                     tradeData?.trade_status === TradeStates.PURCHASED ||
                                     tradeData?.trade_status === TradeStates.COMPLETED ||
-                                    tradeData?.trade_status === TradeStates.CLOSED
+                                    tradeData?.trade_status === TradeStates.CLOSED || isLoading
                                 }
+                                title='Trade is already active'
                                 onClick={() => {
                                     showModal('deleteTrade', '')
                                 }}
@@ -219,28 +307,32 @@ function TradeProfilePage({pageId}) {
                                 text="Manage Trade"
                                 width={150}
                                 outlined={true}
-                                marginRight="16px"
+                                marginRight="10px"
                                 onClick={() => {
                                     handleNavigation(
                                         `/trade/${tradeId}/manage-trade?status=${tradeType}`
                                     )
                                 }}
+                                disabled={isLoading}
                             />
                             <Button
                                 text="Edit Trade"
                                 width={150}
                                 outlined={true}
-                                marginRight="16px"
+                                marginRight="10px"
                                 disabled={
                                     tradeData?.trade_status === TradeStates.PURCHASED ||
                                     tradeData?.trade_status === TradeStates.COMPLETED ||
-                                    tradeData?.trade_status === TradeStates.CLOSED}
+                                    tradeData?.trade_status === TradeStates.CLOSED || isLoading
+                                }
+                                title='Trade is already purchased'
                                 onClick={() => showModal('editTrade', 'Edit Trade')}
                             />
                             <Button
                                 text="Go to Car Profile"
                                 width={155}
                                 outlined={true}
+                                disabled={isLoading}
                                 onClick={() =>
                                     handleNavigation(
                                         `/inventory/car-profile/${tradeData.car.id}?status=car listings`
@@ -458,7 +550,7 @@ function TradeProfilePage({pageId}) {
                                                         label="Enter price"
                                                         fullWidth
                                                         type="number"
-                                                        value={tradeData.sold_slots_price}
+                                                        value={tradeData?.car?.resale_price || tradeData.sold_slots_price}
                                                         onChange={handleTradeChange('sold_slots_price')}
                                                     ></TextField>
                                                 </FlexRow>
@@ -513,7 +605,7 @@ function TradeProfilePage({pageId}) {
                                                             }}
                                                         >
                                                             <Typography variant="h5">
-                                                                &#8358; {formatNumber(tradeData.sold_slots_price)}
+                                                                &#8358; {formatNumber(tradeData?.car?.resale_price || tradeData.sold_slots_price)}
                                                             </Typography>
                                                             <Button
                                                                 text="Edit Sold Price"

@@ -1,5 +1,6 @@
 import getConfig from 'next/config';
 import {fetchWrapper} from '../helpers/fetchWrapper';
+
 const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
@@ -53,6 +54,26 @@ const updateSingleTrade = (id, data) => {
         })
 }
 
+const disburseTradeROT = (id, data) => {
+    return fetchWrapper.post(`${baseUrl}/trades/disburse-rots/`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
+const rollbackTrade = (id, data) => {
+    return fetchWrapper.post(`${baseUrl}/trades/rollback-trade/`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
 const createSingleTrade = (data) => {
     return fetchWrapper.post(`${baseUrl}/trades/`, data)
         .then((response) => {
@@ -92,5 +113,7 @@ export const tradeService = {
     updateSingleTrade,
     deleteSingleTrade,
     createSingleTrade,
-    retrieveUserTrades
+    retrieveUserTrades,
+    disburseTradeROT,
+    rollbackTrade
 }
