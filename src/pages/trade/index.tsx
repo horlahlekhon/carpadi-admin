@@ -44,18 +44,11 @@ function TradesPage({response}) {
     })
     const [tradeStats, setTradeStats] = useState(
         {
-            "active_trades": {
-                "trading_users": 0,
-                "active_trades": 0
-            },
-            "sold_trades": {
-                "trading_users": 0,
-                "sold_trades": 0
-            },
-            "closed_trades": {
-                "trading_users": 0,
-                "closed_trades": 0
-            }
+            "active_trades": {"trading_users": 0, "active_trades": 0},
+            "sold_trades": {"trading_users": 0, "sold_trades": 0},
+            "closed_trades": {"trading_users": 0, "closed_trades": 0},
+            "expired_trades": {"trading_users": 0, "expired_trades": 0},
+            "purchased_trades": {"trading_users": 0, "purchased_trades": 0}
         }
     )
 
@@ -257,13 +250,13 @@ function TradesPage({response}) {
                             variant="h5"
                             color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
                         >
-                            NA
+                            {tradeStats?.purchased_trades?.purchased_trades}
                         </Typography>
                         <Typography
                             variant="inherit"
                             color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
                         >
-                            with NA Users
+                            with {tradeStats?.purchased_trades?.trading_users} Users
                         </Typography>
                     </StatsCard>
                 </Grid>
@@ -321,13 +314,13 @@ function TradesPage({response}) {
                             variant="h5"
                             color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
                         >
-                            NA
+                            {tradeStats?.expired_trades?.expired_trades}
                         </Typography>
                         <Typography
                             variant="inherit"
                             color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
                         >
-                            with NA Users
+                            with {tradeStats?.expired_trades?.trading_users} Users
                         </Typography>
                     </StatsCard>
                 </Grid>
