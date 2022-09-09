@@ -55,7 +55,7 @@ const updateSingleTrade = (id, data) => {
 }
 
 const disburseTradeROT = (id, data) => {
-    return fetchWrapper.post(`${baseUrl}/trades/disburse-rots/`, data)
+    return fetchWrapper.post(`${baseUrl}/trades/disburse-rots/?trade=${id}`, data)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -65,7 +65,7 @@ const disburseTradeROT = (id, data) => {
 }
 
 const rollbackTrade = (id, data) => {
-    return fetchWrapper.post(`${baseUrl}/trades/rollback-trade/`, data)
+    return fetchWrapper.post(`${baseUrl}/trades/rollback-trade/?trade=${id}`, data)
         .then((response) => {
             return {status: true, data: response}
         })

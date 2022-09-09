@@ -176,11 +176,15 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
 
     const saveTrade = () => {
         setLoading(true)
-        trade['car'] = selectedCar?.id
-        trade['trade_status'] = 'pending'
-        trade['min_sale_price'] = minSellingPrice
-        trade['estimated_return_on_trade'] = Number((Number(minSellingPrice) - (Number(selectedCar?.bought_price) + Number(selectedCar?.cost_of_repairs) + Number(selectedCar?.maintenance_cost))).toFixed(2))
-        return tradeService.createSingleTrade(trade)
+        let tradeX = {}
+        tradeX['slots_available'] = trade?.slots_available
+        tradeX['estimated_sales_duration'] = trade?.estimated_sales_duration
+        tradeX['bts_time'] = trade?.bts_time
+        tradeX['car'] = selectedCar?.id
+        tradeX['trade_status'] = 'pending'
+        tradeX['min_sale_price'] = minSellingPrice
+        tradeX['estimated_return_on_trade'] = Number((Number(minSellingPrice) - (Number(selectedCar?.bought_price) + Number(selectedCar?.cost_of_repairs) + Number(selectedCar?.maintenance_cost))).toFixed(2))
+        return tradeService.createSingleTrade(tradeX)
             .then((data) => {
                 if (data.status) {
                     toast.success('Trade Created')

@@ -281,7 +281,7 @@ function TradeProfilePage({pageId}) {
                                 outlined={true}
                                 marginRight="10px"
                                 disabled={tradeData?.trade_status !== TradeStates.COMPLETED || tradeData?.remaining_slots > 0 || isLoading}
-                                title='Trade must be completed'
+                                title='Trade must be completed or is already settled'
                                 onClick={() => {
                                     settleTrade()
                                 }}
