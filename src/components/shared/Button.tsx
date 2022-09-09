@@ -21,8 +21,8 @@ const Btn = ({
                  }
              }) => {
     return (
-        <Tooltip title={title} placement='left'>
-            <Button
+        <Tooltip title={disabled ? title : ''} placement='top'>
+            <span><Button
                 variant={outlined ? 'outlined' : 'contained'}
                 className={classes.btn}
                 disableElevation
@@ -45,7 +45,7 @@ const Btn = ({
                 onClick={onClick}
             >
                 {text || 'Button'}
-            </Button>
+            </Button></span>
         </Tooltip>
     )
 }
