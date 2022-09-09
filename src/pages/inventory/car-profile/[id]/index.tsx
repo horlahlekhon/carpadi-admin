@@ -491,11 +491,11 @@ function CarProfilePage({pageId}) {
                                     </ImageGrid>
                                 </div>
                                 <Button text="Create Sales Profile" width='100%' outlined={true}
-                                        disabled={!car?.inspection || car?.inspection?.status !== InspectionStates.COMPLETED}
+                                        disabled={!car?.inspection || car?.inspection?.status !== InspectionStates.COMPLETED || car?.status === CarStates.SOLD}
                                         title={(!car?.inspection || car?.inspection?.status !== InspectionStates.COMPLETED) ? 'Inspection must be completed' : ''}
                                         onClick={() => setCreateSale(true)}/>
                                 <Button text="Maintenance Record" width='100%' outlined={true} marginTop={16}
-                                        disabled={!car?.inspection || car?.inspection?.status === InspectionStates.PENDING}
+                                        disabled={!car?.inspection || car?.inspection?.status === InspectionStates.PENDING || car?.status === CarStates.SOLD}
                                         title={(!car?.inspection || car?.inspection?.status === InspectionStates.PENDING) ? 'Inspection must be completed' : ''}
                                         marginBottom={30}
                                         onClick={() => handleNavigation(`/inventory/car-profile/${car.id}/maintenance-record?status=${status}`)}/>
@@ -539,7 +539,7 @@ function CarProfilePage({pageId}) {
                                 </CheckItem>
                                 <CheckItem style={{background: status === 'archived' ? t.alertSuccessLite : ''}}>
                                     <span>Add to Archived</span>
-                                    <Checkbox color='primary' checked={car.status === CarStates.ARCHIVED.valueOf()}/>
+                                    <Checkbox color='primary' checked={car.status === CarStates.ARCHIVED.valueOf()} disabled/>
                                 </CheckItem>
                             </Flex>
                         </div>
