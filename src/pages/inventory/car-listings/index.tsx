@@ -36,7 +36,7 @@ function CarListingsPage() {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
-        retrieveCarList(newPage - 1)
+        retrieveCarList((newPage - 1) * rowsPerPage)
     }
 
     const handleNavigation = (action: string) => {
@@ -67,6 +67,7 @@ function CarListingsPage() {
     const classes = useStyles()
 
     const retrieveCarList = (page = 0) => {
+        setCars([])
         retrieveCars(rowsPerPage, page, CarStates.ALL)
             .then((response) => {
                 if (response.status) {
@@ -130,6 +131,7 @@ function CarListingsPage() {
                                 <TableCell>No</TableCell>
                                 <TableCell align="left">Image</TableCell>
                                 <TableCell align="left">VIN</TableCell>
+                                <TableCell align="left">Status</TableCell>
                                 <TableCell align="left">Make</TableCell>
                                 <TableCell align="left">Model</TableCell>
                                 <TableCell align="left">Year</TableCell>
@@ -146,18 +148,20 @@ function CarListingsPage() {
                                         key={idx}
                                     >
                                         <TableCell component="th" scope="row">
-                                            {idx}
+                                            {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                         </TableCell>
                                         <TableCell component="th" scope="row">
                                             <img src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
                                                  height={48}/>
                                         </TableCell>
                                         <TableCell align="left">{row.vin}</TableCell>
+                                        <TableCell align="left"
+                                                   style={{textTransform: 'lowercase'}}>{row?.status}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.name}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.model}</TableCell>
                                         <TableCell align="left">{row?.information?.brand?.year}</TableCell>
                                         <TableCell align="left">{row?.information?.fuel_type}</TableCell>
-                                        <TableCell align="left">
+                                        <TableCell align="left" style={{textTransform: 'lowercase'}}>
                                             {row?.information?.transmission}
                                         </TableCell>
                                         <TableCell align="left">{formatDate(row?.information?.created)}</TableCell>

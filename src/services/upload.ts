@@ -15,11 +15,12 @@ const preset = `${publicRuntimeConfig.cloudinaryPreset}`;
  * @param actionName
  * @param file [Required]
  */
-const uploadFile = (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload',) => {
+const uploadFile = (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload') => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('upload_preset', preset);
     formData.append('public_id', `${uploadType}_${resourceId}_${randomString()}`);
+    // formData.append('transformation', 'w_600,h_410');
     return fetch(`${baseUrl}/${actionName}`, {method: 'POST', body: formData})
         .then(async (response) => {
             let res = await response.json()

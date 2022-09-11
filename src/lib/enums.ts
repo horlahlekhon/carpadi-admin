@@ -4,6 +4,7 @@ enum CarStates {
     INSPECTED = 'inspected',
     NEW = 'new',
     FAILED_INSPECTION = "failed_inspection",
+    ONGOING_INSPECTION = "ongoing_inspection",
     AVAILABLE = "available",
     ONGOING_TRADE = "ongoing_trade",
     BOUGHT = "bought",
@@ -26,6 +27,7 @@ enum CarMaintenanceTypes {
 enum CarTransmissionTypes {
     MANUAL = "manual",
     AUTOMATIC = "automatic",
+    STANDARD = "standard",
 }
 
 enum FuelTypes {
@@ -69,6 +71,22 @@ enum UploadTypes {
     ANY = 'any'
 }
 
+enum ActivityTypes {
+    Transaction = "transaction",
+    TradeUnit = "trade_unit",
+    Disbursement = "disbursement",
+    CarCreation = "car_creation",
+    NewUser = "new_user",
+}
+
+enum TransactionStates {
+    Unsettled = "unsettled",
+    Success = "success",
+    Failed = "failed",
+    Cancelled = "cancelled",
+    Pending = "pending",
+}
+
 export {
     CarStates,
     TradeStates,
@@ -77,5 +95,7 @@ export {
     FuelTypes,
     CarTypes,
     InspectionStates,
-    UploadTypes
+    UploadTypes,
+    ActivityTypes,
+    TransactionStates
 }

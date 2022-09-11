@@ -21,12 +21,15 @@ import {usePagination} from '@material-ui/lab/Pagination'
 import {tradeService} from '../../services/trade'
 import {toast, Toaster} from "react-hot-toast";
 import Moment from 'moment';
+import CPToast from "../../components/shared/CPToast";
 
 function TradesPage({response}) {
     enum Trades {
         ACTIVE = 'Active',
         SOLD = 'Sold',
-        CLOSED = 'Closed'
+        CLOSED = 'Closed',
+        PURCHASED = 'Purchased',
+        EXPIRED = 'Expired'
     }
 
     const rowsPerPage = 10
@@ -41,18 +44,11 @@ function TradesPage({response}) {
     })
     const [tradeStats, setTradeStats] = useState(
         {
-            "active_trades": {
-                "trading_users": 0,
-                "active_trades": 0
-            },
-            "sold_trades": {
-                "trading_users": 0,
-                "sold_trades": 0
-            },
-            "closed_trades": {
-                "trading_users": 0,
-                "closed_trades": 0
-            }
+            "active_trades": {"trading_users": 0, "active_trades": 0},
+            "sold_trades": {"trading_users": 0, "sold_trades": 0},
+            "closed_trades": {"trading_users": 0, "closed_trades": 0},
+            "expired_trades": {"trading_users": 0, "expired_trades": 0},
+            "purchased_trades": {"trading_users": 0, "purchased_trades": 0}
         }
     )
 
@@ -141,23 +137,7 @@ function TradesPage({response}) {
 
     return (
         <Container>
-            <div>
-                <Toaster
-                    position="top-right"
-                    toastOptions={{
-                        style: {
-                            border: '1px solid #243773',
-                            padding: '16px',
-                            fontWeight: 'bold',
-                            color: '#243773'
-                        },
-                        iconTheme: {
-                            primary: '#243773',
-                            secondary: '#FFFAEE'
-                        }
-                    }}
-                />
-            </div>
+            <CPToast/>
             <Header>
                 <Typography variant="h4">
                     <b>Trade</b>
@@ -184,7 +164,7 @@ function TradesPage({response}) {
                 </div>
             </Breadcrumbs>
             <Grid container spacing={3} style={{marginTop: 21, marginBottom: 15}}>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                     <StatsCard
                         onClick={() => {
                             setSelected(Trades.ACTIVE);
@@ -200,7 +180,7 @@ function TradesPage({response}) {
                             variant="inherit"
                             color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
                         >
-                            Active
+                            Ongoing
                         </Typography>
                         <Typography
                             variant="h5"
@@ -216,7 +196,7 @@ function TradesPage({response}) {
                         </Typography>
                     </StatsCard>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={2}>
                     <StatsCard
                         onClick={() => {
                             setSelected(Trades.SOLD);
@@ -232,7 +212,7 @@ function TradesPage({response}) {
                             variant="inherit"
                             color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
                         >
-                            Sold
+                            Completed
                         </Typography>
                         <Typography
                             variant="h5"
@@ -248,7 +228,39 @@ function TradesPage({response}) {
                         </Typography>
                     </StatsCard>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={2}>
+                    <StatsCard
+                        onClick={() => {
+                            setSelected(Trades.PURCHASED);
+                            setPage(0);
+                            retrieveTrades('purchased')
+                        }}
+                        style={{
+                            border:
+                                selectedTrade === Trades.PURCHASED ? '3px solid #00AEEF' : 'none'
+                        }}
+                    >
+                        <Typography
+                            variant="inherit"
+                            color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                        >
+                            Purchased
+                        </Typography>
+                        <Typography
+                            variant="h5"
+                            color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                        >
+                            {tradeStats?.purchased_trades?.purchased_trades}
+                        </Typography>
+                        <Typography
+                            variant="inherit"
+                            color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                        >
+                            with {tradeStats?.purchased_trades?.trading_users} Users
+                        </Typography>
+                    </StatsCard>
+                </Grid>
+                <Grid item xs={2}>
                     <StatsCard
                         onClick={() => {
                             setSelected(Trades.CLOSED);
@@ -277,6 +289,38 @@ function TradesPage({response}) {
                             color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
                         >
                             with {tradeStats.closed_trades.trading_users} Users
+                        </Typography>
+                    </StatsCard>
+                </Grid>
+                <Grid item xs={3}>
+                    <StatsCard
+                        onClick={() => {
+                            setSelected(Trades.EXPIRED);
+                            setPage(0);
+                            retrieveTrades('expired')
+                        }}
+                        style={{
+                            border:
+                                selectedTrade === Trades.EXPIRED ? '3px solid #00AEEF' : 'none'
+                        }}
+                    >
+                        <Typography
+                            variant="inherit"
+                            color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                        >
+                            Expired
+                        </Typography>
+                        <Typography
+                            variant="h5"
+                            color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                        >
+                            {tradeStats?.expired_trades?.expired_trades}
+                        </Typography>
+                        <Typography
+                            variant="inherit"
+                            color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                        >
+                            with {tradeStats?.expired_trades?.trading_users} Users
                         </Typography>
                     </StatsCard>
                 </Grid>
@@ -310,8 +354,8 @@ function TradesPage({response}) {
                                         </TableCell>
                                         <TableCell align="left">{row.id.substring(row.id.length - 7)}</TableCell>
                                         <TableCell align="left">{row.slots_available}</TableCell>
-                                        <TableCell align="left">{row.slots_available - row.remaining_slots}</TableCell>
                                         <TableCell align="left">{row.remaining_slots}</TableCell>
+                                        <TableCell align="left">{row.slots_available - row.remaining_slots}</TableCell>
                                         <TableCell align="left">
                                             &#8358; {row.price_per_slot.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </TableCell>

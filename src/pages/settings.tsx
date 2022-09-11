@@ -39,7 +39,7 @@ function SettingsPage() {
         showPassword: false,
         password: '',
         oldPassword: '',
-        confirmPassword: '',
+        confirmPassword: ''
     })
 
     const [fees, setFees] = useState({
@@ -49,7 +49,9 @@ function SettingsPage() {
         "carpadi_trade_rot_percentage": 0,
         "merchant_trade_rot_percentage": 0,
         "transfer_fee": 0,
-        "close_trade_fee": 0
+        "close_trade_fee": 0,
+        "carpadi_commision": 0,
+        "bonus_percentage": 0
     })
 
 
@@ -58,7 +60,7 @@ function SettingsPage() {
         if (currentTab === 'payment-setup') {
             return
         } else if (currentTab === 'fee-management') {
-            if (fees.merchant_trade_rot_percentage > 0 && fees.carpadi_trade_rot_percentage > 0 && fees.transfer_fee > 0 && fees.close_trade_fee > 0) {
+            if (fees.merchant_trade_rot_percentage > 0 && fees.carpadi_commision > 0 && fees.transfer_fee > 0 && fees.close_trade_fee > 0) {
                 updateSetting(fees.id, fees)
                     .then((res) => {
                         if (res.status) {
@@ -338,8 +340,8 @@ function SettingsPage() {
                                         placeholder="Enter Percentage"
                                         style={{width: 400}}
                                         type='number'
-                                        value={fees?.carpadi_trade_rot_percentage}
-                                        onChange={(e) => handleFeeChange('carpadi_trade_rot_percentage', e.target.value)}
+                                        value={fees?.carpadi_commision}
+                                        onChange={(e) => handleFeeChange('carpadi_commision', e.target.value)}
                                     ></TextField>
                                 </FlexRow>
                             </FlexRow>

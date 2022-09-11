@@ -1,6 +1,4 @@
-import {BehaviorSubject} from 'rxjs';
 import getConfig from 'next/config';
-import Router from 'next/router'
 import {fetchWrapper} from '../helpers/fetchWrapper';
 
 const {publicRuntimeConfig} = getConfig();
@@ -47,7 +45,27 @@ const retrieveTradeUnits = (id) => {
 }
 
 const updateSingleTrade = (id, data) => {
-    return fetchWrapper.put(`${baseUrl}/trades/${id}/`, data)
+    return fetchWrapper.patch(`${baseUrl}/trades/${id}/`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
+const disburseTradeROT = (id, data) => {
+    return fetchWrapper.post(`${baseUrl}/trades/disburse-rots/?trade=${id}`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
+const rollbackTrade = (id, data) => {
+    return fetchWrapper.post(`${baseUrl}/trades/rollback-trade/?trade=${id}`, data)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -78,7 +96,7 @@ const deleteSingleTrade = (id) => {
 }
 
 const retrieveUserTrades = (merchantId, status = 'purchased') => {
-    return fetchWrapper.get(`${baseUrl}/trades?limit=${50}&offset=${0}&merchant=${merchantId}&trade_status=${status}`)
+    return fetchWrapper.get(`${baseUrl}/trade-units?limit=${50}&offset=${0}&merchant=${merchantId}&trade_status=${status}`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -95,5 +113,7 @@ export const tradeService = {
     updateSingleTrade,
     deleteSingleTrade,
     createSingleTrade,
-    retrieveUserTrades
+    retrieveUserTrades,
+    disburseTradeROT,
+    rollbackTrade
 }

@@ -18,7 +18,7 @@ import styled from "styled-components";
 import {useRouter} from "next/router";
 import {tradeService} from "../../services/trade";
 import {retrieveCars} from "../../services/car";
-import {formatDate, trimString} from "../../helpers/formatters";
+import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import {retrieveSettings} from "../../services/setting";
 import {CarStates} from "../../lib/enums";
 
@@ -50,11 +50,16 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
         "carpadi_trade_rot_percentage": 0,
         "merchant_trade_rot_percentage": 0,
         "transfer_fee": 0,
-        "close_trade_fee": 0
+        "close_trade_fee": 0,
+        "carpadi_commision": 0,
+        "bonus_percentage": 0
     })
-    const [pricePerslot, setPPS] = useState((Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(trade.slots_available))
+    const [pricePerslot, setPPS] = useState((Number(selectedCar?.bought_price || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(trade.slots_available))
     const [extimatedRot, setEROT] = useState((Number(pricePerslot) * (Number(fees?.merchant_trade_rot_percentage) / 100)))
-    const [minSellingPrice, setMSP] = useState(((Number(pricePerslot) * (Number(fees?.carpadi_trade_rot_percentage) / 100)) * trade.slots_available))
+    const [minSellingPrice, setMSP] = useState(((Number(pricePerslot) * (Number(fees?.carpadi_commision) / 100)) * trade.slots_available))
+    const [ROT, setROT] = useState((Number(pricePerslot) * (Number(fees?.merchant_trade_rot_percentage) / 100)))
+    const [minProfit, setMProfit] = useState((Number(pricePerslot) * (Number(fees?.merchant_trade_rot_percentage) / 100)))
+
 
     const options = {
         addCar: {
@@ -70,14 +75,24 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
     const handleTradeChange = (prop) => (event) => {
         setTrade({...trade, [prop]: event.target.value})
         if (prop === 'slots_available') {
-            const pps = (Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(event.target.value)
+            const pps = (Number(selectedCar?.bought_price || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(event.target.value)
             // @ts-ignore
             setPPS(pps.toFixed(2))
-            const erot = (Number(pps) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+            // const erot = (Number(pps) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+
+            const rot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+            // @ts-ignore
+            setROT(rot.toFixed(2))
+
+            const mProfit = (rot * (Number(fees?.carpadi_commision) / 100))
+            // @ts-ignore
+            setMProfit(mProfit.toFixed(2))
+
+            const erot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100))
             // @ts-ignore
             setEROT(erot.toFixed(2))
             // @ts-ignore
-            setMSP(((((Number(fees?.carpadi_trade_rot_percentage) / 100)) * ((pps + erot) * Number(event.target.value))) + Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)).toFixed(2))
+            setMSP((rot + (Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost))).toFixed(2))
         }
     }
 
@@ -86,11 +101,20 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
         const pps = (Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)) / Number(value)
         // @ts-ignore
         setPPS(pps.toFixed(2))
-        const erot = (Number(pps) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+
+        const rot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+        // @ts-ignore
+        setROT(rot.toFixed(2))
+
+        const mProfit = (rot * (Number(fees?.carpadi_commision) / 100))
+        // @ts-ignore
+        setMProfit(mProfit.toFixed(2))
+
+        const erot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100))
         // @ts-ignore
         setEROT(erot.toFixed(2))
         // @ts-ignore
-        setMSP(((((Number(fees?.carpadi_trade_rot_percentage) / 100)) * ((pps + erot) * Number(value))) + Number(selectedCar?.bought_price || 0) + Number(selectedCar?.cost_of_repairs || 0) + Number(selectedCar?.maintenance_cost || 0)).toFixed(2))
+        setMSP((rot + (Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost))).toFixed(2))
 
     }
 
@@ -119,7 +143,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
         if (searchTerm === '' || searchTerm === undefined || searchTerm === null) {
             setCars(refCars)
         } else {
-            const filteredCars = [...refCars].filter(x => (x?.information?.model.toString().toLowerCase().includes(searchTerm.toLowerCase()) || x?.information?.make.toString().toLowerCase().includes(searchTerm.toLowerCase())))
+            const filteredCars = [...refCars].filter(x => (String(x?.information?.brand?.model).toLowerCase().includes(searchTerm.toLowerCase()) || String(x?.information?.brand?.name).toLowerCase().includes(searchTerm.toLowerCase())))
             setCars(filteredCars)
         }
     }
@@ -152,15 +176,17 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
 
     const saveTrade = () => {
         setLoading(true)
-        trade['car'] = selectedCar?.id
-        trade['trade_status'] = 'pending'
-        trade['min_sale_price'] = minSellingPrice
-        trade['estimated_return_on_trade'] = Number((Number(minSellingPrice) - (Number(selectedCar?.bought_price) + Number(selectedCar?.cost_of_repairs) + Number(selectedCar?.maintenance_cost))).toFixed(2))
-        return tradeService.createSingleTrade(trade)
+        let tradeX = {
+            slots_available: trade?.slots_available,
+            estimated_sales_duration: trade?.estimated_sales_duration,
+            car: selectedCar?.id,
+        }
+        return tradeService.createSingleTrade(tradeX)
             .then((data) => {
                 if (data.status) {
                     toast.success('Trade Created')
                     onClick()
+                    handleNavigation(`/trade/${data.data.id}`)
                 } else {
                     toast.error(data?.data || "An error occurred")
                 }
@@ -298,16 +324,15 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                     </Table>
                                 </TableContainer>
                             </TableCard>
-                            <div style={{display: 'flex', marginTop: 20}}>
-                                <Button
-                                    text="Proceed"
-                                    width={510}
-                                    marginLeft="auto"
-                                    marginRight="auto"
-                                    onClick={() => setModalView('createTrade')}
-                                    disabled={selectedCar === null}
-                                />
-                            </div>
+                            <Button
+                                text="Proceed"
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={20}
+                                onClick={() => setModalView('createTrade')}
+                                disabled={selectedCar === null}
+                            />
                         </>
                     )
                     }
@@ -342,7 +367,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                     </VehicleDetails>
                                     <Button
                                         text="Go to Car Profile"
-                                        width={150}
+                                        width={155}
                                         outlined={true}
                                         onClick={() => handleNavigation(`/inventory/car-profile/${selectedCar?.id}?status=${selectedCar?.status}`)}
                                     />
@@ -423,11 +448,13 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                 <Typography variant="body1">
                                                     Total Slot Price + Total ROT
                                                 </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
+                                                <Typography
+                                                    variant="h5">&#8358; {formatNumber((Number(pricePerslot) * Number(trade?.slots_available)) + Number(ROT))}</Typography>
                                             </PriceCard>
                                             <Statistic>
                                                 <div className="key">Initial + ROT</div>
-                                                <div className="value">&#8358; 0.00</div>
+                                                <div
+                                                    className="value">&#8358; {formatNumber((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) + Number(ROT))}</div>
                                             </Statistic>
                                             <Statistic>
                                                 <div className="key">Sold Slot Price</div>
@@ -437,7 +464,8 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                 <Typography variant="body1">
                                                     Estimated Carpadi minimum Profit on Sales
                                                 </Typography>
-                                                <Typography variant="h5">&#8358; 0.00</Typography>
+                                                <Typography
+                                                    variant="h5">&#8358; {formatNumber(minProfit)}</Typography>
                                             </PriceCard>
                                             {/*<PriceCard*/}
                                             {/*    style={{*/}

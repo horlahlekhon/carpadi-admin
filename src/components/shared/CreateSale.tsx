@@ -176,8 +176,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
         if (searchTerm === '' || searchTerm === undefined || searchTerm === null) {
             setCars(refCars)
         } else {
-            const filteredCars = [...refCars].filter(x => (x?.information?.model.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-                x?.information?.make.toString().toLowerCase().includes(searchTerm.toLowerCase())))
+            const filteredCars = [...refCars].filter(x => (String(x?.information?.brand?.model).toLowerCase().includes(searchTerm.toLowerCase()) || String(x?.information?.brand?.name).toLowerCase().includes(searchTerm.toLowerCase())))
             setCars(filteredCars)
         }
     }
@@ -396,16 +395,15 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 </Table>
                             </TableContainer>
                         </TableCard>
-                        <div style={{display: 'flex', marginTop: 20}}>
-                            <Button
-                                text="Proceed"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                onClick={() => setModalView('addCarDetails')}
-                                disabled={selectedCar === null}
-                            />
-                        </div>
+                        <Button
+                            text="Proceed"
+                            width={510}
+                            marginLeft="auto"
+                            marginRight="auto"
+                            marginTop={20}
+                            onClick={() => setModalView('addCarDetails')}
+                            disabled={selectedCar === null}
+                        />
                     </>
                 )
                 }
@@ -533,15 +531,14 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 </div>
                             ))}
                         </InputGrid>
-                        <div style={{display: 'flex', marginTop: 70}}>
-                            <Button
-                                text="Proceed"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                onClick={() => setModalView('viewCarSummary')}
-                            />
-                        </div>
+                        <Button
+                            text="Proceed"
+                            width={510}
+                            marginLeft="auto"
+                            marginRight="auto"
+                            marginTop={70}
+                            onClick={() => setModalView('viewCarSummary')}
+                        />
                     </>
                 )}
                 {modalView === 'viewCarSummary' && (
@@ -630,16 +627,15 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                     />
                                 </div>
                             </SalesStatus>
-                            <div style={{display: 'flex', marginTop: 70}}>
-                                <Button
-                                    text={isLoading ? "Loading..." : "Create Sales Profile"}
-                                    width={510}
-                                    marginLeft="auto"
-                                    marginRight="auto"
-                                    disabled={isLoading}
-                                    onClick={() => saveSale()}
-                                />
-                            </div>
+                            <Button
+                                text={isLoading ? "Loading..." : "Create Sales Profile"}
+                                width={510}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={70}
+                                disabled={isLoading}
+                                onClick={() => saveSale()}
+                            />
                         </Body>
                     </>
                 )}

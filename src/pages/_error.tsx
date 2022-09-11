@@ -1,12 +1,9 @@
-import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {Grid, Paper, Radio, Typography, withStyles} from '@material-ui/core'
-import Button from '../../components/shared/Button'
-import {t} from '../../styles/theme'
+import Button from '../components/shared/Button'
 import {useRouter} from "next/router";
 
 
-function ServerErrorPage() {
+function DefaultErrorPage() {
     const router = useRouter()
 
     return (
@@ -26,7 +23,7 @@ function ServerErrorPage() {
     )
 }
 
-export default ServerErrorPage
+export default DefaultErrorPage
 
 const Container = styled.div`
   display: flex;
