@@ -255,7 +255,10 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 placeholder="Number Plate"
                                 value={licence_plate}
                                 variant='standard'
-                                onChange={(e) => setPlate(e.target.value)}
+                                error={!(new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(licence_plate))}
+                                onChange={(e) => {
+                                    setPlate(e.target.value)
+                                }}
                             />
                             <TextField
                                 className="text-field"
@@ -393,7 +396,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             marginLeft="auto"
                             marginRight="auto"
                             marginTop={40}
-                            disabled={!licence_plate || !carColor || !car?.mileage || !bought_price}
+                            disabled={!licence_plate || !carColor || !car?.mileage || !(new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(licence_plate))}
                             onClick={() => setModalView('uploadCarImages')}
                         />
                     </>
