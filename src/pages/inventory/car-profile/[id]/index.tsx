@@ -590,11 +590,11 @@ function CarProfilePage({pageId}) {
                             </Detail>
                             <Detail>
                                 <div className="key">Current Mileage</div>
-                                <div className="value">{formatNumber(car?.information?.mileage) || 'NA'}</div>
+                                <div className="value">{formatNumber(car?.information?.mileage) || 'NA'} Km</div>
                             </Detail>
                             <Detail>
                                 <div className="key">Vehicle Age</div>
-                                <div className="value">{formatNumber(car?.information?.age) || 'NA'} Years</div>
+                                <div className="value">{formatNumber(car?.information?.age) || 'NA'}</div>
                             </Detail>
                             {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL].includes(car?.status) && (
                                 <Button text='Create Trade' width='100%' marginTop={30}
