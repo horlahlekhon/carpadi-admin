@@ -17,20 +17,86 @@ import Checkbox from "../../../../components/shared/Checkbox";
 import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
 import {deleteCar, retrieveSingleCar, updateCar} from "../../../../services/car";
-import {CarStates, CarTransmissionTypes, FuelTypes, InspectionStates, TradeStates} from "../../../../lib/enums";
+import {
+    CarStates,
+    CarTransmissionTypes,
+    FuelTypes,
+    InspectionStates,
+    TradeStates,
+    UploadTypes
+} from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
 import CPToast from "../../../../components/shared/CPToast";
 import {uploadFile} from "../../../../services/upload";
-import ntc from "../../../../lib/ntc";
 import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
 import {createInspection, retrieveInspection} from "../../../../services/inspection";
 import {authService} from "../../../../services/auth";
 import {getColorName} from "../../../../helpers/utils";
 import Moment from "moment";
+import Autocomplete from '@material-ui/lab/Autocomplete';
+import {Add} from "@material-ui/icons";
+import {doc} from "prettier";
+import {
+    createCarDocument,
+    deleteCarDocument,
+    retrieveCarDocuments,
+    updateCarDocument
+} from "../../../../services/car-documents";
 
 
 function CarProfilePage({pageId}) {
+    const carDocuments = [
+        {
+            "asset": null,
+            "name": 'Proof of ownership',
+            "description": 'Proof of ownership',
+            "car": null,
+            "is_preloaded": true
+        },
+        {
+            "asset": null,
+            "name": 'Allocation of plate number',
+            "description": 'Allocation of plate number',
+            "car": null,
+            "is_preloaded": true
+        },
+        {
+            "asset": null,
+            "name": 'Vehicle license',
+            "description": 'Vehicle license',
+            "car": null,
+            "is_preloaded": true
+        },
+        {
+            "asset": null,
+            "name": 'Customs paper/Receipt of purchase',
+            "description": 'Customs paper/Receipt of purchase',
+            "car": null,
+            "is_preloaded": true
+        },
+        {
+            "asset": null,
+            "name": 'Police CMR',
+            "description": 'Police CMR',
+            "car": null,
+            "is_preloaded": true
+        },
+        {
+            "asset": null,
+            "name": 'Insurance',
+            "description": 'Insurance',
+            "car": null,
+            "is_preloaded": true
+        },
+        {
+            "asset": null,
+            "name": 'Road worthiness',
+            "description": 'Road worthiness',
+            "car": null,
+            "is_preloaded": true
+        },
+    ]
     const router = useRouter()
     const [carId, setCarId] = useState(null)
     const [isSaving, setIsSaving] = useState(false)
@@ -108,7 +174,11 @@ function CarProfilePage({pageId}) {
     const [modalTitle, setModalTitle] = useState('')
     const [modalTagline, setModalTagline] = useState(' Kindly provide the following information below.')
     const [createSale, setCreateSale] = useState(false)
+    const [documentValue, setDocumentValue] = useState(null)
+    const [docIdx, setDocIdx] = useState(null)
+    const [vehicleDocuments, setVehicleDocuments] = useState([])
     const hiddenFileInput = useRef(null);
+    const hiddenFileInput2 = useRef(null);
 
     const showModal = (viewName: string, title: string, customTagline: string = null!) => {
         setModalView(viewName)
@@ -130,6 +200,27 @@ function CarProfilePage({pageId}) {
     const handleFileChange = event => {
         const fileUploaded = event.target.files;
         handleFile(fileUploaded);
+    };
+
+    const handleFileChange2 = event => {
+        const fileUploaded = event.target.files[0];
+        uploadFile(fileUploaded, UploadTypes.CAR_DOCUMENT, car?.id)
+            .then((res) => {
+                if (res.status) {
+                    const url = res.data.secure_url;
+                    let docs = [...vehicleDocuments]
+                    docs[docIdx]['asset'] = url;
+                    setVehicleDocuments(docs)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                setIsSaving(false)
+            })
     };
 
     const handleFile = (files) => {
@@ -235,13 +326,8 @@ function CarProfilePage({pageId}) {
             "colour": car?.colour,
             "description": car.description,
             "name": car.name,
-            "licence_plate": car.licence_plate,
-            // "margin": car?.margin || 0,
-            // "resale_price": car?.resale_price || 0,
-            // "inspection_report": null,
-            // "car_inspector": null
+            "licence_plate": car.licence_plate
         }
-
         const vehicleData = {
             "engine": car?.information?.engine,
             "transmission": car?.information?.transmission,
@@ -295,13 +381,6 @@ function CarProfilePage({pageId}) {
     }
 
     function setColor(colorCode) {
-        // const result = ntc.name(colorCode)
-        // if (result.length >= 2 && result[1]) {
-        //     // @ts-ignore
-        //     setCarData({...car, 'colour': String(result[1])})
-        // } else {
-        //     toast.error('We are having issues determining that color, try selecting another shade.')
-        // }
         setCarData({...car, 'colour': colorCode})
     }
 
@@ -366,18 +445,181 @@ function CarProfilePage({pageId}) {
             })
     }
 
+    const viewDocuments = () => {
+        retrieveCarDocuments(car?.id)
+            .then((res) => {
+                if (res.status) {
+                    setVehicleDocuments(res?.data?.results || [])
+                    showModal('vehicleDocuments', 'Vehicle Documents')
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+    }
+
+    const retrieveDocuments = () => {
+        retrieveCarDocuments(car?.id)
+            .then((res) => {
+                if (res.status) {
+                    setVehicleDocuments(res?.data?.results || [])
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+    }
+
+    const addNewDocument = () => {
+        const document = {
+            "asset": null,
+            "name": '',
+            "description": '',
+            "car": null
+        };
+        let docs = [...vehicleDocuments, document];
+        setVehicleDocuments(docs)
+    }
+
+    const addDocument = (document: any) => {
+        let docs = [...vehicleDocuments];
+        docs = docs.findIndex((a) => a?.name === document?.name) === -1 ? [...docs, document] : docs;
+        setVehicleDocuments(docs)
+    }
+
+    const removeDocument = (document: any) => {
+        let docs = [...vehicleDocuments];
+        if (document?.id) {
+            deleteCarDocument(document?.id)
+                .then((res) => {
+                    if (res.status) {
+                        toast.success("Deleted successfully!")
+                    } else {
+                        toast.error(res.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+                .finally(() => {
+                    retrieveDocuments()
+                })
+        } else {
+            docs = docs.filter((a) => a?.name !== document?.name)
+            setVehicleDocuments(docs)
+        }
+    }
+
+    const updateDocumentValue = (idx: number, field: string, value: string) => {
+        let docs = [...vehicleDocuments]
+        docs[idx][field] = value;
+        setVehicleDocuments(docs)
+    }
+
+    const uploadDocument = (idx) => {
+        setDocIdx(idx)
+        setIsSaving(true)
+        hiddenFileInput2.current.click();
+    }
+
+    const verifyDocument = (id: any) => {
+        if (id) {
+            updateCarDocument(id, {is_verified: true})
+                .then((res) => {
+                    if (res.status) {
+                        toast.success(`Verified successfully!`)
+                    } else {
+                        toast.error(res.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+                .finally(() => {
+                    retrieveDocuments()
+                })
+        }
+    }
+
+    const saveDocuments = () => {
+        setIsSaving(true)
+        vehicleDocuments.forEach((doc, idx) => {
+            if (doc?.id) {
+                const d = {
+                    name: doc?.name,
+                    description: doc?.description,
+                }
+                updateCarDocument(doc?.id, d)
+                    .then((res) => {
+                        if (res.status) {
+                            toast.success(`Updated ${doc?.name}`)
+                        } else {
+                            toast.error(res.data)
+                        }
+                    })
+                    .catch((error) => {
+                        toast.error(error)
+                    })
+                    .finally(() => {
+                        retrieveDocuments()
+                    })
+            } else {
+                doc.car = car?.id
+                createCarDocument(doc)
+                    .then((res) => {
+                        if (res.status) {
+                            toast.success(`Created ${doc?.name}`)
+                        } else {
+                            toast.error(res.data)
+                        }
+                    })
+                    .catch((error) => {
+                        toast.error(error)
+                    })
+                    .finally(() => {
+                        retrieveDocuments()
+                    })
+            }
+            if (idx >= vehicleDocuments.length - 1) {
+                setIsSaving(false)
+                setModalState(false)
+            }
+        })
+    }
+
+    const downloadDocument = (resourceUrl: any) => {
+        if (resourceUrl) {
+            let link = document.createElement("a");
+            link.href = resourceUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
     useEffect(() => {
         setCarId(pageId)
         retrieveCar(pageId)
     }, [])
 
-    // @ts-ignore
+// @ts-ignore
     return (
         <MainLayout>
             <Container>
                 <CPToast/>
                 {createSale && <CreateSale car={car} modalOpen={true} onClick={() => setCreateSale(false)}/>}
                 {createTrade && <CreateTrade car={car} onClick={() => setCreateTrade(false)}/>}
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={hiddenFileInput2}
+                    onChange={handleFileChange2}
+                    style={{display: 'none'}}
+                />
                 <Header>
                     <Typography variant="h4">
                         <b>{trimString(carId)}</b>
@@ -420,8 +662,8 @@ function CarProfilePage({pageId}) {
                         <div className="button-group">
                             {car?.inspection?.id &&
                                 <Button
-                                    text="Vehicle Inspection Report"
-                                    width={215}
+                                    text="Inspection Report"
+                                    width={160}
                                     outlined={true}
                                     marginRight="16px"
                                     disabled={!car?.inspection?.id}
@@ -451,16 +693,25 @@ function CarProfilePage({pageId}) {
                             />
                             <Button
                                 text="Edit Images"
-                                width={150}
+                                width={135}
                                 outlined={true}
                                 marginRight="16px"
                                 onClick={() => showModal('editImages', 'Edit Car Images', 'Upload minimum of 5 images to complete profile')}
                             />
                             <Button
                                 text="Edit Details"
+                                width={135}
+                                outlined={true}
+                                marginRight="16px"
+                                onClick={() => showModal('editDetails', 'Edit Car Profile')}
+                            />
+                            <Button
+                                text="Car Documents"
                                 width={150}
                                 outlined={true}
-                                onClick={() => showModal('editDetails', 'Edit Car Profile')}
+                                onClick={() => {
+                                    viewDocuments()
+                                }}
                             />
                         </div>
                     </ActionBar>
@@ -599,8 +850,8 @@ function CarProfilePage({pageId}) {
                             </Detail>
                             {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL].includes(car?.status) && (
                                 <Button text='Create Trade' width='100%' marginTop={30}
-                                        disabled={car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)}
-                                        title={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) ? 'Vehicle must be available for trade' : ''}
+                                        disabled={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) || car?.inspection?.status !== InspectionStates.COMPLETED}
+                                        title={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) ? 'Vehicle should be available for trade and must have been inspected' : ''}
                                         onClick={() => setCreateTrade(true)}
                                 />
                             )}
@@ -636,6 +887,96 @@ function CarProfilePage({pageId}) {
                                 : ''}{' '}
                             &nbsp;
                         </Typography>
+                        {modalView === 'vehicleDocuments' && (
+                            <div style={{marginTop: '30px', marginBottom: '30px'}}>
+                                <Autocomplete
+                                    id="combo-box-demo"
+                                    options={carDocuments}
+                                    getOptionLabel={(option) => option.name}
+                                    style={{width: 900, marginBottom: '20px'}}
+                                    value={documentValue}
+                                    onChange={(event: any, newValue: any | null) => {
+                                        addDocument(newValue);
+                                    }}
+                                    renderInput={(params) => <TextField {...params} label="Required Documents"
+                                                                        placeholder="Required Documents"
+                                                                        variant="outlined"/>}
+                                />
+
+                                <FlexRow style={{marginBottom: 20}}>
+                                    {/*<HeaderText>Documents</HeaderText>*/}
+                                    <IconPill onClick={() => addNewDocument()}>
+                                        Add Document
+                                        <Add className="icon"/>
+                                    </IconPill>
+                                </FlexRow>
+
+                                {vehicleDocuments.map((doc, idx) => (
+                                    <div key={idx}>
+                                        <InputGridX key={idx}>
+                                            <TextField
+                                                className="text-field"
+                                                fullWidth
+                                                placeholder={doc?.name || `Document ${idx + 1}`}
+                                                label={doc?.name || `Document ${idx + 1}`}
+                                                value={doc?.name}
+                                                disabled={doc?.is_preloaded || (carDocuments.findIndex((a) => a?.name === doc?.name) >= 0) || doc?.is_verified}
+                                                onChange={(e) => updateDocumentValue(idx, 'name', e.target.value)}
+                                            />
+                                            <TextField
+                                                className="text-field"
+                                                fullWidth
+                                                placeholder={'Description'}
+                                                label={'Description'}
+                                                value={doc?.description}
+                                                disabled={doc?.is_preloaded || (carDocuments.findIndex((a) => a?.name === doc?.name) >= 0) || doc?.is_verified}
+                                                onChange={(e) => updateDocumentValue(idx, 'description', e.target.value)}
+                                            />
+                                            <div className="input">
+                                                <Button
+                                                    text={doc?.is_verified ? 'Verified' : 'Verify'}
+                                                    outlined={true}
+                                                    width={71}
+                                                    height={28}
+                                                    borderRadius="8px"
+                                                    bgColor={t.alertSuccess}
+                                                    disabled={!doc?.id || doc?.is_verified}
+                                                    title={'Document is either verified or has not been saved'}
+                                                    onClick={() => verifyDocument(doc?.id)}
+                                                />
+                                                <Button
+                                                    text={doc?.asset ? "Download" : "Upload"}
+                                                    outlined={true}
+                                                    width={80}
+                                                    height={28}
+                                                    borderRadius="8px"
+                                                    onClick={() => doc?.asset ? downloadDocument(doc?.asset) : uploadDocument(idx)}
+                                                />
+                                                <Button
+                                                    text={"Delete"}
+                                                    outlined={true}
+                                                    width={71}
+                                                    height={28}
+                                                    borderRadius="8px"
+                                                    bgColor={t.alertError}
+                                                    onClick={() => removeDocument(doc)}
+                                                />
+                                            </div>
+                                        </InputGridX>
+                                    </div>
+                                ))}
+                                <Button
+                                    text={isSaving ? "Saving..." : "Save Documents"}
+                                    width={510}
+                                    marginLeft="auto"
+                                    marginRight="auto"
+                                    marginTop={40}
+                                    disabled={isSaving || vehicleDocuments.length < 1 || vehicleDocuments.some((a) => a?.name === '')
+                                        || vehicleDocuments.some((a) => a?.description === '') || vehicleDocuments.some((a) => a?.asset === null)}
+                                    onClick={() => saveDocuments()}
+                                />
+                            </div>
+                        )}
                         {modalView === 'createInspection' && (
                             <>
                                 <InputGrid>
@@ -1038,6 +1379,48 @@ const HeaderText = withStyles({
         display: 'block'
     }
 })(Typography)
+
+const FlexRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .currency-box {
+    height: 27px;
+    width: 27px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: ${t.lightGrey};
+    background: ${t.liteGrey};
+    margin-right: 10px;
+  }
+`
+
+const IconPill = styled.button`
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: ${t.primaryExtraLite};
+  color: ${t.primaryDeepBlue};
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.02);
+    transition: all 0.3s ease-out;
+  }
+
+  .icon {
+    margin-left: 8px;
+  }
+`
+
 const Info = styled.div`
   display: flex;
   flex-direction: column;
@@ -1241,6 +1624,37 @@ const InputGrid = styled.div`
     margin: auto;
   }
 `
+const InputGridX = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-column-gap: 24px;
+  margin-bottom: 20px;
+  width: 900px;
+
+  .input {
+    width: 97%;
+    background: ${t.white};
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: fit-content;
+    padding: 5px 10px;
+    margin: auto;
+    border-bottom: 1px solid ${t.lightGrey};
+  }
+
+  .text-field {
+    width: 97%;
+    background: ${t.white};
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+    height: 39px;
+    margin: auto;
+  }
+`
 const SplitContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -1368,52 +1782,6 @@ const VehicleDetails = styled.div`
     }
   }
 `
-const ModalSplitContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin-top: 20px;
-  min-width: 800px;
-
-  .left,
-  .right {
-    display: flex;
-    flex-direction: column;
-
-    .title {
-      font-weight: bold;
-      color: ${t.grey};
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
-  }
-
-  .left {
-    width: 45%;
-    margin-right: 24px;
-    display: flex;
-    flex-direction: column;
-
-    .input {
-      margin-bottom: 30px;
-    }
-  }
-
-  .right {
-    width: 55%;
-
-    .content {
-      border: 2px solid ${t.extraLiteGrey};
-      border-radius: 12px;
-      padding: 20px;
-    }
-
-    .title {
-      font-weight: bold;
-      color: ${t.grey};
-      margin-bottom: 10px;
-    }
-  }
-`
 const Statistic = styled.div`
   display: flex;
   flex-direction: row;
@@ -1430,4 +1798,5 @@ const Statistic = styled.div`
     font-weight: bold;
   }
 `
+
 
