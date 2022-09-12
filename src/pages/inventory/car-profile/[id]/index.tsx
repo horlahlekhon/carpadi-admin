@@ -539,7 +539,8 @@ function CarProfilePage({pageId}) {
                                 </CheckItem>
                                 <CheckItem style={{background: status === 'archived' ? t.alertSuccessLite : ''}}>
                                     <span>Add to Archived</span>
-                                    <Checkbox color='primary' checked={car.status === CarStates.ARCHIVED.valueOf()} disabled/>
+                                    <Checkbox color='primary' checked={car.status === CarStates.ARCHIVED.valueOf()}
+                                              disabled/>
                                 </CheckItem>
                             </Flex>
                         </div>
@@ -668,7 +669,10 @@ function CarProfilePage({pageId}) {
                                             fullWidth
                                             variant='standard'
                                             value={newInspection?.owners_phone}
-                                            onChange={(e) => updateInspectionFields('owners_phone', e.target.value)}
+                                            error={!(new RegExp(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im).test(newInspection?.owners_phone))}
+                                            onChange={(e) => {
+                                                updateInspectionFields('owners_phone', e.target.value)
+                                            }}
                                         />
                                     </Flex>
                                 </InputGrid>
@@ -703,7 +707,7 @@ function CarProfilePage({pageId}) {
                                     marginLeft="auto"
                                     marginRight="auto"
                                     marginTop={40}
-                                    disabled={isSaving}
+                                    disabled={isSaving || !(new RegExp(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im).test(newInspection?.owners_phone))}
                                     onClick={() => addInspection()}
                                 />
                             </>
