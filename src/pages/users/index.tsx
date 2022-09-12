@@ -100,7 +100,7 @@ function UsersPage() {
         setPage(newPage - 1)
         retrieveUsers({
             tradeStatus: selectedUsers === Users.ACTIVE ? 'actively_trading' : selectedUsers === Users.NO_TRADING ? 'not_actively_trading' : '',
-            page: newPage - 1
+            page: ((newPage - 1) * rowsPerPage)
         })
     }
 
@@ -287,12 +287,13 @@ function UsersPage() {
                             <TableRow>
                                 <TableCell>No</TableCell>
                                 <TableCell align="left">Image</TableCell>
+                                <TableCell align="left">Full Name</TableCell>
                                 <TableCell align="left">User Name</TableCell>
                                 <TableCell align="left">Status</TableCell>
                                 <TableCell align="left">Joined Date</TableCell>
                                 <TableCell align="left">User ID</TableCell>
-                                <TableCell align="left">Total Asset</TableCell>
-                                <TableCell align="left">Trading Cash</TableCell>
+                                {/*<TableCell align="left">Total Asset</TableCell>*/}
+                                {/*<TableCell align="left">Trading Cash</TableCell>*/}
                                 <TableCell align="left">&nbsp;</TableCell>
                             </TableRow>
                         </TableHead>
@@ -301,7 +302,7 @@ function UsersPage() {
                                 .map((row, idx) => (
                                     <TableRow key={idx}>
                                         <TableCell component="th" scope="row">
-                                            {idx}
+                                            {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                         </TableCell>
                                         <TableCell component="th" scope="row">
                                             <img alt={row.user?.first_name} src={row.user.profile_picture} width={40}
@@ -309,6 +310,7 @@ function UsersPage() {
                                                  style={{borderRadius: '50%'}}/>
 
                                         </TableCell>
+                                        <TableCell align="left">{row.user?.first_name} {row.user?.last_name}</TableCell>
                                         <TableCell align="left">{row.user.username}</TableCell>
                                         <TableCell
                                             align="left"
@@ -318,6 +320,7 @@ function UsersPage() {
                                         >
                                             <ActivityTab
                                                 style={{
+                                                    width: '100px',
                                                     background:
                                                         row.user.is_active
                                                             ? t.alertSuccessLite
@@ -329,12 +332,12 @@ function UsersPage() {
                                         </TableCell>
                                         <TableCell align="left">{formatDate(row.created)}</TableCell>
                                         <TableCell align="left">{trimString(row.user.id)}</TableCell>
-                                        <TableCell align="left">
-                                            &#8358; NA
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            &#8358; NA
-                                        </TableCell>
+                                        {/*<TableCell align="left">*/}
+                                        {/*    &#8358; NA*/}
+                                        {/*</TableCell>*/}
+                                        {/*<TableCell align="left">*/}
+                                        {/*    &#8358; NA*/}
+                                        {/*</TableCell>*/}
                                         <TableCell align="left">
                                             <Button
                                                 text="View"

@@ -312,17 +312,19 @@ function UserProfilePage({pageId}) {
                                                     className="value">&#8358; {formatNumber(wallet?.unsettled_cash)}</div>
                                             </Statistic>
                                         </Grid>
-                                        <Button
-                                            text="View All Transactions"
-                                            width="90%"
-                                            marginLeft="auto"
-                                            marginRight="auto"
-                                            marginBottom="40px"
-                                            marginTop={40}
-                                            onClick={() => {
-                                                retrieveUserWalletTransactions(wallet?.id)
-                                            }}
-                                        />
+                                        <div style={{width: '100%'}}>
+                                            <Button
+                                                text="View All Transactions"
+                                                width="90%"
+                                                marginLeft="auto"
+                                                marginRight="auto"
+                                                marginBottom="40px"
+                                                marginTop={40}
+                                                onClick={() => {
+                                                    retrieveUserWalletTransactions(wallet?.id)
+                                                }}
+                                            />
+                                        </div>
                                         <Grid container spacing={3}>
                                             <Grid item xs={12} style={{fontWeight: 600}}>
                                                 <Statistic style={{fontSize: 14}}>
