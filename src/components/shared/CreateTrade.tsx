@@ -88,7 +88,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
             // @ts-ignore
             setMProfit(mProfit.toFixed(2))
 
-            const erot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+            const erot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100)) / Number(trade?.slots_available)
             // @ts-ignore
             setEROT(erot.toFixed(2))
             // @ts-ignore
@@ -110,7 +110,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
         // @ts-ignore
         setMProfit(mProfit.toFixed(2))
 
-        const erot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100))
+        const erot = ((Number(selectedCar?.bought_price) + Number(selectedCar?.maintenance_cost)) * (Number(fees?.merchant_trade_rot_percentage) / 100)) / Number(trade?.slots_available)
         // @ts-ignore
         setEROT(erot.toFixed(2))
         // @ts-ignore
