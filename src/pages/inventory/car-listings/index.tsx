@@ -33,6 +33,7 @@ function CarListingsPage() {
         "next": null,
         "previous": null,
     })
+    const [pageLoading, setPageLoading] = useState(false)
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
@@ -67,6 +68,7 @@ function CarListingsPage() {
     const classes = useStyles()
 
     const retrieveCarList = (page = 0) => {
+        setPageLoading(true)
         setCars([])
         retrieveCars(rowsPerPage, page, CarStates.ALL)
             .then((response) => {
@@ -84,6 +86,9 @@ function CarListingsPage() {
             })
             .catch((error) => {
                 toast.error(error.data)
+            })
+            .finally(() => {
+                setPageLoading(false)
             })
     }
 

@@ -20,6 +20,7 @@ import {toast} from "react-hot-toast";
 import CPToast from "../components/shared/CPToast";
 import CreateTrade from "../components/shared/CreateTrade";
 import AddCarProfile from "../components/shared/AddCarProfile";
+import Loader from "../components/layouts/core/Loader";
 
 function HomePage() {
     const router = useRouter()
@@ -86,6 +87,7 @@ function HomePage() {
         {name: 'Sold', value: 0}
     ])
     const COLORS = ['black', t.primaryDeepBlue, t.primaryBlue, t.primaryLite, t.primaryAshBlue]
+    const [pageLoading, setPageLoading] = useState(false)
 
     const updateYear = (action: string) => {
         if (action === 'next') {
@@ -138,6 +140,7 @@ function HomePage() {
     }
 
     useEffect(() => {
+        setPageLoading(true)
         retrieveHomeStats()
             .then((res) => {
                 if (res.status) {
@@ -150,6 +153,9 @@ function HomePage() {
             .catch((error) => {
                 toast.error(error)
             })
+            .finally(() => {
+                setPageLoading(false)
+            })
     }, [])
 
     useEffect(() => {
@@ -159,194 +165,205 @@ function HomePage() {
     return (
         <Container>
             <CPToast/>
-            <Header>
-                <Typography variant="h4">
-                    <b>Dashboard</b>
-                </Typography>
-                <ActionBar>
-                    <GreyTextTypography variant="subtitle2">
-                        Quick Action
-                    </GreyTextTypography>
-                    <Button text="Add Car Profile" width={150} marginLeft="18px"
-                            onClick={() => setAddCarProfile(true)}/>
-                    <Button
-                        text="Create Trade"
-                        width={150}
-                        outlined={true}
-                        marginLeft="18px"
-                        onClick={() => setCreateTrade(true)}
-                    />
-                </ActionBar>
-            </Header>
-            {createTrade && <CreateTrade modalOpen={createTrade} onClick={() => setCreateTrade(false)}/>}
-            {addCarProfile && <AddCarProfile modalOpen={addCarProfile} onClick={() => setAddCarProfile(false)}/>}
-            <Grid container spacing={2}>
-                <Grid item xs={8}>
-                    <MainSection>
-                        <Filter>
-                            <Typography variant="body1">Filter</Typography>
-                            <FilterCTA>
-                                <Picker>
-                                    <ArrowBackIos
-                                        onClick={() => {
-                                            updateMonth('prev')
-                                        }}
-                                    />
-                                    <PickerText style={{textTransform: 'capitalize'}}>
-                                        {months[monthIdx]}
-                                    </PickerText>
-                                    <ArrowForwardIos
-                                        onClick={() => {
-                                            updateMonth('next')
-                                        }}
-                                    />
-                                </Picker>
-                                <Picker>
-                                    <ArrowBackIos
-                                        onClick={() => {
-                                            updateYear('prev')
-                                        }}
-                                    />
-                                    <PickerText>{year}</PickerText>
-                                    <ArrowForwardIos
-                                        onClick={() => {
-                                            updateYear('next')
-                                        }}
-                                    />
-                                </Picker>
-                                <Typography variant="body1">Filter year only</Typography>
-                                <Radio
-                                    checked={yearOnlyFilter}
-                                    onClick={updateYearOnlyFilter}
-                                    color="secondary"
-                                    style={{marginLeft: '10px'}}
-                                />
-                                <Button text="Apply" width={94} marginLeft="24px"/>
-                            </FilterCTA>
-                        </Filter>
-                        <Grid container spacing={2} style={{marginTop: '8px'}}>
-                            <Grid item xs={4}>
-                                <AveragesCard>
-                                    <Typography variant="body2">
-                                        Average Buy to Sell Time
-                                    </Typography>
-                                    <Typography variant="h5">{formatNumber(pageData?.average_bts)} Days</Typography>
-                                </AveragesCard>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <AveragesCard>
-                                    <Typography variant="body2">
-                                        Average Number of Users Trading
-                                    </Typography>
-                                    <Typography
-                                        variant="h5">{formatNumber(pageData?.number_of_trading_users)}</Typography>
-                                </AveragesCard>
-                            </Grid>
-                            <Grid item xs={4}>
-                                <AveragesCard>
-                                    <Typography variant="body2">
-                                        Average Trading Cash Per Slot
-                                    </Typography>
-                                    <Typography
-                                        variant="h5">₦ {formatNumber(pageData?.average_trading_cash)}</Typography>
-                                </AveragesCard>
-                            </Grid>
+            {!pageLoading && (
+                <>
+                    <Header>
+                        <Typography variant="h4">
+                            <b>Dashboard</b>
+                        </Typography>
+                        <ActionBar>
+                            <GreyTextTypography variant="subtitle2">
+                                Quick Action
+                            </GreyTextTypography>
+                            <Button text="Add Car Profile" width={150} marginLeft="18px"
+                                    onClick={() => setAddCarProfile(true)}/>
+                            <Button
+                                text="Create Trade"
+                                width={150}
+                                outlined={true}
+                                marginLeft="18px"
+                                onClick={() => setCreateTrade(true)}
+                            />
+                        </ActionBar>
+                    </Header>
+                    {createTrade && <CreateTrade modalOpen={createTrade} onClick={() => setCreateTrade(false)}/>}
+                    {addCarProfile &&
+                        <AddCarProfile modalOpen={addCarProfile} onClick={() => setAddCarProfile(false)}/>}
+                    <Grid container spacing={2}>
+                        <Grid item xs={8}>
+                            <MainSection>
+                                <Filter>
+                                    <Typography variant="body1">Filter</Typography>
+                                    <FilterCTA>
+                                        <Picker>
+                                            <ArrowBackIos
+                                                onClick={() => {
+                                                    updateMonth('prev')
+                                                }}
+                                            />
+                                            <PickerText style={{textTransform: 'capitalize'}}>
+                                                {months[monthIdx]}
+                                            </PickerText>
+                                            <ArrowForwardIos
+                                                onClick={() => {
+                                                    updateMonth('next')
+                                                }}
+                                            />
+                                        </Picker>
+                                        <Picker>
+                                            <ArrowBackIos
+                                                onClick={() => {
+                                                    updateYear('prev')
+                                                }}
+                                            />
+                                            <PickerText>{year}</PickerText>
+                                            <ArrowForwardIos
+                                                onClick={() => {
+                                                    updateYear('next')
+                                                }}
+                                            />
+                                        </Picker>
+                                        <Typography variant="body1">Filter year only</Typography>
+                                        <Radio
+                                            checked={yearOnlyFilter}
+                                            onClick={updateYearOnlyFilter}
+                                            color="secondary"
+                                            style={{marginLeft: '10px'}}
+                                        />
+                                        <Button text="Apply" width={94} marginLeft="24px"/>
+                                    </FilterCTA>
+                                </Filter>
+                                <Grid container spacing={2} style={{marginTop: '8px'}}>
+                                    <Grid item xs={4}>
+                                        <AveragesCard>
+                                            <Typography variant="body2">
+                                                Average Buy to Sell Time
+                                            </Typography>
+                                            <Typography
+                                                variant="h5">{formatNumber(pageData?.average_bts)} Days</Typography>
+                                        </AveragesCard>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <AveragesCard>
+                                            <Typography variant="body2">
+                                                Average Number of Users Trading
+                                            </Typography>
+                                            <Typography
+                                                variant="h5">{formatNumber(pageData?.number_of_trading_users)}</Typography>
+                                        </AveragesCard>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <AveragesCard>
+                                            <Typography variant="body2">
+                                                Average Trading Cash Per Slot
+                                            </Typography>
+                                            <Typography
+                                                variant="h5">₦ {formatNumber(pageData?.average_trading_cash)}</Typography>
+                                        </AveragesCard>
+                                    </Grid>
+                                </Grid>
+                                <Shares>
+                                    <ShareItem>
+                                        <Typography variant="subtitle2">
+                                            Total available share
+                                        </Typography>
+                                        <Typography
+                                            variant="h6">{formatNumber(pageData?.total_available_shares)}</Typography>
+                                    </ShareItem>
+                                    <ShareItem>
+                                        <Typography variant="subtitle2">
+                                            Available share value
+                                        </Typography>
+                                        <Typography
+                                            variant="h6">₦ {formatNumber(pageData?.total_available_shares_value)}</Typography>
+                                    </ShareItem>
+                                    <ShareItem>
+                                        <Typography variant="subtitle2">
+                                            Cars with available share
+                                        </Typography>
+                                        <Typography
+                                            variant="h6">{formatNumber(pageData?.total_cars_with_shares)}</Typography>
+                                    </ShareItem>
+                                </Shares>
+                                <Paper
+                                    elevation={0}
+                                    style={{marginTop: '16px', height: '409px', padding: '16px'}}
+                                >
+                                    <GraphStats>
+                                        <StatItem>
+                                            <ColorSquare style={{backgroundColor: t.primaryBlue}}/>
+                                            <div>
+                                                <Typography variant="body2">Total Trading Cash</Typography>
+                                                <Typography
+                                                    variant="h6">₦ {formatNumber(pageData?.total_trading_cash_vs_return_on_trades?.ttc.reduce((a, b) => a + b, 0))}</Typography>
+                                            </div>
+                                        </StatItem>
+                                        <StatItem>
+                                            <ColorSquare style={{backgroundColor: t.primaryDeepBlue}}/>
+                                            <div>
+                                                <Typography variant="body2">Return On Trades</Typography>
+                                                <Typography
+                                                    variant="h6"> {formatNumber(pageData?.total_trading_cash_vs_return_on_trades?.rot.reduce((a, b) => a + b, 0))}</Typography>
+                                            </div>
+                                        </StatItem>
+                                    </GraphStats>
+                                    <div style={{height: '300px'}}>
+                                        <LineChart ttc={pageData?.total_trading_cash_vs_return_on_trades?.ttc}
+                                                   rot={pageData?.total_trading_cash_vs_return_on_trades?.rot}/>
+                                    </div>
+                                </Paper>
+                            </MainSection>
                         </Grid>
-                        <Shares>
-                            <ShareItem>
-                                <Typography variant="subtitle2">
-                                    Total available share
-                                </Typography>
-                                <Typography variant="h6">{formatNumber(pageData?.total_available_shares)}</Typography>
-                            </ShareItem>
-                            <ShareItem>
-                                <Typography variant="subtitle2">
-                                    Available share value
-                                </Typography>
-                                <Typography
-                                    variant="h6">₦ {formatNumber(pageData?.total_available_shares_value)}</Typography>
-                            </ShareItem>
-                            <ShareItem>
-                                <Typography variant="subtitle2">
-                                    Cars with available share
-                                </Typography>
-                                <Typography variant="h6">{formatNumber(pageData?.total_cars_with_shares)}</Typography>
-                            </ShareItem>
-                        </Shares>
-                        <Paper
-                            elevation={0}
-                            style={{marginTop: '16px', height: '409px', padding: '16px'}}
-                        >
-                            <GraphStats>
-                                <StatItem>
-                                    <ColorSquare style={{backgroundColor: t.primaryBlue}}/>
-                                    <div>
-                                        <Typography variant="body2">Total Trading Cash</Typography>
-                                        <Typography
-                                            variant="h6">₦ {formatNumber(pageData?.total_trading_cash_vs_return_on_trades?.ttc.reduce((a, b) => a + b, 0))}</Typography>
-                                    </div>
-                                </StatItem>
-                                <StatItem>
-                                    <ColorSquare style={{backgroundColor: t.primaryDeepBlue}}/>
-                                    <div>
-                                        <Typography variant="body2">Return On Trades</Typography>
-                                        <Typography
-                                            variant="h6"> {formatNumber(pageData?.total_trading_cash_vs_return_on_trades?.rot.reduce((a, b) => a + b, 0))}</Typography>
-                                    </div>
-                                </StatItem>
-                            </GraphStats>
-                            <div style={{height: '300px'}}>
-                                <LineChart ttc={pageData?.total_trading_cash_vs_return_on_trades?.ttc}
-                                           rot={pageData?.total_trading_cash_vs_return_on_trades?.rot}/>
-                            </div>
-                        </Paper>
-                    </MainSection>
-                </Grid>
-                <Grid item xs={4}>
-                    <CarsSummaryCard>
-                        <Typography variant="body1">Cars Summary</Typography>
-                        <PieChart
-                            data={pieChartData}
-                            colors={COLORS}
-                            labels={pieChartData.map((x) => x?.name)}
-                        />
-                    </CarsSummaryCard>
-                    <ActivitiesCard>
-                        <ActivitiesHeader>
-                            <Typography variant="body1">Recent Trade Activities</Typography>
-                            <Typography
-                                variant="caption"
-                                color="textSecondary"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    cursor: 'pointer'
-                                }}
-                                onClick={() => {
-                                    handleNavigation('/notifications')
-                                }}
-                            >
-                                View All
-                                <ArrowRightSharp/>
-                            </Typography>
-                        </ActivitiesHeader>
-                        {pageData?.recent_trade_activities?.recent_activities.map((activity, i) => (
-                            <ActivityItem key={i}
-                                          onClick={() => {
-                                              handleNavigation(`/users/${activity.merchant}`)
-                                          }}
-                            >
-                                <ImageCircle>
-                                    <Image src="/icons/Users-Blue.svg" width={16} height={21}/>
-                                </ImageCircle>
-                                <ActivityItemText>
-                                    {activity?.description.replace('Activity Type:', '')}
-                                </ActivityItemText>
-                            </ActivityItem>
-                        ))}
-                    </ActivitiesCard>
-                </Grid>
-            </Grid>
+                        <Grid item xs={4}>
+                            <CarsSummaryCard>
+                                <Typography variant="body1">Cars Summary</Typography>
+                                <PieChart
+                                    data={pieChartData}
+                                    colors={COLORS}
+                                    labels={pieChartData.map((x) => x?.name)}
+                                />
+                            </CarsSummaryCard>
+                            <ActivitiesCard>
+                                <ActivitiesHeader>
+                                    <Typography variant="body1">Recent Trade Activities</Typography>
+                                    <Typography
+                                        variant="caption"
+                                        color="textSecondary"
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => {
+                                            handleNavigation('/notifications')
+                                        }}
+                                    >
+                                        View All
+                                        <ArrowRightSharp/>
+                                    </Typography>
+                                </ActivitiesHeader>
+                                {pageData?.recent_trade_activities?.recent_activities.map((activity, i) => (
+                                    <ActivityItem key={i}
+                                                  onClick={() => {
+                                                      handleNavigation(`/users/${activity.merchant}`)
+                                                  }}
+                                    >
+                                        <ImageCircle>
+                                            <Image src="/icons/Users-Blue.svg" width={16} height={21}/>
+                                        </ImageCircle>
+                                        <ActivityItemText>
+                                            {activity?.description.replace('Activity Type:', '')}
+                                        </ActivityItemText>
+                                    </ActivityItem>
+                                ))}
+                            </ActivitiesCard>
+                        </Grid>
+                    </Grid>
+                </>
+            )}
+            {pageLoading && (
+                <Loader/>
+            )}
         </Container>
     )
 }

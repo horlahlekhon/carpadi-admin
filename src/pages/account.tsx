@@ -11,10 +11,12 @@ import {accountService} from "../services/account";
 import {toast} from "react-hot-toast";
 import {formatNumber} from "../helpers/formatters";
 import {months} from "../lib/constants";
+import Loader from "../components/layouts/core/Loader";
 
 
 function AccountPage() {
     let currentYear = new Date().getFullYear()
+    const [pageLoading, setPageLoading] = useState(false)
     const [year, setYear] = useState(currentYear)
     const [monthIdx, setMonthIdx] = useState(0)
     const [yearOnlyFilter, setYearOnlyFilter] = useState(true)
@@ -91,6 +93,7 @@ function AccountPage() {
     }
 
     const getAccountStats = () => {
+        setPageLoading(true)
         accountService.retrieveAccountStats()
             .then((response) => {
                 if (response.status) {
@@ -113,6 +116,9 @@ function AccountPage() {
             .catch((error) => {
                 toast.error(error.data)
             })
+            .finally(() => {
+                setPageLoading(false)
+            })
     }
 
     useEffect(() => {
@@ -122,188 +128,195 @@ function AccountPage() {
     return (
         <Container>
             <CPToast/>
-            <Header>
-                <Typography variant="h4">
-                    <b>Account</b>
-                </Typography>
-            </Header>
-            <Grid container spacing={2}>
-                <Grid item xs={12}>
-                    <MainSection>
-                        <Filter>
-                            <Typography variant="body1" style={{fontWeight: 700}}>
-                                Account Analytics
-                            </Typography>
-                            <FilterCTA>
-                                <Typography variant="body1" style={{marginRight: 16}}>
-                                    Filter
-                                </Typography>
-                                <Picker>
-                                    <ArrowBackIos
-                                        onClick={() => {
-                                            updateMonth('prev')
-                                        }}
-                                    />
-                                    <PickerText style={{textTransform: 'capitalize'}}>
-                                        {months[monthIdx]}
-                                    </PickerText>
-                                    <ArrowForwardIos
-                                        onClick={() => {
-                                            updateMonth('next')
-                                        }}
-                                    />
-                                </Picker>
-                                <Picker>
-                                    <ArrowBackIos
-                                        onClick={() => {
-                                            updateYear('prev')
-                                        }}
-                                    />
-                                    <PickerText>{year}</PickerText>
-                                    <ArrowForwardIos
-                                        onClick={() => {
-                                            updateYear('next')
-                                        }}
-                                    />
-                                </Picker>
-                                <Typography variant="body1">Filter year only</Typography>
-                                <Radio
-                                    checked={yearOnlyFilter}
-                                    onClick={updateYearOnlyFilter}
-                                    color="secondary"
-                                    style={{marginLeft: '10px'}}
-                                />
-                                <Button text="Apply" width={94} marginLeft="24px"/>
-                            </FilterCTA>
-                        </Filter>
-                        <Grid container spacing={3} xs={12} style={{marginTop: 20}}>
-                            <Grid container item spacing={2} xs={8}>
-                                <Grid item xs={4}>
-                                    <Card>
-                                        <Typography variant="body1">Total Trading Cash</Typography>
-                                        <Grid item>
-                                            <Typography variant="h5" style={{fontSize: '1.2rem'}}>
-                                                &#8358; {formatNumber(accountStats.total_trading_cash.total_trading_cash)}
-                                            </Typography>
-                                            <Typography
-                                                variant="inherit">with {accountStats.total_trading_cash.users_trading_count} Users</Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Card>
-                                        <Typography variant="body1">
-                                            Total Withdraw-able Cash
+            {!pageLoading && (
+                <>
+                    <Header>
+                        <Typography variant="h4">
+                            <b>Account</b>
+                        </Typography>
+                    </Header>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <MainSection>
+                                <Filter>
+                                    <Typography variant="body1" style={{fontWeight: 700}}>
+                                        Account Analytics
+                                    </Typography>
+                                    <FilterCTA>
+                                        <Typography variant="body1" style={{marginRight: 16}}>
+                                            Filter
                                         </Typography>
-                                        <Grid item>
-                                            <Typography variant="h5"
-                                                        style={{fontSize: '1.2rem'}}>&#8358; {formatNumber(accountStats.total_withdrawable_cash.total_withdrawable_cash)}</Typography>
-                                            <Typography
-                                                variant="inherit">with {accountStats.total_withdrawable_cash.users} Users</Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Card>
-                                        <Typography variant="body1">
-                                            Total Unsettled Cash
-                                        </Typography>
-                                        <Grid item>
-                                            <Typography variant="h5"
-                                                        style={{fontSize: '1.2rem'}}>&#8358; {formatNumber(accountStats.total_unsettled_cash.total_unsettled_cash)}</Typography>
-                                            <Typography
-                                                variant="inherit">with {accountStats.total_unsettled_cash.users} Users</Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                                <Grid container item xs={6}>
-                                    <Card style={{background: t.primaryLite, height: 190}}>
-                                        <Typography variant="body1">
-                                            Total Transfer Charges
-                                        </Typography>
-                                        <Grid item>
-                                            <Typography
-                                                variant="h5">&#8358; {formatNumber(accountStats.total_transfer_charges.total_transfer_charges)}</Typography>
-                                            <Typography
-                                                variant="inherit">with {accountStats.total_transfer_charges.users} Users</Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                                <Grid container item xs={6}>
-                                    <Card style={{background: t.alertSuccessLite, height: 190}}>
-                                        <Typography variant="body1">
-                                            Total Closed Trade Charges
-                                        </Typography>
-                                        <Grid item>
-                                            <Typography variant="h5">&#8358; NA</Typography>
-                                            <Typography variant="inherit">with NA Users</Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                                <Grid container item xs={6}>
-                                    <Card style={{height: 190}}>
-                                        <Typography variant="body1">
-                                            Total Number of made Deposit
-                                        </Typography>
-                                        <Grid item>
-                                            <Typography
-                                                variant="h5">{formatNumber(accountStats.total_deposits_count.total_deposits_count)}</Typography>
-                                            <Typography
-                                                variant="inherit">with {accountStats.total_deposits_count.users} Users</Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                                <Grid container item xs={6}>
-                                    <Card style={{height: 190}}>
-                                        <Typography variant="body1">
-                                            Total Number of made Withdrawals
-                                        </Typography>
-                                        <Grid item>
-                                            <Typography
-                                                variant="h5">{formatNumber(accountStats.total_withdrawals_count.total_withdrawals_count)}</Typography>
-                                            <Typography
-                                                variant="inherit">with {accountStats.total_withdrawals_count.users} Users</Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                            </Grid>
-                            <Grid container item xs={4}>
-                                <Grid item xs={12}>
-                                    <Card
-                                        style={{color: 'white', background: t.primaryAshBlue}}
-                                    >
-                                        <Typography variant="body1">Total Assets</Typography>
-                                        <Grid item>
-                                            <Typography variant="h5">
-                                                &#8358; {formatNumber(accountStats.total_assets.total_assets)}
-                                            </Typography>
-                                            <Typography variant="inherit">
-                                                with {formatNumber(accountStats.total_assets.users)} Users
-                                            </Typography>
-                                        </Grid>
-                                    </Card>
-                                </Grid>
-                                <Grid item xs={12} style={{marginTop: 14}}>
-                                    <Card style={{height: 'fit-content'}}>
-                                        <PieChart
-                                            data={pieChartData}
-                                            colors={COLORS}
-                                            labels={pieChartData.map((x) => x.name)}
+                                        <Picker>
+                                            <ArrowBackIos
+                                                onClick={() => {
+                                                    updateMonth('prev')
+                                                }}
+                                            />
+                                            <PickerText style={{textTransform: 'capitalize'}}>
+                                                {months[monthIdx]}
+                                            </PickerText>
+                                            <ArrowForwardIos
+                                                onClick={() => {
+                                                    updateMonth('next')
+                                                }}
+                                            />
+                                        </Picker>
+                                        <Picker>
+                                            <ArrowBackIos
+                                                onClick={() => {
+                                                    updateYear('prev')
+                                                }}
+                                            />
+                                            <PickerText>{year}</PickerText>
+                                            <ArrowForwardIos
+                                                onClick={() => {
+                                                    updateYear('next')
+                                                }}
+                                            />
+                                        </Picker>
+                                        <Typography variant="body1">Filter year only</Typography>
+                                        <Radio
+                                            checked={yearOnlyFilter}
+                                            onClick={updateYearOnlyFilter}
+                                            color="secondary"
+                                            style={{marginLeft: '10px'}}
                                         />
-                                        {pieChartData.map((item, idx) => (
-                                            <ChartStats key={idx}>
-                                                <div className="stat">{item.name}</div>
-                                                <div className="value">&#8358; {item.value}</div>
-                                            </ChartStats>
-                                        ))
-                                        }
-                                    </Card>
+                                        <Button text="Apply" width={94} marginLeft="24px"/>
+                                    </FilterCTA>
+                                </Filter>
+                                <Grid container spacing={3} xs={12} style={{marginTop: 20}}>
+                                    <Grid container item spacing={2} xs={8}>
+                                        <Grid item xs={4}>
+                                            <Card>
+                                                <Typography variant="body1">Total Trading Cash</Typography>
+                                                <Grid item>
+                                                    <Typography variant="h5" style={{fontSize: '1.2rem'}}>
+                                                        &#8358; {formatNumber(accountStats.total_trading_cash.total_trading_cash)}
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="inherit">with {accountStats.total_trading_cash.users_trading_count} Users</Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Card>
+                                                <Typography variant="body1">
+                                                    Total Withdraw-able Cash
+                                                </Typography>
+                                                <Grid item>
+                                                    <Typography variant="h5"
+                                                                style={{fontSize: '1.2rem'}}>&#8358; {formatNumber(accountStats.total_withdrawable_cash.total_withdrawable_cash)}</Typography>
+                                                    <Typography
+                                                        variant="inherit">with {accountStats.total_withdrawable_cash.users} Users</Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <Card>
+                                                <Typography variant="body1">
+                                                    Total Unsettled Cash
+                                                </Typography>
+                                                <Grid item>
+                                                    <Typography variant="h5"
+                                                                style={{fontSize: '1.2rem'}}>&#8358; {formatNumber(accountStats.total_unsettled_cash.total_unsettled_cash)}</Typography>
+                                                    <Typography
+                                                        variant="inherit">with {accountStats.total_unsettled_cash.users} Users</Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid container item xs={6}>
+                                            <Card style={{background: t.primaryLite, height: 190}}>
+                                                <Typography variant="body1">
+                                                    Total Transfer Charges
+                                                </Typography>
+                                                <Grid item>
+                                                    <Typography
+                                                        variant="h5">&#8358; {formatNumber(accountStats.total_transfer_charges.total_transfer_charges)}</Typography>
+                                                    <Typography
+                                                        variant="inherit">with {accountStats.total_transfer_charges.users} Users</Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid container item xs={6}>
+                                            <Card style={{background: t.alertSuccessLite, height: 190}}>
+                                                <Typography variant="body1">
+                                                    Total Closed Trade Charges
+                                                </Typography>
+                                                <Grid item>
+                                                    <Typography variant="h5">&#8358; NA</Typography>
+                                                    <Typography variant="inherit">with NA Users</Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid container item xs={6}>
+                                            <Card style={{height: 190}}>
+                                                <Typography variant="body1">
+                                                    Total Number of made Deposit
+                                                </Typography>
+                                                <Grid item>
+                                                    <Typography
+                                                        variant="h5">{formatNumber(accountStats.total_deposits_count.total_deposits_count)}</Typography>
+                                                    <Typography
+                                                        variant="inherit">with {accountStats.total_deposits_count.users} Users</Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid container item xs={6}>
+                                            <Card style={{height: 190}}>
+                                                <Typography variant="body1">
+                                                    Total Number of made Withdrawals
+                                                </Typography>
+                                                <Grid item>
+                                                    <Typography
+                                                        variant="h5">{formatNumber(accountStats.total_withdrawals_count.total_withdrawals_count)}</Typography>
+                                                    <Typography
+                                                        variant="inherit">with {accountStats.total_withdrawals_count.users} Users</Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container item xs={4}>
+                                        <Grid item xs={12}>
+                                            <Card
+                                                style={{color: 'white', background: t.primaryAshBlue}}
+                                            >
+                                                <Typography variant="body1">Total Assets</Typography>
+                                                <Grid item>
+                                                    <Typography variant="h5">
+                                                        &#8358; {formatNumber(accountStats.total_assets.total_assets)}
+                                                    </Typography>
+                                                    <Typography variant="inherit">
+                                                        with {formatNumber(accountStats.total_assets.users)} Users
+                                                    </Typography>
+                                                </Grid>
+                                            </Card>
+                                        </Grid>
+                                        <Grid item xs={12} style={{marginTop: 14}}>
+                                            <Card style={{height: 'fit-content'}}>
+                                                <PieChart
+                                                    data={pieChartData}
+                                                    colors={COLORS}
+                                                    labels={pieChartData.map((x) => x.name)}
+                                                />
+                                                {pieChartData.map((item, idx) => (
+                                                    <ChartStats key={idx}>
+                                                        <div className="stat">{item.name}</div>
+                                                        <div className="value">&#8358; {item.value}</div>
+                                                    </ChartStats>
+                                                ))
+                                                }
+                                            </Card>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            </MainSection>
                         </Grid>
-                    </MainSection>
-                </Grid>
-            </Grid>
+                    </Grid>
+                </>
+            )}
+            {pageLoading && (
+                <Loader/>
+            )}
         </Container>
     )
 }

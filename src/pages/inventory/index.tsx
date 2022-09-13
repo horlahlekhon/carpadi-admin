@@ -6,7 +6,7 @@ import {
     Input, InputAdornment,
     InputLabel,
     Modal,
-    Select, 
+    Select,
     TextField,
     Typography,
 } from '@material-ui/core'
@@ -21,6 +21,7 @@ import CreateTrade from "../../components/shared/CreateTrade";
 import AddCarProfile from "../../components/shared/AddCarProfile";
 import {retrieveInventoryStats} from "../../services/inventory";
 import {formatNumber} from "../../helpers/formatters";
+import Loader from "../../components/layouts/core/Loader";
 
 function InventoryPage() {
     const router = useRouter()
@@ -39,6 +40,7 @@ function InventoryPage() {
         "sold": 0,
         "archived": 0
     })
+    const [pageLoading, setPageLoading] = useState(false)
     const hiddenFileInput = useRef(null);
 
     const handleNavigation = (action: string) => {
@@ -69,6 +71,7 @@ function InventoryPage() {
     }
 
     const retrieveInventoryStatistics = () => {
+        setPageLoading(true)
         retrieveInventoryStats()
             .then((response) => {
                 if (response.status) {
@@ -80,6 +83,9 @@ function InventoryPage() {
             .catch((error) => {
                 toast.error(error.data)
             })
+            .finally(() => {
+                setPageLoading(false)
+            })
     }
 
     useEffect(() => {
@@ -89,289 +95,296 @@ function InventoryPage() {
     return (
         <Container>
             <CPToast/>
-            {createTrade && <CreateTrade modalOpen={createTrade} onClick={() => setCreateTrade(false)}/>}
-            {addCarProfile && <AddCarProfile modalOpen={addCarProfile} onClick={() => setAddCarProfile(false)}/>}
-            <Header>
-                <Typography variant="h4">
-                    <b>Inventory</b>
-                </Typography>
-                <ActionBar>
-                    <Button text="Add Car Profile" width={150} marginLeft="18px"
-                            onClick={() => setAddCarProfile(true)}/>
-                    <Button
-                        text="Create Brand"
-                        width={150}
-                        outlined={true}
-                        marginLeft="18px"
-                        bgColor={t.primaryBlue}
-                        disabled={true}
-                        onClick={() => showModal('createBrand', 'Create Brand', 'Add a vehicle brand')}
-                    />
-                    <Button
-                        text="Create Trade"
-                        width={150}
-                        outlined={true}
-                        marginLeft="18px"
-                        onClick={() => setCreateTrade(true)}
-                    />
-                </ActionBar>
-            </Header>
-            <Breadcrumbs>
-                <img
-                    src="/icons/Inventory-Black.svg"
-                    width={'20px'}
-                    height={'18px'}
-                    style={{marginRight: '12px'}}
-                />
-                <div
-                    onClick={() => {
-                        handleNavigation('/inventory')
-                    }}
-                >
-                    <span className="text">Inventory</span>
-                    <span className="separator"></span>
-                </div>
-                <div>&nbsp;</div>
-            </Breadcrumbs>
-            <Grid container spacing={5} style={{marginTop: 24}}>
-                <Grid item xs={4}>
-                    <Card>
-                        <Typography variant="h6">Car Listings</Typography>
-                        <div className="bottom">
-                            <div className="count">{formatNumber(tradeStats.car_listing)}</div>
-                            <Button text="View All" width="84px" onClick={() => {
-                                handleNavigation('/inventory/car-listings')
-                            }}/>
-                        </div>
-                    </Card>
-                </Grid>
-                <Grid item xs={4}>
-                    <Card>
-                        <Typography variant="h6">Under Inspection</Typography>
-                        <div className="bottom">
-                            <div className="count">{formatNumber(tradeStats.under_inspection)}</div>
-                            <Button text="View All" width="84px" onClick={() => {
-                                handleNavigation('/inventory/under-inspection')
-                            }}/>
-                        </div>
-                    </Card>
-                </Grid>
-                <Grid item xs={4}>
-                    <Card>
-                        <div className='top'>
-                            <Typography variant="h6">Available For Trade</Typography>
-                            <div className='success'>controlled by created trade</div>
-                        </div>
-                        <div className="bottom">
-                            <div className="count">{formatNumber(tradeStats.passed_for_trade)}</div>
-                            <Button text="View All" width="84px" onClick={() => {
-                                handleNavigation('/inventory/available-for-trade')
-                            }}/>
-                        </div>
-                    </Card>
-                </Grid>
-                <Grid item xs={4}>
-                    <Card>
-                        <div className='top'>
-                            <Typography variant="h6">Ongoing Trade</Typography>
-                            <div className='danger'>system controlled</div>
-                        </div>
-                        <div className="bottom">
-                            <div className="count">{formatNumber(tradeStats.ongoing_trade)}</div>
-                            <Button text="View All" width="84px" onClick={() => {
-                                handleNavigation('/inventory/ongoing-trade')
-                            }}/>
-                        </div>
-                    </Card>
-                </Grid>
-                <Grid item xs={4}>
-                    <Card>
-                        <div className='top'>
-                            <Typography variant="h6">Sold</Typography>
-                            <div className='danger'>system controlled</div>
-                        </div>
-                        <div className="bottom">
-                            <div className="count">{formatNumber(tradeStats.sold)}</div>
-                            <Button text="View All" width="84px" onClick={() => {
-                                handleNavigation('/inventory/sold')
-                            }}/>
-                        </div>
-                    </Card>
-                </Grid>
-                <Grid item xs={4}>
-                    <Card>
-                        <Typography variant="h6">Archived</Typography>
-                        <div className="bottom">
-                            <div className="count">{formatNumber(tradeStats.archived)}</div>
-                            <Button text="View All" width="84px" onClick={() => {
-                                handleNavigation('/inventory/archived')
-                            }}/>
-                        </div>
-                    </Card>
-                </Grid>
-            </Grid>
-            <Modal
-                open={modalOpen}
-                onClose={() => {
-                    setModalState(false)
-                }}
-            >
-                <ModalBody>
-                    <ModalBodyHeader>
-                        <Typography variant="h5" style={{fontWeight: 600}}>
-                            {modalTitle}
+            {!pageLoading && (
+                <>
+                    {createTrade && <CreateTrade modalOpen={createTrade} onClick={() => setCreateTrade(false)}/>}
+                    {addCarProfile &&
+                        <AddCarProfile modalOpen={addCarProfile} onClick={() => setAddCarProfile(false)}/>}
+                    <Header>
+                        <Typography variant="h4">
+                            <b>Inventory</b>
                         </Typography>
-                        <Image
-                            src="/icons/Cancel-Black.svg"
-                            width={25}
-                            height={25}
-                            onClick={() => setModalState(false)}
-                            style={{cursor: 'pointer'}}
+                        <ActionBar>
+                            <Button text="Add Car Profile" width={150} marginLeft="18px"
+                                    onClick={() => setAddCarProfile(true)}/>
+                            <Button
+                                text="Create Brand"
+                                width={150}
+                                outlined={true}
+                                marginLeft="18px"
+                                bgColor={t.primaryBlue}
+                                disabled={true}
+                                onClick={() => showModal('createBrand', 'Create Brand', 'Add a vehicle brand')}
+                            />
+                            <Button
+                                text="Create Trade"
+                                width={150}
+                                outlined={true}
+                                marginLeft="18px"
+                                onClick={() => setCreateTrade(true)}
+                            />
+                        </ActionBar>
+                    </Header>
+                    <Breadcrumbs>
+                        <img
+                            src="/icons/Inventory-Black.svg"
+                            width={'20px'}
+                            height={'18px'}
+                            style={{marginRight: '12px'}}
                         />
-                    </ModalBodyHeader>
-                    <Typography variant="inherit" style={{marginBottom: 20}}>
-                        {modalTitle !== ''
-                            ? modalTagline
-                            : ''}{' '}
-                        &nbsp;
-                    </Typography>
-                    {modalView === 'createBrand' && (
-                        <>
-                            <InputGrid>
-                                <input
-                                    type='file'
-                                    accept='image/*'
-                                    ref={hiddenFileInput}
-                                    onChange={handleFileChange}
-                                    style={{display: 'none'}}
+                        <div
+                            onClick={() => {
+                                handleNavigation('/inventory')
+                            }}
+                        >
+                            <span className="text">Inventory</span>
+                            <span className="separator"></span>
+                        </div>
+                        <div>&nbsp;</div>
+                    </Breadcrumbs>
+                    <Grid container spacing={5} style={{marginTop: 24}}>
+                        <Grid item xs={4}>
+                            <Card>
+                                <Typography variant="h6">Car Listings</Typography>
+                                <div className="bottom">
+                                    <div className="count">{formatNumber(tradeStats.car_listing)}</div>
+                                    <Button text="View All" width="84px" onClick={() => {
+                                        handleNavigation('/inventory/car-listings')
+                                    }}/>
+                                </div>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Card>
+                                <Typography variant="h6">Under Inspection</Typography>
+                                <div className="bottom">
+                                    <div className="count">{formatNumber(tradeStats.under_inspection)}</div>
+                                    <Button text="View All" width="84px" onClick={() => {
+                                        handleNavigation('/inventory/under-inspection')
+                                    }}/>
+                                </div>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Card>
+                                <div className='top'>
+                                    <Typography variant="h6">Available For Trade</Typography>
+                                    <div className='success'>controlled by created trade</div>
+                                </div>
+                                <div className="bottom">
+                                    <div className="count">{formatNumber(tradeStats.passed_for_trade)}</div>
+                                    <Button text="View All" width="84px" onClick={() => {
+                                        handleNavigation('/inventory/available-for-trade')
+                                    }}/>
+                                </div>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Card>
+                                <div className='top'>
+                                    <Typography variant="h6">Ongoing Trade</Typography>
+                                    <div className='danger'>system controlled</div>
+                                </div>
+                                <div className="bottom">
+                                    <div className="count">{formatNumber(tradeStats.ongoing_trade)}</div>
+                                    <Button text="View All" width="84px" onClick={() => {
+                                        handleNavigation('/inventory/ongoing-trade')
+                                    }}/>
+                                </div>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Card>
+                                <div className='top'>
+                                    <Typography variant="h6">Sold</Typography>
+                                    <div className='danger'>system controlled</div>
+                                </div>
+                                <div className="bottom">
+                                    <div className="count">{formatNumber(tradeStats.sold)}</div>
+                                    <Button text="View All" width="84px" onClick={() => {
+                                        handleNavigation('/inventory/sold')
+                                    }}/>
+                                </div>
+                            </Card>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <Card>
+                                <Typography variant="h6">Archived</Typography>
+                                <div className="bottom">
+                                    <div className="count">{formatNumber(tradeStats.archived)}</div>
+                                    <Button text="View All" width="84px" onClick={() => {
+                                        handleNavigation('/inventory/archived')
+                                    }}/>
+                                </div>
+                            </Card>
+                        </Grid>
+                    </Grid>
+                    <Modal
+                        open={modalOpen}
+                        onClose={() => {
+                            setModalState(false)
+                        }}
+                    >
+                        <ModalBody>
+                            <ModalBodyHeader>
+                                <Typography variant="h5" style={{fontWeight: 600}}>
+                                    {modalTitle}
+                                </Typography>
+                                <Image
+                                    src="/icons/Cancel-Black.svg"
+                                    width={25}
+                                    height={25}
+                                    onClick={() => setModalState(false)}
+                                    style={{cursor: 'pointer'}}
                                 />
-                                <FormControl
-                                    fullWidth
-                                    variant="standard"
-                                >
-                                    <InputLabel htmlFor="standard-adornment-password">
-                                        Upload Vehicle Image
-                                    </InputLabel>
-                                    <Input
-                                        id="custom-file"
-                                        type={'text'}
-                                        readOnly={true}
-                                        endAdornment={
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    aria-label="toggle password visibility"
-                                                    onClick={handleFileClick}
-                                                >
-                                                    <img src='/images/Upload.png' height={20} width={22}/>
-                                                    <Typography variant='subtitle2' color='primary'
-                                                                style={{marginLeft: 2}}>Upload</Typography>
-                                                </IconButton>
-                                            </InputAdornment>
-                                        }
+                            </ModalBodyHeader>
+                            <Typography variant="inherit" style={{marginBottom: 20}}>
+                                {modalTitle !== ''
+                                    ? modalTagline
+                                    : ''}{' '}
+                                &nbsp;
+                            </Typography>
+                            {modalView === 'createBrand' && (
+                                <>
+                                    <InputGrid>
+                                        <input
+                                            type='file'
+                                            accept='image/*'
+                                            ref={hiddenFileInput}
+                                            onChange={handleFileChange}
+                                            style={{display: 'none'}}
+                                        />
+                                        <FormControl
+                                            fullWidth
+                                            variant="standard"
+                                        >
+                                            <InputLabel htmlFor="standard-adornment-password">
+                                                Upload Vehicle Image
+                                            </InputLabel>
+                                            <Input
+                                                id="custom-file"
+                                                type={'text'}
+                                                readOnly={true}
+                                                endAdornment={
+                                                    <InputAdornment position="end">
+                                                        <IconButton
+                                                            aria-label="toggle password visibility"
+                                                            onClick={handleFileClick}
+                                                        >
+                                                            <img src='/images/Upload.png' height={20} width={22}/>
+                                                            <Typography variant='subtitle2' color='primary'
+                                                                        style={{marginLeft: 2}}>Upload</Typography>
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                }
+                                            />
+                                        </FormControl>
+                                        <TextField
+                                            className="text-field"
+                                            fullWidth
+                                            placeholder="Model"
+                                        />
+                                    </InputGrid>
+                                    <InputGrid>
+                                        <FormControl fullWidth>
+                                            <Select
+                                                value={brandModel}
+                                                onChange={(event) =>
+                                                    setBrandModel(String(event.target.value))
+                                                }
+                                                displayEmpty
+                                                inputProps={{'aria-label': 'Without label'}}
+                                                style={{height: 40}}
+                                            >
+                                                <option value="" disabled>
+                                                    Brand Model
+                                                </option>
+                                                <option value={''}>&nbsp;</option>
+                                            </Select>
+                                        </FormControl>
+                                        <TextField
+                                            className="text-field"
+                                            fullWidth
+                                            placeholder="Body Type"
+                                        />
+                                    </InputGrid>
+                                    <InputGrid>
+                                        <TextField
+                                            className="text-field"
+                                            fullWidth
+                                            placeholder="Year"
+                                        />
+                                    </InputGrid>
+                                    <Button
+                                        text="Proceed"
+                                        width={510}
+                                        marginLeft="auto"
+                                        marginRight="auto"
+                                        marginTop={40}
+                                        onClick={() => showModal('viewBrandSummary', 'Proceed', 'Vehicle brand summary')}
                                     />
-                                </FormControl>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Model"
-                                />
-                            </InputGrid>
-                            <InputGrid>
-                                <FormControl fullWidth>
-                                    <Select
-                                        value={brandModel}
-                                        onChange={(event) =>
-                                            setBrandModel(String(event.target.value))
-                                        }
-                                        displayEmpty
-                                        inputProps={{'aria-label': 'Without label'}}
-                                        style={{height: 40}}
-                                    >
-                                        <option value="" disabled>
-                                            Brand Model
-                                        </option>
-                                        <option value={''}>&nbsp;</option>
-                                    </Select>
-                                </FormControl>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Body Type"
-                                />
-                            </InputGrid>
-                            <InputGrid>
-                                <TextField
-                                    className="text-field"
-                                    fullWidth
-                                    placeholder="Year"
-                                />
-                            </InputGrid>
-                            <Button
-                                text="Proceed"
-                                width={510}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={40}
-                                onClick={() => showModal('viewBrandSummary', 'Proceed', 'Vehicle brand summary')}
-                            />
-                        </>
-                    )}
-                    {modalView === 'viewBrandSummary' && (
-                        <>
-                            <FlexRow style={{justifyContent: 'space-between', alignItems: 'start', marginTop: 8}}>
-                                <img
-                                    src="/images/Big-Default-Car.png"
-                                    width={185}
-                                    height={135}
-                                    style={{borderRadius: '8px'}}
-                                />
-                                <img
-                                    src="/images/Toyota-Full.png"
-                                    width={80}
-                                    height={22}
-                                    style={{}}
-                                />
-                            </FlexRow>
-                            <Statistic>
-                                <div className='key'>Make</div>
-                                <div className='value'>Toyota</div>
-                            </Statistic>
-                            <Statistic>
-                                <div className='key'>Model</div>
-                                <div className='value'>Rav4</div>
-                            </Statistic>
-                            <Statistic>
-                                <div className='key'>Year</div>
-                                <div className='value'>2018</div>
-                            </Statistic>
-                            <Statistic>
-                                <div className='key'>Body Type</div>
-                                <div className='value'>Saloon</div>
-                            </Statistic>
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: 12,
-                                fontWeight: 'bold',
-                                color: t.lightGrey
-                            }}>
-                                <img src='/icons/Caution-Yellow.svg' alt='caution' height={20} width={20}
-                                     style={{marginRight: 4}}/>
-                                <span>There’s no current UI for managing created brands, If you wish to delete contact the development team</span>
-                            </div>
-                            <Button
-                                text="Create & Save Brand"
-                                width={516}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={40}
-                                onClick={() => setModalState(false)}
-                            />
-                        </>
-                    )}
-                </ModalBody>
-            </Modal>
+                                </>
+                            )}
+                            {modalView === 'viewBrandSummary' && (
+                                <>
+                                    <FlexRow
+                                        style={{justifyContent: 'space-between', alignItems: 'start', marginTop: 8}}>
+                                        <img
+                                            src="/images/Big-Default-Car.png"
+                                            width={185}
+                                            height={135}
+                                            style={{borderRadius: '8px'}}
+                                        />
+                                        <img
+                                            src="/images/Toyota-Full.png"
+                                            width={80}
+                                            height={22}
+                                            style={{}}
+                                        />
+                                    </FlexRow>
+                                    <Statistic>
+                                        <div className='key'>Make</div>
+                                        <div className='value'>Toyota</div>
+                                    </Statistic>
+                                    <Statistic>
+                                        <div className='key'>Model</div>
+                                        <div className='value'>Rav4</div>
+                                    </Statistic>
+                                    <Statistic>
+                                        <div className='key'>Year</div>
+                                        <div className='value'>2018</div>
+                                    </Statistic>
+                                    <Statistic>
+                                        <div className='key'>Body Type</div>
+                                        <div className='value'>Saloon</div>
+                                    </Statistic>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: 12,
+                                        fontWeight: 'bold',
+                                        color: t.lightGrey
+                                    }}>
+                                        <img src='/icons/Caution-Yellow.svg' alt='caution' height={20} width={20}
+                                             style={{marginRight: 4}}/>
+                                        <span>There’s no current UI for managing created brands, If you wish to delete contact the development team</span>
+                                    </div>
+                                    <Button
+                                        text="Create & Save Brand"
+                                        width={516}
+                                        marginLeft="auto"
+                                        marginRight="auto"
+                                        marginTop={40}
+                                        onClick={() => setModalState(false)}
+                                    />
+                                </>
+                            )}
+                        </ModalBody>
+                    </Modal>
+                </>
+            )}
+            {pageLoading && (<Loader/>)}
         </Container>
     )
 }

@@ -7,7 +7,7 @@ const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
 const retrieveCarDocuments = (car = '', limit = 20, offset = 0) => {
-    return fetchWrapper.get(`${baseUrl}/car-documents?limit=${limit}&offset=${offset}&status=${status}`)
+    return fetchWrapper.get(`${baseUrl}/car-documents?limit=${limit}&offset=${offset}&car=${car}`)
         .then((response) => {
             return {status: true, data: response}
         })

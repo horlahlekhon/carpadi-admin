@@ -23,6 +23,7 @@ import CreateSale from "../../components/shared/CreateSale";
 import {toast} from "react-hot-toast";
 import {retrieveSales} from "../../services/sale";
 import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
+import Loader from "../../components/layouts/core/Loader";
 
 function SalesPage() {
     enum Sales {
@@ -57,6 +58,9 @@ function SalesPage() {
             }
         }
     )
+    const [pageLoading, setPageLoading] = useState(false)
+
+
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
     }
@@ -96,6 +100,7 @@ function SalesPage() {
     }
 
     const getSales = (saleStatus = 'active', page = 0) => {
+        setPageLoading(true)
         retrieveSales(rowsPerPage, page, saleStatus)
             .then((response) => {
                 if (response.status) {
@@ -111,6 +116,9 @@ function SalesPage() {
             })
             .catch((error) => {
                 toast.error(error.data)
+            })
+            .finally(() => {
+                setPageLoading(false)
             })
     }
 
@@ -128,214 +136,219 @@ function SalesPage() {
     return (
         <Container>
             <CPToast/>
-            {createSale && <CreateSale modalOpen={true} onClick={() => setCreateSale(false)}/>}
-            <Header>
-                <Typography variant="h4">
-                    <b>Selling</b>
-                </Typography>
-                <Button
-                    text="Add Car to Sales Platform"
-                    width={210}
-                    fontSize="13px"
-                    outlined={true}
-                    onClick={() => {
-                        setCreateSale(true)
-                    }}
-                />
-            </Header>
-            <Breadcrumbs>
-                <img
-                    src="/icons/Vehicle-Blue.svg"
-                    width={'20px'}
-                    height={'18px'}
-                    style={{marginRight: '12px'}}
-                />
-                <div
-                    onClick={() => {
-                        handleNavigation('sales')
-                    }}
-                >
-                    <span className="text">Selling</span>
-                    <span className="separator"></span>
-                </div>
-                <div
-                    onClick={() => {
-                        handleNavigation('sales')
-                    }}
-                ></div>
-            </Breadcrumbs>
-            <Grid container spacing={3} style={{marginTop: 21, marginBottom: 15}}>
-                <Grid item xs={6}>
-                    <StatsCard
-                        onClick={() => {
-                            selectSale(Sales.ACTIVE)
-                            setPage(0);
-                            getSales('active')
-                        }}
-                        style={{
-                            border:
-                                selectedSales === Sales.ACTIVE ? '3px solid #00AEEF' : 'none'
-                        }}
-                    >
-                        <Typography
-                            variant="inherit"
-                            color={selectedSales == Sales.ACTIVE ? 'primary' : 'inherit'}
-                        >
-                            Active
+            {!pageLoading && (
+                <>
+                    {createSale && <CreateSale modalOpen={true} onClick={() => setCreateSale(false)}/>}
+                    <Header>
+                        <Typography variant="h4">
+                            <b>Selling</b>
                         </Typography>
-                        <Typography
-                            variant="h5"
-                            color={selectedSales == Sales.ACTIVE ? 'primary' : 'inherit'}
+                        <Button
+                            text="Add Car to Sales Platform"
+                            width={210}
+                            fontSize="13px"
+                            outlined={true}
+                            onClick={() => {
+                                setCreateSale(true)
+                            }}
+                        />
+                    </Header>
+                    <Breadcrumbs>
+                        <img
+                            src="/icons/Vehicle-Blue.svg"
+                            width={'20px'}
+                            height={'18px'}
+                            style={{marginRight: '12px'}}
+                        />
+                        <div
+                            onClick={() => {
+                                handleNavigation('sales')
+                            }}
                         >
-                            NA
-                        </Typography>
-                    </StatsCard>
-                </Grid>
-                <Grid item xs={6}>
-                    <StatsCard
-                        onClick={() => {
-                            selectSale(Sales.INACTIVE)
-                            setPage(0);
-                            getSales('inactive')
-                        }}
-                        style={{
-                            border:
-                                selectedSales === Sales.INACTIVE ? '3px solid #00AEEF' : 'none'
-                        }}
-                    >
-                        <Typography
-                            variant="inherit"
-                            color={selectedSales == Sales.INACTIVE ? 'primary' : 'inherit'}
-                        >
-                            Inctive
-                        </Typography>
-                        <Typography
-                            variant="h5"
-                            color={selectedSales == Sales.INACTIVE ? 'primary' : 'inherit'}
-                        >
-                            NA
-                        </Typography>
-                    </StatsCard>
-                </Grid>
-            </Grid>
-            <TableCard>
-                <TableContainer>
-                    <Table style={{minWidth: 650}} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>No</TableCell>
-                                <TableCell align="right">Image</TableCell>
-                                <TableCell align="right">VIN</TableCell>
-                                <TableCell align="right">Make</TableCell>
-                                <TableCell align="right">Model</TableCell>
-                                <TableCell align="right">Year</TableCell>
-                                <TableCell align="right">Fuel Type</TableCell>
-                                <TableCell align="right">Selling Price</TableCell>
-                                <TableCell align="right">Date Listed</TableCell>
-                                <TableCell align="right">&nbsp;</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {sales
-                                .map((row, idx) => (
-                                    <TableRow
-                                        key={idx}
-                                        // style={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                    >
-                                        <TableCell component="th" scope="row">
-                                            {idx + 1}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            <img src={row?.product_images.length > 0 ? row?.product_images[0] : null}
-                                                 width={48} height={48} alt={trimString(row?.id)}/>
-                                        </TableCell>
-                                        <TableCell align="right">{row?.car?.vin}</TableCell>
-                                        <TableCell align="right">{row?.car?.make}</TableCell>
-                                        <TableCell align="right">{row?.car?.model}</TableCell>
-                                        <TableCell align="right">{row?.car?.year}</TableCell>
-                                        <TableCell align="right">{row?.car?.fuel_type}</TableCell>
-                                        <TableCell align="right">
-                                            &#8358;{formatNumber(row?.selling_price)}
-                                        </TableCell>
-                                        <TableCell align="right">{formatDate(row?.created)}</TableCell>
-                                        <TableCell align="right">
-                                            <Button
-                                                text="View"
-                                                width={66}
-                                                outlined={true}
-                                                onClick={() => handleNavigation(`sales/${row.id}`)}
-                                            />
-                                        </TableCell>
+                            <span className="text">Selling</span>
+                            <span className="separator"></span>
+                        </div>
+                        <div
+                            onClick={() => {
+                                handleNavigation('sales')
+                            }}
+                        ></div>
+                    </Breadcrumbs>
+                    <Grid container spacing={3} style={{marginTop: 21, marginBottom: 15}}>
+                        <Grid item xs={6}>
+                            <StatsCard
+                                onClick={() => {
+                                    selectSale(Sales.ACTIVE)
+                                    setPage(0);
+                                    getSales('active')
+                                }}
+                                style={{
+                                    border:
+                                        selectedSales === Sales.ACTIVE ? '3px solid #00AEEF' : 'none'
+                                }}
+                            >
+                                <Typography
+                                    variant="inherit"
+                                    color={selectedSales == Sales.ACTIVE ? 'primary' : 'inherit'}
+                                >
+                                    Active
+                                </Typography>
+                                <Typography
+                                    variant="h5"
+                                    color={selectedSales == Sales.ACTIVE ? 'primary' : 'inherit'}
+                                >
+                                    NA
+                                </Typography>
+                            </StatsCard>
+                        </Grid>
+                        <Grid item xs={6}>
+                            <StatsCard
+                                onClick={() => {
+                                    selectSale(Sales.INACTIVE)
+                                    setPage(0);
+                                    getSales('inactive')
+                                }}
+                                style={{
+                                    border:
+                                        selectedSales === Sales.INACTIVE ? '3px solid #00AEEF' : 'none'
+                                }}
+                            >
+                                <Typography
+                                    variant="inherit"
+                                    color={selectedSales == Sales.INACTIVE ? 'primary' : 'inherit'}
+                                >
+                                    Inctive
+                                </Typography>
+                                <Typography
+                                    variant="h5"
+                                    color={selectedSales == Sales.INACTIVE ? 'primary' : 'inherit'}
+                                >
+                                    NA
+                                </Typography>
+                            </StatsCard>
+                        </Grid>
+                    </Grid>
+                    <TableCard>
+                        <TableContainer>
+                            <Table style={{minWidth: 650}} aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>No</TableCell>
+                                        <TableCell align="right">Image</TableCell>
+                                        <TableCell align="right">VIN</TableCell>
+                                        <TableCell align="right">Make</TableCell>
+                                        <TableCell align="right">Model</TableCell>
+                                        <TableCell align="right">Year</TableCell>
+                                        <TableCell align="right">Fuel Type</TableCell>
+                                        <TableCell align="right">Selling Price</TableCell>
+                                        <TableCell align="right">Date Listed</TableCell>
+                                        <TableCell align="right">&nbsp;</TableCell>
                                     </TableRow>
-                                ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TableFooter>
-                    <div>
-                        Showing page {page + 1} of {Math.ceil(sales.length / rowsPerPage)}/{' '}
-                        {paginationKeys.count} Total Items
-                    </div>
+                                </TableHead>
+                                <TableBody>
+                                    {sales
+                                        .map((row, idx) => (
+                                            <TableRow
+                                                key={idx}
+                                                // style={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row">
+                                                    {idx + 1}
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    <img src={row?.product_images.length > 0 ? row?.product_images[0] : null}
+                                                         width={48} height={48} alt={trimString(row?.id)}/>
+                                                </TableCell>
+                                                <TableCell align="right">{row?.car?.vin}</TableCell>
+                                                <TableCell align="right">{row?.car?.make}</TableCell>
+                                                <TableCell align="right">{row?.car?.model}</TableCell>
+                                                <TableCell align="right">{row?.car?.year}</TableCell>
+                                                <TableCell align="right">{row?.car?.fuel_type}</TableCell>
+                                                <TableCell align="right">
+                                                    &#8358;{formatNumber(row?.selling_price)}
+                                                </TableCell>
+                                                <TableCell align="right">{formatDate(row?.created)}</TableCell>
+                                                <TableCell align="right">
+                                                    <Button
+                                                        text="View"
+                                                        width={66}
+                                                        outlined={true}
+                                                        onClick={() => handleNavigation(`sales/${row.id}`)}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <TableFooter>
+                            <div>
+                                Showing page {page + 1} of {Math.ceil(sales.length / rowsPerPage)}/{' '}
+                                {paginationKeys.count} Total Items
+                            </div>
 
-                    <nav>
-                        <ul className={classes.ul}>
-                            {items.map(({page, type, selected, ...item}, index) => {
-                                let children = null
+                            <nav>
+                                <ul className={classes.ul}>
+                                    {items.map(({page, type, selected, ...item}, index) => {
+                                        let children = null
 
-                                if (type === 'start-ellipsis' || type === 'end-ellipsis') {
-                                    children = '…'
-                                } else if (type === 'page') {
-                                    children = (
-                                        <button
-                                            type="button"
-                                            className={classes.button}
-                                            {...item}
-                                            style={{
-                                                borderColor: selected ? t.primaryDeepBlue : t.lightGrey,
-                                                fontWeight: selected ? 'bold' : undefined
-                                            }}
-                                        >
-                                            {page}
-                                        </button>
-                                    )
-                                } else if (type === 'previous') {
-                                    children = (
-                                        <button
-                                            className={classes.button}
-                                            type="button"
-                                            {...item}
-                                            style={{
-                                                borderColor: selected ? t.primaryDeepBlue : t.lightGrey
-                                            }}
-                                        >
-                                            {'back'}
-                                        </button>
-                                    )
-                                } else {
-                                    children = (
-                                        <button
-                                            className={classes.button}
-                                            type="button"
-                                            {...item}
-                                            style={{
-                                                borderColor: selected ? t.primaryDeepBlue : t.lightGrey
-                                            }}
-                                        >
-                                            {type}
-                                        </button>
-                                    )
-                                }
+                                        if (type === 'start-ellipsis' || type === 'end-ellipsis') {
+                                            children = '…'
+                                        } else if (type === 'page') {
+                                            children = (
+                                                <button
+                                                    type="button"
+                                                    className={classes.button}
+                                                    {...item}
+                                                    style={{
+                                                        borderColor: selected ? t.primaryDeepBlue : t.lightGrey,
+                                                        fontWeight: selected ? 'bold' : undefined
+                                                    }}
+                                                >
+                                                    {page}
+                                                </button>
+                                            )
+                                        } else if (type === 'previous') {
+                                            children = (
+                                                <button
+                                                    className={classes.button}
+                                                    type="button"
+                                                    {...item}
+                                                    style={{
+                                                        borderColor: selected ? t.primaryDeepBlue : t.lightGrey
+                                                    }}
+                                                >
+                                                    {'back'}
+                                                </button>
+                                            )
+                                        } else {
+                                            children = (
+                                                <button
+                                                    className={classes.button}
+                                                    type="button"
+                                                    {...item}
+                                                    style={{
+                                                        borderColor: selected ? t.primaryDeepBlue : t.lightGrey
+                                                    }}
+                                                >
+                                                    {type}
+                                                </button>
+                                            )
+                                        }
 
-                                return (
-                                    <li key={index} className={classes.li}>
-                                        {children}
-                                    </li>
-                                )
-                            })}
-                        </ul>
-                    </nav>
-                </TableFooter>
-            </TableCard>
+                                        return (
+                                            <li key={index} className={classes.li}>
+                                                {children}
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
+                            </nav>
+                        </TableFooter>
+                    </TableCard>
+                </>
+            )}
+            {pageLoading && (<Loader/>)}
         </Container>
     )
 }
