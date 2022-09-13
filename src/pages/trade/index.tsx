@@ -23,6 +23,7 @@ import {toast, Toaster} from "react-hot-toast";
 import Moment from 'moment';
 import CPToast from "../../components/shared/CPToast";
 import Loader from "../../components/layouts/core/Loader";
+import CreateTrade from "../../components/shared/CreateTrade";
 
 function TradesPage({response}) {
     enum Trades {
@@ -53,6 +54,7 @@ function TradesPage({response}) {
         }
     )
     const [pageLoading, setPageLoading] = useState(false)
+    const [createTrade, setCreateTrade] = useState(false)
 
     useEffect(() => {
         retrieveTradeStats();
@@ -146,10 +148,20 @@ function TradesPage({response}) {
             <CPToast/>
             {!pageLoading && (
                 <>
+                    {createTrade && <CreateTrade modalOpen={createTrade} onClick={() => setCreateTrade(false)}/>}
                     <Header>
                         <Typography variant="h4">
                             <b>Trade</b>
                         </Typography>
+                        <ActionBar>
+                            <Button
+                                text="Create Trade"
+                                width={150}
+                                outlined={true}
+                                marginLeft="18px"
+                                onClick={() => setCreateTrade(true)}
+                            />
+                        </ActionBar>
                     </Header>
                     <Breadcrumbs>
                         <img
@@ -547,4 +559,9 @@ const Breadcrumbs = styled.div`
       }
     }
   }
+`
+const ActionBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `
