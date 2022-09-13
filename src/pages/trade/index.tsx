@@ -171,168 +171,163 @@ function TradesPage({response}) {
                             <span className="separator"></span>
                         </div>
                     </Breadcrumbs>
-                    <Grid container spacing={3} style={{marginTop: 21, marginBottom: 15}}>
-                        <Grid item xs={3}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Trades.ACTIVE);
-                                    setPage(0);
-                                    retrieveTrades('ongoing')
-                                }}
-                                style={{
-                                    border:
-                                        selectedTrade === Trades.ACTIVE ? '3px solid #00AEEF' : 'none'
-                                }}
+                    <Flex>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.ACTIVE);
+                                setPage(0);
+                                retrieveTrades('ongoing')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.ACTIVE ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
-                                >
-                                    Ongoing
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
-                                >
-                                    {tradeStats.active_trades.active_trades}
-                                </Typography>
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
-                                >
-                                    with {tradeStats.active_trades.trading_users} Users
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Trades.SOLD);
-                                    setPage(0);
-                                    retrieveTrades('completed')
-                                }}
-                                style={{
-                                    border:
-                                        selectedTrade === Trades.SOLD ? '3px solid #00AEEF' : 'none'
-                                }}
+                                Ongoing
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
-                                >
-                                    Completed
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
-                                >
-                                    {tradeStats.sold_trades.sold_trades}
-                                </Typography>
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
-                                >
-                                    with {tradeStats.sold_trades.trading_users} Users
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Trades.PURCHASED);
-                                    setPage(0);
-                                    retrieveTrades('purchased')
-                                }}
-                                style={{
-                                    border:
-                                        selectedTrade === Trades.PURCHASED ? '3px solid #00AEEF' : 'none'
-                                }}
+                                {tradeStats.active_trades.active_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
-                                >
-                                    Purchased
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
-                                >
-                                    {tradeStats?.purchased_trades?.purchased_trades}
-                                </Typography>
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
-                                >
-                                    with {tradeStats?.purchased_trades?.trading_users} Users
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Trades.CLOSED);
-                                    setPage(0);
-                                    retrieveTrades('closed')
-                                }}
-                                style={{
-                                    border:
-                                        selectedTrade === Trades.CLOSED ? '3px solid #00AEEF' : 'none'
-                                }}
+                                with {tradeStats.active_trades.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.SOLD);
+                                setPage(0);
+                                retrieveTrades('completed')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.SOLD ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
-                                >
-                                    Closed
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
-                                >
-                                    {tradeStats.closed_trades.closed_trades}
-                                </Typography>
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
-                                >
-                                    with {tradeStats.closed_trades.trading_users} Users
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Trades.EXPIRED);
-                                    setPage(0);
-                                    retrieveTrades('expired')
-                                }}
-                                style={{
-                                    border:
-                                        selectedTrade === Trades.EXPIRED ? '3px solid #00AEEF' : 'none'
-                                }}
+                                Completed
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
-                                >
-                                    Expired
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
-                                >
-                                    {tradeStats?.expired_trades?.expired_trades}
-                                </Typography>
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
-                                >
-                                    with {tradeStats?.expired_trades?.trading_users} Users
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                    </Grid>
+                                {tradeStats.sold_trades.sold_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats.sold_trades.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.PURCHASED);
+                                setPage(0);
+                                retrieveTrades('purchased')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.PURCHASED ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                            >
+                                Purchased
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats?.purchased_trades?.purchased_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats?.purchased_trades?.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.CLOSED);
+                                setPage(0);
+                                retrieveTrades('closed')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.CLOSED ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
+                            >
+                                Closed
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats.closed_trades.closed_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats.closed_trades.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.EXPIRED);
+                                setPage(0);
+                                retrieveTrades('expired')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.EXPIRED ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                            >
+                                Expired
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats?.expired_trades?.expired_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats?.expired_trades?.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                    </Flex>
                     <TableCard>
                         <TableContainer>
                             <Table style={{minWidth: 650}} aria-label="simple table">
@@ -492,6 +487,19 @@ const StatsCard = withStyles({
         transition: 'all 0.3s ease-out'
     }
 })(Paper)
+
+const Flex = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 21px;
+  margin-bottom: 15px;
+`;
+
+const FlexItem = styled.div`
+  width: 100px;
+`;
 
 const TableFooter = styled.div`
   display: flex;
