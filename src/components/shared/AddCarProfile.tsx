@@ -121,14 +121,15 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             "vin": vin,
             "car_pictures": [],
             "colour": carColor,
-            "licence_plate": licence_plate,
-            "bought_price": bought_price,
+            "licence_plate": licence_plate
+        }
+        if (bought_price) {
+            data['bought_price'] = bought_price
         }
         uploadedPictures.forEach(async (picture) => {
             uploadFile(picture?.file, UploadTypes.CAR, vin)
                 .then((res) => {
                     if (res.status) {
-                        console.log(res.data?.secure_url)
                         data.car_pictures.push(res.data?.secure_url)
                     } else {
                         toast.error(res.data)
@@ -147,7 +148,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 toast.success('Created Successfully!')
                                 onClick()
                                 if (response.data?.id) {
-                                    handleNavigation(`/car-profile/${response.data.id}?status=car listings`)
+                                    handleNavigation(`/inventory/car-profile/${response.data.id}?status=car listings`)
                                 }
                             } else {
                                 toast.error(response.data)

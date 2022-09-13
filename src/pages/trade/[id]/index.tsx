@@ -96,7 +96,6 @@ function TradeProfilePage({pageId}) {
                 price_per_slot: tradeData?.price_per_slot,
                 slots_available: tradeData?.slots_available,
                 estimated_sales_duration: tradeData?.estimated_sales_duration,
-                car: tradeData.car.id
             })
             .then((response) => {
                 if (response.status) {
