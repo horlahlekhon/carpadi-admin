@@ -22,6 +22,8 @@ import {tradeService} from '../../services/trade'
 import {toast, Toaster} from "react-hot-toast";
 import Moment from 'moment';
 import CPToast from "../../components/shared/CPToast";
+import Loader from "../../components/layouts/core/Loader";
+import CreateTrade from "../../components/shared/CreateTrade";
 
 function TradesPage({response}) {
     enum Trades {
@@ -51,6 +53,8 @@ function TradesPage({response}) {
             "purchased_trades": {"trading_users": 0, "purchased_trades": 0}
         }
     )
+    const [pageLoading, setPageLoading] = useState(false)
+    const [createTrade, setCreateTrade] = useState(false)
 
     useEffect(() => {
         retrieveTradeStats();
@@ -81,6 +85,7 @@ function TradesPage({response}) {
     }
 
     const retrieveTrades = (tradeStatus = 'ongoing', page = 0) => {
+        setPageLoading(true)
         setTrades([])
         setPagination({
             "count": 0,
@@ -102,6 +107,9 @@ function TradesPage({response}) {
             })
             .catch((error) => {
                 toast.error(error.data)
+            })
+            .finally(() => {
+                setPageLoading(false)
             })
     }
 
@@ -138,319 +146,333 @@ function TradesPage({response}) {
     return (
         <Container>
             <CPToast/>
-            <Header>
-                <Typography variant="h4">
-                    <b>Trade</b>
-                </Typography>
-            </Header>
-            <Breadcrumbs>
-                <img
-                    src="/icons/Trade-Black.svg"
-                    width={'20px'}
-                    height={'18px'}
-                    style={{marginRight: '12px'}}
-                />
-                <div
-                    onClick={() => {
-                        handleNavigation('trade')
-                    }}
-                >
-                    <span className="text">Trade</span>
-                    <span className="separator"></span>
-                </div>
-                <div>
-                    <span className="text">{selectedTrade}</span>
-                    <span className="separator"></span>
-                </div>
-            </Breadcrumbs>
-            <Grid container spacing={3} style={{marginTop: 21, marginBottom: 15}}>
-                <Grid item xs={3}>
-                    <StatsCard
-                        onClick={() => {
-                            setSelected(Trades.ACTIVE);
-                            setPage(0);
-                            retrieveTrades('ongoing')
-                        }}
-                        style={{
-                            border:
-                                selectedTrade === Trades.ACTIVE ? '3px solid #00AEEF' : 'none'
-                        }}
-                    >
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
-                        >
-                            Ongoing
+            {!pageLoading && (
+                <>
+                    {createTrade && <CreateTrade modalOpen={createTrade} onClick={() => setCreateTrade(false)}/>}
+                    <Header>
+                        <Typography variant="h4">
+                            <b>Trade</b>
                         </Typography>
-                        <Typography
-                            variant="h5"
-                            color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
+                        <ActionBar>
+                            <Button
+                                text="Create Trade"
+                                width={150}
+                                outlined={true}
+                                marginLeft="18px"
+                                onClick={() => setCreateTrade(true)}
+                            />
+                        </ActionBar>
+                    </Header>
+                    <Breadcrumbs>
+                        <img
+                            src="/icons/Trade-Black.svg"
+                            width={'20px'}
+                            height={'18px'}
+                            style={{marginRight: '12px'}}
+                        />
+                        <div
+                            onClick={() => {
+                                handleNavigation('trade')
+                            }}
                         >
-                            {tradeStats.active_trades.active_trades}
-                        </Typography>
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
+                            <span className="text">Trade</span>
+                            <span className="separator"></span>
+                        </div>
+                        <div>
+                            <span className="text">{selectedTrade}</span>
+                            <span className="separator"></span>
+                        </div>
+                    </Breadcrumbs>
+                    <Flex>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.ACTIVE);
+                                setPage(0);
+                                retrieveTrades('ongoing')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.ACTIVE ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
                         >
-                            with {tradeStats.active_trades.trading_users} Users
-                        </Typography>
-                    </StatsCard>
-                </Grid>
-                <Grid item xs={2}>
-                    <StatsCard
-                        onClick={() => {
-                            setSelected(Trades.SOLD);
-                            setPage(0);
-                            retrieveTrades('completed')
-                        }}
-                        style={{
-                            border:
-                                selectedTrade === Trades.SOLD ? '3px solid #00AEEF' : 'none'
-                        }}
-                    >
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
+                            >
+                                Ongoing
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats.active_trades.active_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.ACTIVE ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats.active_trades.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.SOLD);
+                                setPage(0);
+                                retrieveTrades('completed')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.SOLD ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
                         >
-                            Completed
-                        </Typography>
-                        <Typography
-                            variant="h5"
-                            color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
+                            >
+                                Completed
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats.sold_trades.sold_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats.sold_trades.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.PURCHASED);
+                                setPage(0);
+                                retrieveTrades('purchased')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.PURCHASED ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
                         >
-                            {tradeStats.sold_trades.sold_trades}
-                        </Typography>
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.SOLD ? 'primary' : 'inherit'}
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                            >
+                                Purchased
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats?.purchased_trades?.purchased_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats?.purchased_trades?.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.CLOSED);
+                                setPage(0);
+                                retrieveTrades('closed')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.CLOSED ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
                         >
-                            with {tradeStats.sold_trades.trading_users} Users
-                        </Typography>
-                    </StatsCard>
-                </Grid>
-                <Grid item xs={2}>
-                    <StatsCard
-                        onClick={() => {
-                            setSelected(Trades.PURCHASED);
-                            setPage(0);
-                            retrieveTrades('purchased')
-                        }}
-                        style={{
-                            border:
-                                selectedTrade === Trades.PURCHASED ? '3px solid #00AEEF' : 'none'
-                        }}
-                    >
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
+                            >
+                                Closed
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats.closed_trades.closed_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats.closed_trades.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Trades.EXPIRED);
+                                setPage(0);
+                                retrieveTrades('expired')
+                            }}
+                            style={{
+                                border:
+                                    selectedTrade === Trades.EXPIRED ? '3px solid #00AEEF' : 'none',
+                                width: '19%'
+                            }}
                         >
-                            Purchased
-                        </Typography>
-                        <Typography
-                            variant="h5"
-                            color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
-                        >
-                            {tradeStats?.purchased_trades?.purchased_trades}
-                        </Typography>
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.PURCHASED ? 'primary' : 'inherit'}
-                        >
-                            with {tradeStats?.purchased_trades?.trading_users} Users
-                        </Typography>
-                    </StatsCard>
-                </Grid>
-                <Grid item xs={2}>
-                    <StatsCard
-                        onClick={() => {
-                            setSelected(Trades.CLOSED);
-                            setPage(0);
-                            retrieveTrades('closed')
-                        }}
-                        style={{
-                            border:
-                                selectedTrade === Trades.CLOSED ? '3px solid #00AEEF' : 'none'
-                        }}
-                    >
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
-                        >
-                            Closed
-                        </Typography>
-                        <Typography
-                            variant="h5"
-                            color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
-                        >
-                            {tradeStats.closed_trades.closed_trades}
-                        </Typography>
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.CLOSED ? 'primary' : 'inherit'}
-                        >
-                            with {tradeStats.closed_trades.trading_users} Users
-                        </Typography>
-                    </StatsCard>
-                </Grid>
-                <Grid item xs={3}>
-                    <StatsCard
-                        onClick={() => {
-                            setSelected(Trades.EXPIRED);
-                            setPage(0);
-                            retrieveTrades('expired')
-                        }}
-                        style={{
-                            border:
-                                selectedTrade === Trades.EXPIRED ? '3px solid #00AEEF' : 'none'
-                        }}
-                    >
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
-                        >
-                            Expired
-                        </Typography>
-                        <Typography
-                            variant="h5"
-                            color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
-                        >
-                            {tradeStats?.expired_trades?.expired_trades}
-                        </Typography>
-                        <Typography
-                            variant="inherit"
-                            color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
-                        >
-                            with {tradeStats?.expired_trades?.trading_users} Users
-                        </Typography>
-                    </StatsCard>
-                </Grid>
-            </Grid>
-            <TableCard>
-                <TableContainer>
-                    <Table style={{minWidth: 650}} aria-label="simple table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>No</TableCell>
-                                <TableCell align="left">Image</TableCell>
-                                <TableCell align="left">Trading ID</TableCell>
-                                <TableCell align="left">Total Slots</TableCell>
-                                <TableCell align="left">Available Slots</TableCell>
-                                <TableCell align="left">Sold Slots</TableCell>
-                                <TableCell align="left">Price Per Slot</TableCell>
-                                <TableCell align="left">Total Slot Price</TableCell>
-                                <TableCell align="left">Date Listed</TableCell>
-                                <TableCell align="left">&nbsp;</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {trades
-                                .map((row, idx) => (
-                                    <TableRow key={idx}>
-                                        <TableCell component="th" scope="row">
-                                            {idx}
-                                        </TableCell>
-                                        <TableCell component="th" scope="row">
-                                            <img src={row.car.image} width={48} height={48}/>
-                                        </TableCell>
-                                        <TableCell align="left">{row.id.substring(row.id.length - 7)}</TableCell>
-                                        <TableCell align="left">{row.slots_available}</TableCell>
-                                        <TableCell align="left">{row.remaining_slots}</TableCell>
-                                        <TableCell align="left">{row.slots_available - row.remaining_slots}</TableCell>
-                                        <TableCell align="left">
-                                            &#8358; {row.price_per_slot.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            &#8358; {(row.price_per_slot * row.slots_available).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                                        </TableCell>
-                                        <TableCell
-                                            align="left"
-                                            style={{
-                                                color:
-                                                    selectedTrade === Trades.CLOSED ? 'red' : 'inherit'
-                                            }}
-                                        >
-                                            {formatDate(row.created) || 'NA'}
-                                        </TableCell>
-                                        <TableCell align="left">
-                                            <Button
-                                                text="View"
-                                                width={66}
-                                                outlined={true}
-                                                onClick={() =>
-                                                    handleNavigation(`trade/${row.id}?type=${selectedTrade}`)
-                                                }
-                                            />
-                                        </TableCell>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                            >
+                                Expired
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                            >
+                                {tradeStats?.expired_trades?.expired_trades}
+                            </Typography>
+                            <Typography
+                                variant="inherit"
+                                color={selectedTrade == Trades.EXPIRED ? 'primary' : 'inherit'}
+                            >
+                                with {tradeStats?.expired_trades?.trading_users} Users
+                            </Typography>
+                        </StatsCard>
+                    </Flex>
+                    <TableCard>
+                        <TableContainer>
+                            <Table style={{minWidth: 650}} aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>No</TableCell>
+                                        <TableCell align="left">Image</TableCell>
+                                        <TableCell align="left">Trading ID</TableCell>
+                                        <TableCell align="left">Total Slots</TableCell>
+                                        <TableCell align="left">Available Slots</TableCell>
+                                        <TableCell align="left">Sold Slots</TableCell>
+                                        <TableCell align="left">Price Per Slot</TableCell>
+                                        <TableCell align="left">Total Slot Price</TableCell>
+                                        <TableCell align="left">Date Listed</TableCell>
+                                        <TableCell align="left">&nbsp;</TableCell>
                                     </TableRow>
-                                ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TableFooter>
-                    <div>
-                        Showing page {page + 1} of {Math.ceil(trades.length / rowsPerPage)}/{' '}
-                        {paginationKeys.count} Total Items
-                    </div>
+                                </TableHead>
+                                <TableBody>
+                                    {trades
+                                        .map((row, idx) => (
+                                            <TableRow key={idx}>
+                                                <TableCell component="th" scope="row">
+                                                    {idx}
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    <img src={row.car.image} width={48} height={48}/>
+                                                </TableCell>
+                                                <TableCell
+                                                    align="left">{row.id.substring(row.id.length - 7)}</TableCell>
+                                                <TableCell align="left">{row.slots_available}</TableCell>
+                                                <TableCell align="left">{row.remaining_slots}</TableCell>
+                                                <TableCell
+                                                    align="left">{row.slots_available - row.remaining_slots}</TableCell>
+                                                <TableCell align="left">
+                                                    &#8358; {row.price_per_slot.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                </TableCell>
+                                                <TableCell align="left">
+                                                    &#8358; {(row.price_per_slot * row.slots_available).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                </TableCell>
+                                                <TableCell
+                                                    align="left"
+                                                    style={{
+                                                        color:
+                                                            selectedTrade === Trades.CLOSED ? 'red' : 'inherit'
+                                                    }}
+                                                >
+                                                    {formatDate(row.created) || 'NA'}
+                                                </TableCell>
+                                                <TableCell align="left">
+                                                    <Button
+                                                        text="View"
+                                                        width={66}
+                                                        outlined={true}
+                                                        onClick={() =>
+                                                            handleNavigation(`trade/${row.id}?type=${selectedTrade}`)
+                                                        }
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <TableFooter>
+                            <div>
+                                Showing page {page + 1} of {Math.ceil(trades.length / rowsPerPage)}/{' '}
+                                {paginationKeys.count} Total Items
+                            </div>
 
-                    <nav>
-                        <ul className={classes.ul}>
-                            {items.map(({page, type, selected, ...item}, index) => {
-                                let children = null
+                            <nav>
+                                <ul className={classes.ul}>
+                                    {items.map(({page, type, selected, ...item}, index) => {
+                                        let children = null
 
-                                if (type === 'start-ellipsis' || type === 'end-ellipsis') {
-                                    children = '…'
-                                } else if (type === 'page') {
-                                    children = (
-                                        <button
-                                            type="button"
-                                            className={classes.button}
-                                            {...item}
-                                            style={{
-                                                borderColor: selected ? t.primaryDeepBlue : t.lightGrey,
-                                                fontWeight: selected ? 'bold' : undefined
-                                            }}
-                                        >
-                                            {page}
-                                        </button>
-                                    )
-                                } else if (type === 'previous') {
-                                    children = (
-                                        <button
-                                            className={classes.button}
-                                            type="button"
-                                            {...item}
-                                            style={{
-                                                borderColor: selected ? t.primaryDeepBlue : t.lightGrey
-                                            }}
-                                        >
-                                            {'back'}
-                                        </button>
-                                    )
-                                } else {
-                                    children = (
-                                        <button
-                                            className={classes.button}
-                                            type="button"
-                                            {...item}
-                                            style={{
-                                                borderColor: selected ? t.primaryDeepBlue : t.lightGrey
-                                            }}
-                                        >
-                                            {type}
-                                        </button>
-                                    )
-                                }
+                                        if (type === 'start-ellipsis' || type === 'end-ellipsis') {
+                                            children = '…'
+                                        } else if (type === 'page') {
+                                            children = (
+                                                <button
+                                                    type="button"
+                                                    className={classes.button}
+                                                    {...item}
+                                                    style={{
+                                                        borderColor: selected ? t.primaryDeepBlue : t.lightGrey,
+                                                        fontWeight: selected ? 'bold' : undefined
+                                                    }}
+                                                >
+                                                    {page}
+                                                </button>
+                                            )
+                                        } else if (type === 'previous') {
+                                            children = (
+                                                <button
+                                                    className={classes.button}
+                                                    type="button"
+                                                    {...item}
+                                                    style={{
+                                                        borderColor: selected ? t.primaryDeepBlue : t.lightGrey
+                                                    }}
+                                                >
+                                                    {'back'}
+                                                </button>
+                                            )
+                                        } else {
+                                            children = (
+                                                <button
+                                                    className={classes.button}
+                                                    type="button"
+                                                    {...item}
+                                                    style={{
+                                                        borderColor: selected ? t.primaryDeepBlue : t.lightGrey
+                                                    }}
+                                                >
+                                                    {type}
+                                                </button>
+                                            )
+                                        }
 
-                                return (
-                                    <li key={index} className={classes.li}>
-                                        {children}
-                                    </li>
-                                )
-                            })}
-                        </ul>
-                    </nav>
-                </TableFooter>
-            </TableCard>
+                                        return (
+                                            <li key={index} className={classes.li}>
+                                                {children}
+                                            </li>
+                                        )
+                                    })}
+                                </ul>
+                            </nav>
+                        </TableFooter>
+                    </TableCard>
+                </>
+            )}
+            {pageLoading && (
+                <Loader/>
+            )}
         </Container>
     )
 }
@@ -477,6 +499,19 @@ const StatsCard = withStyles({
         transition: 'all 0.3s ease-out'
     }
 })(Paper)
+
+const Flex = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 21px;
+  margin-bottom: 15px;
+`;
+
+const FlexItem = styled.div`
+  width: 100px;
+`;
 
 const TableFooter = styled.div`
   display: flex;
@@ -524,4 +559,9 @@ const Breadcrumbs = styled.div`
       }
     }
   }
+`
+const ActionBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `

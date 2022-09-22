@@ -121,14 +121,15 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             "vin": vin,
             "car_pictures": [],
             "colour": carColor,
-            "licence_plate": licence_plate,
-            "bought_price": bought_price,
+            "licence_plate": licence_plate
+        }
+        if (bought_price) {
+            data['bought_price'] = bought_price
         }
         uploadedPictures.forEach(async (picture) => {
             uploadFile(picture?.file, UploadTypes.CAR, vin)
                 .then((res) => {
                     if (res.status) {
-                        console.log(res.data?.secure_url)
                         data.car_pictures.push(res.data?.secure_url)
                     } else {
                         toast.error(res.data)
@@ -147,7 +148,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 toast.success('Created Successfully!')
                                 onClick()
                                 if (response.data?.id) {
-                                    handleNavigation(`/car-profile/${response.data.id}?status=car listings`)
+                                    handleNavigation(`/inventory/car-profile/${response.data.id}?status=car listings`)
                                 }
                             } else {
                                 toast.error(response.data)
@@ -255,7 +256,10 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 placeholder="Number Plate"
                                 value={licence_plate}
                                 variant='standard'
-                                onChange={(e) => setPlate(e.target.value)}
+                                error={!(new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(licence_plate))}
+                                onChange={(e) => {
+                                    setPlate(e.target.value)
+                                }}
                             />
                             <TextField
                                 className="text-field"
@@ -393,7 +397,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             marginLeft="auto"
                             marginRight="auto"
                             marginTop={40}
-                            disabled={!licence_plate || !carColor || !car?.mileage || !bought_price}
+                            disabled={!licence_plate || !carColor || !car?.mileage || !(new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(licence_plate))}
                             onClick={() => setModalView('uploadCarImages')}
                         />
                     </>

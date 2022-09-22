@@ -9,6 +9,7 @@ import {tradeService} from "../../../services/trade";
 import {toast} from "react-hot-toast";
 import {merchantService} from "../../../services/merchant";
 import {formatDate, formatNumber, trimString} from "../../../helpers/formatters";
+import Loader from "../../../components/layouts/core/Loader";
 
 function TradingActivitiesPage({uid}) {
     const router = useRouter()
@@ -58,6 +59,7 @@ function TradingActivitiesPage({uid}) {
         "modified": "2022-06-17T09:11:56.000265Z",
         "bvn": "3568302072"
     })
+    const [pageLoading, setPageLoading] = useState(false)
 
     const handleNavigation = (action: string) => {
         router.push(`${action}`)
@@ -65,6 +67,7 @@ function TradingActivitiesPage({uid}) {
 
     const retrieveTrade = (id) => {
         if (id !== null && id !== undefined) {
+            setPageLoading(true)
             tradeService
                 .retrieveSingleTrade(id)
                 .then((response) => {
@@ -76,6 +79,9 @@ function TradingActivitiesPage({uid}) {
                 })
                 .catch((error) => {
                     toast.error(error.data)
+                })
+                .finally(() => {
+                    setPageLoading(false)
                 })
         }
     }
@@ -106,157 +112,168 @@ function TradingActivitiesPage({uid}) {
     return (
         <MainLayout>
             <Container>
-                <Header>
-                    <Typography variant="h4">
-                        <b>Trading Activities</b>
-                    </Typography>
-                </Header>
-                <Grid container spacing={4}>
-                    <Grid item xs={12}>
-                        <Activities>
-                            <CardHeader>
-                                <div className='profile'>
-                                    <ProfileImage>
-                                        <img src={user?.user?.profile_picture} width={'100%'}
-                                             height={'100%'} alt={user?.user?.first_name}
-                                             style={{borderRadius: '100%'}}/>
-                                    </ProfileImage>
-                                    <div className='details'>
-                                        <div className='name'>{user?.user?.first_name} {user?.user?.last_name}</div>
-                                        <div>TRADING NAME: @{user?.user?.username}</div>
-                                    </div>
-                                </div>
-                                <BtnGroup>
-                                    <Button text='Go to Trade Profile' outlined={true} width={160}
-                                            onClick={() => handleNavigation(`/trade/${trade?.id}?type=Active`)}/>
-                                    <Button text='Go to Car Profile' outlined={true} width={160} marginLeft={18}
-                                            onClick={() => handleNavigation(`/inventory/car-profile/${trade?.car?.id}?status=car listings`)}/>
-                                </BtnGroup>
-                            </CardHeader>
-                            <SplitContainer>
-                                <div className="left">
-                                    <div className="vehicle-details">
-                                        <div className='row'>
-                                            <div className='item'>
-                                                <Typography variant="body1" className="title">
-                                                    Trading ID
-                                                </Typography>
-                                                <Typography variant="h5" className="id">
-                                                    {trimString(trade?.id)}
-                                                </Typography>
-                                            </div>
-                                            <div className='item'>
-                                                <Typography variant="body1" className="title">
-                                                    User ID
-                                                </Typography>
-                                                <Typography variant="h5" className="id">
-                                                    {trimString(user?.id)}
-                                                </Typography>
+                {!pageLoading && (
+                    <>
+                        <Header>
+                            <Typography variant="h4">
+                                <b>Trading Activities</b>
+                            </Typography>
+                        </Header>
+                        <Grid container spacing={4}>
+                            <Grid item xs={12}>
+                                <Activities>
+                                    <CardHeader>
+                                        <div className='profile'>
+                                            <ProfileImage>
+                                                <img src={user?.user?.profile_picture} width={'100%'}
+                                                     height={'100%'} alt={user?.user?.first_name}
+                                                     style={{borderRadius: '100%'}}/>
+                                            </ProfileImage>
+                                            <div className='details'>
+                                                <div
+                                                    className='name'>{user?.user?.first_name} {user?.user?.last_name}</div>
+                                                <div>TRADING NAME: @{user?.user?.username}</div>
                                             </div>
                                         </div>
-                                        <Typography variant="body1" className="title"
-                                                    style={{marginTop: 24, marginBottom: 0}}>
-                                            Trading with
-                                        </Typography>
-                                        <img
-                                            src="/images/Toyota-Full.png"
-                                            width={80}
-                                            height={22}
-                                            style={{marginBottom: -15}}
-                                        />
-                                        <Typography variant="h4" color='secondary'
-                                                    style={{marginTop: 30}}>{trimString(trade?.car?.id)}</Typography>
-                                        <Typography variant="h6">{trade?.car?.make} {trade?.car?.model}</Typography>
+                                        <BtnGroup>
+                                            <Button text='Go to Trade Profile' outlined={true} width={165}
+                                                    onClick={() => handleNavigation(`/trade/${trade?.id}?type=Active`)}/>
+                                            <Button text='Go to Car Profile' outlined={true} width={160} marginLeft={18}
+                                                    onClick={() => handleNavigation(`/inventory/car-profile/${trade?.car?.id}?status=car listings`)}/>
+                                        </BtnGroup>
+                                    </CardHeader>
+                                    <SplitContainer>
+                                        <div className="left">
+                                            <div className="vehicle-details">
+                                                <div className='row'>
+                                                    <div className='item'>
+                                                        <Typography variant="body1" className="title">
+                                                            Trading ID
+                                                        </Typography>
+                                                        <Typography variant="h5" className="id">
+                                                            {trimString(trade?.id)}
+                                                        </Typography>
+                                                    </div>
+                                                    <div className='item'>
+                                                        <Typography variant="body1" className="title">
+                                                            User ID
+                                                        </Typography>
+                                                        <Typography variant="h5" className="id">
+                                                            {trimString(user?.id)}
+                                                        </Typography>
+                                                    </div>
+                                                </div>
+                                                <Typography variant="body1" className="title"
+                                                            style={{marginTop: 24, marginBottom: 0}}>
+                                                    Trading with
+                                                </Typography>
+                                                <img
+                                                    src="/images/Toyota-Full.png"
+                                                    width={80}
+                                                    height={22}
+                                                    style={{marginBottom: -15}}
+                                                />
+                                                <Typography variant="h4" color='secondary'
+                                                            style={{marginTop: 30}}>{trimString(trade?.car?.id)}</Typography>
+                                                <Typography
+                                                    variant="h6">{trade?.car?.make} {trade?.car?.model}</Typography>
 
-                                        <img
-                                            src={trade?.car?.image}
-                                            height={300}
-                                            width={450}
-                                            style={{borderRadius: '8px'}}
-                                            alt={trade?.car?.make}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="right">
-                                    <Grid container spacing={3}>
-                                        <Grid item xs={12}>
-                                            <PriceCard style={{background: status !== 'active' ? t.extraLiteGrey : ''}}>
-                                                <Typography
-                                                    variant="body1">{status === 'active' ? 'Total Expected' : 'Received'} ROT</Typography>
-                                                <Typography
-                                                    variant="h5">&#8358; {formatNumber(trade?.estimated_return_on_trade)}</Typography>
-                                            </PriceCard>
-                                        </Grid>
-                                        <div className='title'>
-                                            Trade Purchase Details
+                                                <img
+                                                    src={trade?.car?.image}
+                                                    height={300}
+                                                    width={450}
+                                                    style={{borderRadius: '8px'}}
+                                                    alt={trade?.car?.make}
+                                                />
+                                            </div>
                                         </div>
-                                        <Grid item xs={12}>
-                                            <Statistic>
-                                                <div className="key">Bought Slots</div>
-                                                <div
-                                                    className="value">{formatNumber((trade?.slots_available || 0) - (trade?.remaining_slots || 0))}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Total
-                                                    Slot {status !== 'active' ? 'Purchased' : ''} Price
+                                        <div className="right">
+                                            <Grid container spacing={3}>
+                                                <Grid item xs={12}>
+                                                    <PriceCard
+                                                        style={{background: status !== 'active' ? t.extraLiteGrey : ''}}>
+                                                        <Typography
+                                                            variant="body1">{status === 'active' ? 'Total Expected' : 'Received'} ROT</Typography>
+                                                        <Typography
+                                                            variant="h5">&#8358; {formatNumber(trade?.estimated_return_on_trade)}</Typography>
+                                                    </PriceCard>
+                                                </Grid>
+                                                <div className='title'>
+                                                    Trade Purchase Details
                                                 </div>
-                                                <div
-                                                    className="value">&#8358; {formatNumber(trade?.sold_slots_price)}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">{status === 'active' ? 'Expected' : 'Received'} ROT
-                                                </div>
-                                                <div
-                                                    className="value">&#8358; {formatNumber(trade?.estimated_return_on_trade)}</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Trading Duration in Months</div>
-                                                <div
-                                                    className="value">{Math.ceil((trade?.estimated_sales_duration || 0) / 30)} Months
-                                                </div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div
-                                                    className="key">Purchase Date
-                                                </div>
-                                                <div className="value">{formatDate(trade?.modified)}</div>
-                                            </Statistic>
-                                            {status !== 'active' && (
-                                                <>
+                                                <Grid item xs={12}>
+                                                    <Statistic>
+                                                        <div className="key">Bought Slots</div>
+                                                        <div
+                                                            className="value">{formatNumber((trade?.slots_available || 0) - (trade?.remaining_slots || 0))}</div>
+                                                    </Statistic>
+                                                    <Statistic>
+                                                        <div className="key">Total
+                                                            Slot {status !== 'active' ? 'Purchased' : ''} Price
+                                                        </div>
+                                                        <div
+                                                            className="value">&#8358; {formatNumber(trade?.sold_slots_price)}</div>
+                                                    </Statistic>
                                                     <Statistic>
                                                         <div
-                                                            className="key">{status === 'sold' ? 'Sold' : 'Closed'} Date
+                                                            className="key">{status === 'active' ? 'Expected' : 'Received'} ROT
                                                         </div>
-                                                        <div className="value">11/03/2022</div>
+                                                        <div
+                                                            className="value">&#8358; {formatNumber(trade?.estimated_return_on_trade)}</div>
                                                     </Statistic>
-                                                </>
-                                            )}
-                                            <Statistic>
-                                                <div className="key">Recent Payment Ref</div>
-                                                <div className="value">REF NA</div>
-                                            </Statistic>
-                                            <Statistic>
-                                                <div className="key">Trade Status</div>
-                                                <div className="value">
-                                                    <ActivityTab
-                                                        style={{
-                                                            background:
-                                                                trade?.trade_status === 'purchased'
-                                                                    ? t.alertSuccessLite
-                                                                    : (status === 'sold' ? t.primaryExtraLite : t.extraLiteGrey)
-                                                        }}
-                                                    >
-                                                        {trade?.trade_status}
-                                                    </ActivityTab>
-                                                </div>
-                                            </Statistic>
-                                        </Grid>
-                                    </Grid>
-                                </div>
-                            </SplitContainer>
-                        </Activities>
-                    </Grid>
-                </Grid>
+                                                    <Statistic>
+                                                        <div className="key">Trading Duration in Months</div>
+                                                        <div
+                                                            className="value">{Math.ceil((trade?.estimated_sales_duration || 0) / 30)} Months
+                                                        </div>
+                                                    </Statistic>
+                                                    <Statistic>
+                                                        <div
+                                                            className="key">Purchase Date
+                                                        </div>
+                                                        <div className="value">{formatDate(trade?.modified)}</div>
+                                                    </Statistic>
+                                                    {status !== 'active' && (
+                                                        <>
+                                                            <Statistic>
+                                                                <div
+                                                                    className="key">{status === 'sold' ? 'Sold' : 'Closed'} Date
+                                                                </div>
+                                                                <div className="value">11/03/2022</div>
+                                                            </Statistic>
+                                                        </>
+                                                    )}
+                                                    <Statistic>
+                                                        <div className="key">Recent Payment Ref</div>
+                                                        <div className="value">REF NA</div>
+                                                    </Statistic>
+                                                    <Statistic>
+                                                        <div className="key">Trade Status</div>
+                                                        <div className="value">
+                                                            <ActivityTab
+                                                                style={{
+                                                                    background:
+                                                                        trade?.trade_status === 'purchased'
+                                                                            ? t.alertSuccessLite
+                                                                            : (status === 'sold' ? t.primaryExtraLite : t.extraLiteGrey)
+                                                                }}
+                                                            >
+                                                                {trade?.trade_status}
+                                                            </ActivityTab>
+                                                        </div>
+                                                    </Statistic>
+                                                </Grid>
+                                            </Grid>
+                                        </div>
+                                    </SplitContainer>
+                                </Activities>
+                            </Grid>
+                        </Grid>
+                    </>
+                )}
+                {pageLoading && (
+                    <Loader/>
+                )}
             </Container>
         </MainLayout>
     )

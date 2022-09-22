@@ -33,7 +33,7 @@ function SideNav() {
   }
 
   const Hamburger = styled.p`
-    width: ${isFullNav ? '100%' : 'fit-content'};
+    width: ${isFullNav ? '' : 'fit-content'};
     height: 48px;
     padding: 16px 25px;
     display: flex;
@@ -246,9 +246,8 @@ const Nav = styled.div`
 const NavItem = styled.a`
   display: flex;
   flex-direction: row;
-  width: 100%;
   height: 48px;
-  justift-content: flex-start;
+  justify-content: flex-start;
   align-items: center;
   padding-left: 41px;
   cursor: pointer;
