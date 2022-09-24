@@ -513,6 +513,7 @@ function CarProfilePage({pageId}) {
     const updateDocumentValue = (idx: number, field: string, value: string) => {
         let docs = [...vehicleDocuments]
         docs[idx][field] = value;
+        docs[idx]['is_modified'] = true;
         setVehicleDocuments(docs)
     }
 
@@ -545,30 +546,38 @@ function CarProfilePage({pageId}) {
         setIsSaving(true)
         vehicleDocuments.forEach((doc, idx) => {
             if (doc?.id) {
+                if(doc?.is_modified) {
+                    const d = {
+                        name: doc?.name,
+                        description: doc?.description,
+                    }
+                    updateCarDocument(doc?.id, d)
+                        .then((res) => {
+                            if (res.status) {
+                                toast.success(`Updated ${doc?.name}`)
+                            } else {
+                                toast.error(res.data)
+                            }
+                        })
+                        .catch((error) => {
+                            toast.error(error)
+                        })
+                        .finally(() => {
+                            retrieveDocuments()
+                        })
+                }
+            } else {
                 const d = {
                     name: doc?.name,
                     description: doc?.description,
+                    is_verified: doc?.is_verified,
+                    asset: doc?.asset,
+                    car: car?.id,
                 }
-                updateCarDocument(doc?.id, d)
+                createCarDocument(d)
                     .then((res) => {
                         if (res.status) {
-                            toast.success(`Updated ${doc?.name}`)
-                        } else {
-                            toast.error(res.data)
-                        }
-                    })
-                    .catch((error) => {
-                        toast.error(error)
-                    })
-                    .finally(() => {
-                        retrieveDocuments()
-                    })
-            } else {
-                doc.car = car?.id
-                createCarDocument(doc)
-                    .then((res) => {
-                        if (res.status) {
-                            toast.success(`Created ${doc?.name}`)
+                            toast.success(`Created ${d?.name}`)
                         } else {
                             toast.error(res.data)
                         }
@@ -613,7 +622,7 @@ function CarProfilePage({pageId}) {
                         {createTrade && <CreateTrade car={car} onClick={() => setCreateTrade(false)}/>}
                         <input
                             type="file"
-                            accept="image/*"
+                            accept="image/*,application/pdf"
                             ref={hiddenFileInput2}
                             onChange={handleFileChange2}
                             style={{display: 'none'}}
@@ -895,10 +904,11 @@ function CarProfilePage({pageId}) {
                                     <div style={{marginTop: '30px', marginBottom: '30px'}}>
                                         <Autocomplete
                                             id="combo-box-demo"
-                                            options={carDocuments}
+                                            options={carDocuments.filter(x => vehicleDocuments.findIndex(a => a.name === x.name) == -1)}
                                             getOptionLabel={(option) => option.name}
                                             style={{width: 900, marginBottom: '20px'}}
                                             value={documentValue}
+                                            disabled={carDocuments.filter(x => vehicleDocuments.findIndex(a => a.name === x.name) == -1).length < 1}
                                             onChange={(event: any, newValue: any | null) => {
                                                 addDocument(newValue);
                                             }}
@@ -1096,6 +1106,7 @@ function CarProfilePage({pageId}) {
                                                 label={getColorName(car.colour) || 'Color'}
                                                 type='color'
                                                 variant='standard'
+                                                value={car?.colour}
                                                 onChange={(e) => setColor(e.target.value)}
                                             />
                                         </InputGrid>
