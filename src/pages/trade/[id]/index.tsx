@@ -329,9 +329,10 @@ function TradeProfilePage({pageId}) {
                                         disabled={
                                             tradeData?.trade_status === TradeStates.PURCHASED ||
                                             tradeData?.trade_status === TradeStates.COMPLETED ||
-                                            tradeData?.trade_status === TradeStates.CLOSED || isLoading
+                                            tradeData?.trade_status === TradeStates.CLOSED || isLoading ||
+                                            (tradeData.slots_available - tradeData.remaining_slots) > 0
                                         }
-                                        title='Trade is already purchased'
+                                        title='Trade slots already purchased'
                                         onClick={() => showModal('editTrade', 'Edit Trade')}
                                     />
                                     <Button
@@ -423,7 +424,7 @@ function TradeProfilePage({pageId}) {
                                         <Statistic>
                                             <div className="key">Trading Duration in Months</div>
                                             <div className="value">
-                                                {Math.ceil(tradeData.estimated_sales_duration / 30)} Months
+                                                {Math.ceil(tradeData.estimated_sales_duration / 30)} Month(s)
                                             </div>
                                         </Statistic>
                                         <Statistic>

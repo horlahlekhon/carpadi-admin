@@ -365,14 +365,14 @@ function SalesProfilePage({pageId}) {
                                 </Typography>
                                 <div className="cta">
                                     <span>Set As Active</span>
-                                    {/*<Switch checked={state.saleActive}*/}
-                                    {/*        onChange={handleChange}*/}
-                                    {/*        name="saleActive" color='primary'></Switch>*/}
-                                    <ToggleSwitch
-                                        checked={state.saleActive}
-                                        onChange={handleChange}
-                                        name="saleActive"
-                                    />
+                                    <Switch checked={state.saleActive}
+                                            onChange={handleChange}
+                                            name="saleActive" color='primary'></Switch>
+                                    {/*<ToggleSwitch*/}
+                                    {/*    checked={state.saleActive}*/}
+                                    {/*    onChange={handleChange}*/}
+                                    {/*    name="saleActive"*/}
+                                    {/*/>*/}
                                 </div>
                             </SalesStatus>
                             <Typography variant="h6" color="secondary">
@@ -514,14 +514,14 @@ function SalesProfilePage({pageId}) {
                                                 <HeaderText className="status">Sales Status</HeaderText>
                                                 <div className="cta">
                                                     <span>Set As Active</span>
-                                                    {/*<Switch checked={state.saleActive}*/}
-                                                    {/*        onChange={handleChange}*/}
-                                                    {/*        name="saleActive" color='primary'></Switch>*/}
-                                                    <ToggleSwitch
-                                                        checked={state.saleActive}
-                                                        onChange={handleChange}
-                                                        name="saleActive"
-                                                    />
+                                                    <Switch checked={state.saleActive}
+                                                            onChange={handleChange}
+                                                            name="saleActive" color='primary'></Switch>
+                                                    {/*<ToggleSwitch*/}
+                                                    {/*    checked={state.saleActive}*/}
+                                                    {/*    onChange={handleChange}*/}
+                                                    {/*    name="saleActive"*/}
+                                                    {/*/>*/}
                                                 </div>
                                             </SalesStatus>
                                         </FlexRow>
