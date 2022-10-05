@@ -64,6 +64,7 @@ function SalesPage() {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
+        getSales(selectedSales.valueOf(), ((newPage - 1) * rowsPerPage))
     }
 
     const handleNavigation = (action: string) => {
@@ -284,7 +285,7 @@ function SalesPage() {
                         </TableContainer>
                         <TableFooter>
                             <div>
-                                Showing page {page + 1} of {Math.ceil(sales.length / rowsPerPage)}/{' '}
+                                Showing page {page + 1} of {Math.ceil(paginationKeys.count / rowsPerPage)}/{' '}
                                 {paginationKeys.count} Total Items
                             </div>
 

@@ -39,7 +39,7 @@ function OngoingTradePage() {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
-        retrieveCarList(newPage - 1)
+        retrieveCarList(((newPage - 1) * rowsPerPage))
     }
 
     const handleNavigation = (action: string) => {

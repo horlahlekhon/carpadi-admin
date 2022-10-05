@@ -64,7 +64,7 @@ function TradesPage({response}) {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1);
-        retrieveTrades(selectedTrade === Trades.ACTIVE ? 'ongoing' : selectedTrade === Trades.SOLD ? 'completed' : 'sold', newPage - 1)
+        retrieveTrades(selectedTrade === Trades.ACTIVE ? 'ongoing' : selectedTrade === Trades.SOLD ? 'completed' : 'sold', ((newPage - 1) * rowsPerPage))
     }
 
     const handleNavigation = (action: string) => {
@@ -363,7 +363,7 @@ function TradesPage({response}) {
                                         .map((row, idx) => (
                                             <TableRow key={idx}>
                                                 <TableCell component="th" scope="row">
-                                                    {idx}
+                                                    {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
                                                     <img src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>
@@ -406,7 +406,7 @@ function TradesPage({response}) {
                         </TableContainer>
                         <TableFooter>
                             <div>
-                                Showing page {page + 1} of {Math.ceil(trades.length / rowsPerPage)}/{' '}
+                                Showing page {page + 1} of {Math.ceil(paginationKeys.count / rowsPerPage)}/{' '}
                                 {paginationKeys.count} Total Items
                             </div>
 
