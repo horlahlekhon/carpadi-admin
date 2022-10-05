@@ -22,6 +22,7 @@ import {toast} from "react-hot-toast";
 import {CarStates} from "../../../lib/enums";
 import {formatDate} from "../../../helpers/formatters";
 import Loader from "../../../components/layouts/core/Loader";
+import {applyTransformation} from "../../../services/upload";
 
 function OngoingTradePage() {
     const rowsPerPage = 10
@@ -157,7 +158,7 @@ function OngoingTradePage() {
                                                     {idx}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={row.pictures.length > 0 ? row.pictures[0] : null}
+                                                    <img src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}
                                                          width={48}
                                                          height={48}/>
                                                 </TableCell>

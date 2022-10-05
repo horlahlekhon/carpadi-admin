@@ -53,8 +53,20 @@ const resizeFile = (file, {width = 300, height = 300, format = "JPEG"}) => {
     });
 }
 
+const applyTransformation = (url: string, width: number, height: number) => {
+    if(url) {
+        const splitUrl = url.split('upload/')
+        if (splitUrl.length == 2) {
+            return `${splitUrl[0]}upload/w_${width},h_${height}/${splitUrl[1]}`
+        }
+        return url;
+    }
+    return url
+}
+
 export {
     uploadFile,
     deleteUpload,
-    resizeFile
+    resizeFile,
+    applyTransformation
 }

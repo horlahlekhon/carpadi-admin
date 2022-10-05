@@ -23,6 +23,7 @@ import {toast} from "react-hot-toast";
 import CPToast from "../../components/shared/CPToast";
 import {formatDate, formatNumber, trimString} from '../../helpers/formatters'
 import Loader from "../../components/layouts/core/Loader";
+import {applyTransformation} from "../../services/upload";
 
 
 function UsersPage() {
@@ -313,7 +314,7 @@ function UsersPage() {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img alt={row.user?.first_name} src={row.user.profile_picture}
+                                                    <img alt={row.user?.first_name} src={applyTransformation(row.user.profile_picture, 48, 48)}
                                                          width={40}
                                                          height={40}
                                                          style={{borderRadius: '50%'}}/>

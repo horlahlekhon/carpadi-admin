@@ -24,6 +24,7 @@ import Moment from 'moment';
 import CPToast from "../../components/shared/CPToast";
 import Loader from "../../components/layouts/core/Loader";
 import CreateTrade from "../../components/shared/CreateTrade";
+import {applyTransformation} from "../../services/upload";
 
 function TradesPage({response}) {
     enum Trades {
@@ -365,7 +366,7 @@ function TradesPage({response}) {
                                                     {idx}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={row.car.image} width={48} height={48}/>
+                                                    <img src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>
                                                 </TableCell>
                                                 <TableCell
                                                     align="left">{row.id.substring(row.id.length - 7)}</TableCell>

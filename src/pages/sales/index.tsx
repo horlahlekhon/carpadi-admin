@@ -24,6 +24,7 @@ import {toast} from "react-hot-toast";
 import {retrieveSales} from "../../services/sale";
 import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import Loader from "../../components/layouts/core/Loader";
+import {applyTransformation} from "../../services/upload";
 
 function SalesPage() {
     enum Sales {
@@ -256,7 +257,7 @@ function SalesPage() {
                                                     {idx + 1}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={row?.product_images.length > 0 ? row?.product_images[0] : null}
+                                                    <img src={row?.product_images.length > 0 ? applyTransformation(row?.product_images[0], 48, 48) : null}
                                                          width={48} height={48} alt={trimString(row?.id)}/>
                                                 </TableCell>
                                                 <TableCell align="right">{row?.car?.vin}</TableCell>
