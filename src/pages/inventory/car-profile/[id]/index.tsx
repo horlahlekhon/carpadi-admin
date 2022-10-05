@@ -27,7 +27,7 @@ import {
 } from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
 import CPToast from "../../../../components/shared/CPToast";
-import {uploadFile} from "../../../../services/upload";
+import {resizeFile, uploadFile} from "../../../../services/upload";
 import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
 import {createInspection, retrieveInspection} from "../../../../services/inspection";
@@ -228,9 +228,10 @@ function CarProfilePage({pageId}) {
 
     const handleFile = (files) => {
         let arr = Array.from(files)
-        arr.forEach((file) => {
+        arr.forEach(async(file) => {
+            const resizedFile = await resizeFile(file, {width: 500, height: 300})
             setIsSaving(true)
-            uploadFile(file)
+            uploadFile(resizedFile)
                 .then((res) => {
                     if (res.status) {
                         let arr = car.pictures

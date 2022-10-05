@@ -1,6 +1,7 @@
 import getConfig from 'next/config';
 import {UploadTypes} from "../lib/enums";
 import {randomString} from "../helpers/condeGenerators";
+import Resizer from "react-image-file-resizer";
 
 
 const {publicRuntimeConfig} = getConfig();
@@ -35,7 +36,25 @@ const deleteUpload = (id) => {
     console.log(id)
 }
 
+const resizeFile = (file, {width = 300, height = 300, format = "JPEG"}) => {
+    return new Promise((resolve) => {
+        Resizer.imageFileResizer(
+            file,
+            width,
+            height,
+            format,
+            100,
+            0,
+            (uri) => {
+                resolve(uri);
+            },
+            "base64"
+        );
+    });
+}
+
 export {
     uploadFile,
-    deleteUpload
+    deleteUpload,
+    resizeFile
 }
