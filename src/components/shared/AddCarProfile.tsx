@@ -7,7 +7,7 @@ import {useRef, useState} from "react";
 import {toast} from "react-hot-toast";
 import styled from "styled-components";
 import {retrieveVINDetails} from "../../services/vehicle";
-import {uploadFile} from "../../services/upload";
+import {resizeFile, uploadFile} from "../../services/upload";
 import ntc from "../../lib/ntc";
 import {trimString} from "../../helpers/formatters";
 import {createCar} from "../../services/car";
@@ -127,18 +127,19 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             data['bought_price'] = bought_price
         }
         uploadedPictures.forEach(async (picture) => {
-            uploadFile(picture?.file, UploadTypes.CAR, vin)
-                .then((res) => {
-                    if (res.status) {
-                        data.car_pictures.push(res.data?.secure_url)
-                    } else {
-                        toast.error(res.data)
-                    }
-                })
-                .catch((error) => {
-                    toast.error(error)
-                })
-            const res = await uploadFile(picture?.file, UploadTypes.CAR, vin);
+            const p = await resizeFile(picture?.file, {width: 500, height: 300, format: 'JPEG'})
+            // uploadFile(p, UploadTypes.CAR, vin)
+            //     .then((res) => {
+            //         if (res.status) {
+            //             data.car_pictures.push(res.data?.secure_url)
+            //         } else {
+            //             toast.error(res.data)
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         toast.error(error)
+            //     })
+            const res = await uploadFile(p, UploadTypes.CAR, vin);
             if (res.status) {
                 data.car_pictures.push(res.data?.secure_url)
                 if (data.car_pictures.length === uploadedPictures.length) {
