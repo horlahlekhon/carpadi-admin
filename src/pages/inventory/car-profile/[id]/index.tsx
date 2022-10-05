@@ -861,7 +861,7 @@ function CarProfilePage({pageId}) {
                                         <div className="key">Vehicle Age</div>
                                         <div className="value">{formatNumber(car?.information?.age) || 'NA'}</div>
                                     </Detail>
-                                    {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL].includes(car?.status) && (
+                                    {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL, CarStates.INSPECTED].includes(car?.status) && (
                                         <Button text='Create Trade' width='100%' marginTop={30}
                                                 disabled={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) || car?.inspection?.status !== InspectionStates.COMPLETED}
                                                 title={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) ? 'Vehicle should be available for trade and must have been inspected' : ''}
