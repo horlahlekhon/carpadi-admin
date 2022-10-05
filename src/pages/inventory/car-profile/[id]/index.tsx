@@ -372,6 +372,7 @@ function CarProfilePage({pageId}) {
 
     function setColor(colorCode) {
         setCarData({...car, 'colour': colorCode})
+        setEditedCarData({...editedCar, 'colour': colorCode})
     }
 
     function setField(fieldName, value) {
