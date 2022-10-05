@@ -255,7 +255,7 @@ function SalesPage() {
                                                 // style={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row">
-                                                    {idx + 1}
+                                                    {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
                                                     <img src={row?.product_images.length > 0 ? applyTransformation(row?.product_images[0], 48, 48) : null}

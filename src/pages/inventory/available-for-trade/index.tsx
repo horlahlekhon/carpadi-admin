@@ -155,7 +155,7 @@ function AvailableForTradePage() {
                                                 key={idx}
                                             >
                                                 <TableCell component="th" scope="row">
-                                                    {idx}
+                                                    {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
                                                     <img src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}
