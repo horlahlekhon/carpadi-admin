@@ -228,7 +228,7 @@ function CarProfilePage({pageId}) {
 
     const handleFile = (files) => {
         let arr = Array.from(files)
-        arr.forEach(async(file) => {
+        arr.forEach(async (file) => {
             const resizedFile = await resizeFile(file, {width: 500, height: 300})
             setIsSaving(true)
             uploadFile(resizedFile)
@@ -408,9 +408,15 @@ function CarProfilePage({pageId}) {
     }
 
     const updateInspectionFields = (field, value) => {
-        let obj = {...newInspection}
-        obj[field] = value;
-        setNewInspection(obj)
+        if (field == 'inspection_date' && Moment(value).toDate() > Moment().toDate()) {
+            toast.dismiss()
+            toast.error("Date cannot be greater than today")
+            return
+        } else {
+            let obj = {...newInspection}
+            obj[field] = value;
+            setNewInspection(obj)
+        }
     }
 
     function addInspection(): void {
@@ -544,7 +550,7 @@ function CarProfilePage({pageId}) {
         setIsSaving(true)
         vehicleDocuments.forEach((doc, idx) => {
             if (doc?.id) {
-                if(doc?.is_modified) {
+                if (doc?.is_modified) {
                     const d = {
                         name: doc?.name,
                         description: doc?.description,
