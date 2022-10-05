@@ -146,6 +146,7 @@ function CarProfilePage({pageId}) {
         "name": null,
         "licence_plate": null
     })
+    const [editedCar, setEditedCarData] = useState({})
     const [newInspection, setNewInspection] = useState({
         "owners_name": null,
         "owners_review": null,
@@ -323,15 +324,7 @@ function CarProfilePage({pageId}) {
     }
     const updateCarData = () => {
         setIsSaving(true)
-        const data = {
-            "car_pictures": car.pictures,
-            "status": car.status,
-            "bought_price": car.bought_price,
-            "colour": car?.colour,
-            "description": car.description,
-            "name": car.name,
-            "licence_plate": car.licence_plate
-        }
+        const data = editedCar;
         const vehicleData = {
             "transmission": car?.information?.transmission,
             "fuel_type": car?.information?.fuel_type,
@@ -382,8 +375,11 @@ function CarProfilePage({pageId}) {
 
     function setField(fieldName, value) {
         let obj = {...car}
+        let obj2 = {...editedCar}
         obj[fieldName] = value;
+        obj2[fieldName] = value;
         setCarData(obj)
+        setEditedCarData(obj2)
     }
 
     function setInfoField(fieldName, value) {
@@ -703,14 +699,20 @@ function CarProfilePage({pageId}) {
                                         width={135}
                                         outlined={true}
                                         marginRight="16px"
-                                        onClick={() => showModal('editImages', 'Edit Car Images', 'Upload minimum of 5 images to complete profile')}
+                                        onClick={() => {
+                                            setEditedCarData({})
+                                            showModal('editImages', 'Edit Car Images', 'Upload minimum of 5 images to complete profile')
+                                        }}
                                     />
                                     <Button
                                         text="Edit Details"
                                         width={135}
                                         outlined={true}
                                         marginRight="16px"
-                                        onClick={() => showModal('editDetails', 'Edit Car Profile')}
+                                        onClick={() => {
+                                            setEditedCarData({})
+                                            showModal('editDetails', 'Edit Car Profile')
+                                        }}
                                     />
                                     <Button
                                         text="Car Documents"
