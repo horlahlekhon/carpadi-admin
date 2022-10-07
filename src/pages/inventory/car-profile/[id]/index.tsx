@@ -21,7 +21,7 @@ import {
     CarStates,
     CarTransmissionTypes,
     FuelTypes,
-    InspectionStates,
+    InspectionStates, RequiredCarDocuments,
     TradeStates,
     UploadTypes
 } from "../../../../lib/enums";
@@ -53,49 +53,56 @@ function CarProfilePage({pageId}) {
             "name": 'Proof of ownership',
             "description": 'Proof of ownership',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.ProofOfOwnership
         },
         {
             "asset": null,
             "name": 'Allocation of plate number',
             "description": 'Allocation of plate number',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.AllocationOfLicensePlate
         },
         {
             "asset": null,
             "name": 'Vehicle license',
             "description": 'Vehicle license',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.VehicleLicense
         },
         {
             "asset": null,
             "name": 'Customs paper/Receipt of purchase',
             "description": 'Customs paper/Receipt of purchase',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.CustomPapersOrPurchaseReceipt
         },
         {
             "asset": null,
             "name": 'Police CMR',
             "description": 'Police CMR',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.PoliceCMR
         },
         {
             "asset": null,
             "name": 'Insurance',
             "description": 'Insurance',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.Insurance
         },
         {
             "asset": null,
             "name": 'Road worthiness',
             "description": 'Road worthiness',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.RoadWorthiness
         },
     ]
     const router = useRouter()
@@ -479,7 +486,8 @@ function CarProfilePage({pageId}) {
             "asset": null,
             "name": '',
             "description": '',
-            "car": null
+            "car": null,
+            "document_type": RequiredCarDocuments.Others
         };
         let docs = [...vehicleDocuments, document];
         setVehicleDocuments(docs)
@@ -548,6 +556,31 @@ function CarProfilePage({pageId}) {
 
     const saveDocuments = () => {
         setIsSaving(true)
+        // let newDocs = vehicleDocuments.filter(x => x?.id == null)
+        // newDocs = newDocs.map(doc => {
+        //     return {
+        //         name: doc?.name,
+        //         description: doc?.description,
+        //         is_verified: doc?.is_verified,
+        //         asset: doc?.asset,
+        //         car: car?.id,
+        //     }
+        // })
+        // createCarDocument(newDocs)
+        //     .then((res) => {
+        //         if (res.status) {
+        //             toast.success(`Created documents`)
+        //         } else {
+        //             toast.error(res.data)
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         toast.error(error)
+        //     })
+        //     .finally(() => {
+        //         retrieveDocuments()
+        //     })
+        
         vehicleDocuments.forEach((doc, idx) => {
             if (doc?.id) {
                 if (doc?.is_modified) {
@@ -575,6 +608,7 @@ function CarProfilePage({pageId}) {
                     name: doc?.name,
                     description: doc?.description,
                     is_verified: doc?.is_verified,
+                    document_type: doc?.document_type,
                     asset: doc?.asset,
                     car: car?.id,
                 }
@@ -600,13 +634,16 @@ function CarProfilePage({pageId}) {
         })
     }
 
-    const downloadDocument = (resourceUrl: any) => {
-        if (resourceUrl) {
+    const downloadDocument = (resourceUrl: string) => {
+        if (resourceUrl && String(resourceUrl).startsWith('http')) {
             let link = document.createElement("a");
             link.href = resourceUrl;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        } else {
+            toast.dismiss()
+            toast.error("Invalid image url")
         }
     }
 
@@ -969,7 +1006,7 @@ function CarProfilePage({pageId}) {
                                                             onClick={() => verifyDocument(doc?.id)}
                                                         />
                                                         <Button
-                                                            text={doc?.asset ? "Download" : "Upload"}
+                                                            text={!!doc?.asset ? "Download" : "Upload"}
                                                             outlined={true}
                                                             width={80}
                                                             height={28}
