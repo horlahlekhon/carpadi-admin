@@ -97,7 +97,8 @@ enum RequiredCarDocuments {
     PoliceCMR = "police_CMR",
     Insurance = "insurance",
     RoadWorthiness = "road_worthiness",
-    Others = "others"
+    Others = "others",
+    OwnerInformation = "owner_identification"
 }
 
 export {

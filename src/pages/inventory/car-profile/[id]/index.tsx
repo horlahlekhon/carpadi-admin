@@ -104,6 +104,14 @@ function CarProfilePage({pageId}) {
             "is_preloaded": true,
             "document_type": RequiredCarDocuments.RoadWorthiness
         },
+        {
+            "asset": null,
+            "name": 'Owner Information',
+            "description": 'Owner Information',
+            "car": null,
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.OwnerInformation
+        },
     ]
     const router = useRouter()
     const [carId, setCarId] = useState(null)
