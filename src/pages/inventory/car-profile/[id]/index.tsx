@@ -588,7 +588,7 @@ function CarProfilePage({pageId}) {
         //     .finally(() => {
         //         retrieveDocuments()
         //     })
-        
+
         vehicleDocuments.forEach((doc, idx) => {
             if (doc?.id) {
                 if (doc?.is_modified) {
@@ -1876,6 +1876,4 @@ const Statistic = styled.div`
   .value {
     font-weight: bold;
   }
-`
-
-
+`;

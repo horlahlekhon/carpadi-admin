@@ -168,6 +168,18 @@ function UserProfilePage({pageId}) {
                         <Body>
                             <SplitContainer>
                                 <div className="left">
+                                    <Button
+                                        text={user?.user?.is_active ? 'Approved': 'Pending Approval'}
+                                        title="This user is already approved"
+                                        width={165}
+                                        outlined={true}
+                                        marginLeft="auto"
+                                        marginTop={4}
+                                        disabled={user?.user?.is_active}
+                                        onClick={() => {
+                                            toast.error('This function has not been implemented')
+                                        }}
+                                    />
                                     <div className="user-info">
                                         <div className="profile">
                                             <ProfileImage style={{borderRadius: '50%'}}>
@@ -201,13 +213,17 @@ function UserProfilePage({pageId}) {
                                             <div className="key">Email Address</div>
                                             <div className="value">{user?.user?.email}</div>
                                         </Statistic>
+                                        <Statistic>
+                                            <div className="key">Phone Number</div>
+                                            <div className="value">{user?.user?.phone}</div>
+                                        </Statistic>
                                         <div
                                             className={user?.user?.is_active ? "user-status" : "user-status-error"}>Email {user?.user?.is_active ? 'Verified' : 'Unverified'}</div>
                                         <Statistic style={{fontWeight: 600}}>
                                             <div className="key">Address</div>
                                         </Statistic>
                                         <p>
-                                            NA
+                                            Address not available
                                         </p>
                                     </div>
                                 </div>

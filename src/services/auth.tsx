@@ -52,7 +52,7 @@ function login(username, password) {
  */
 function refreshToken() {
     if (process.browser) {
-        const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = JSON.parse(String(localStorage.getItem('refreshToken')));
         return fetchWrapper.post(`${baseUrl}/token-refresh/`, {refresh: refreshToken})
             .then(data => {
                 authSubject.next(true);

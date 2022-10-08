@@ -31,7 +31,8 @@ function UsersPage() {
         ACTIVE = 'ActiveTrading',
         NO_TRADING = 'NoTrading',
         TOTAL = 'Total',
-        INACTIVE = 'Inactive'
+        INACTIVE = 'Inactive',
+        PENDING = 'Pending'
     }
 
     const [pageLoading, setPageLoading] = useState(false)
@@ -185,106 +186,117 @@ function UsersPage() {
                             <span className="separator"></span>
                         </div>
                     </Breadcrumbs>
-                    <Grid container spacing={3} style={{marginTop: 21, marginBottom: 15}}>
-                        <Grid item xs={3}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Users.TOTAL)
-                                    setPage(0);
-                                    retrieveUsers({tradeStatus: ''})
-                                }}
-                                style={{
-                                    border:
-                                        selectedUsers === Users.TOTAL ? '3px solid #00AEEF' : 'none'
-                                }}
+                    <Flex>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Users.TOTAL)
+                                setPage(0);
+                                retrieveUsers({tradeStatus: ''})
+                            }}
+                            style={{
+                                border:
+                                    selectedUsers === Users.TOTAL ? '3px solid #00AEEF' : 'none',
+                                width: "19%"
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedUsers == Users.TOTAL ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedUsers == Users.TOTAL ? 'primary' : 'inherit'}
-                                >
-                                    Total Users
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedUsers == Users.TOTAL ? 'primary' : 'inherit'}
-                                >
-                                    {formatNumber(userStats.total_users)}
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Users.ACTIVE)
-                                    setPage(0);
-                                    retrieveUsers({tradeStatus: 'actively_trading'})
-                                }}
-                                style={{
-                                    border:
-                                        selectedUsers === Users.ACTIVE ? '3px solid #00AEEF' : 'none'
-                                }}
+                                Total Users
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedUsers == Users.TOTAL ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedUsers == Users.ACTIVE ? 'primary' : 'inherit'}
-                                >
-                                    Active Trading Users
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedUsers == Users.ACTIVE ? 'primary' : 'inherit'}
-                                >
-                                    {formatNumber(userStats.active_users)}
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Users.NO_TRADING)
-                                    setPage(0);
-                                    retrieveUsers({tradeStatus: 'not_actively_trading'})
-                                }}
-                                style={{
-                                    border:
-                                        selectedUsers === Users.NO_TRADING
-                                            ? '3px solid #00AEEF'
-                                            : 'none'
-                                }}
+                                {formatNumber(userStats.total_users)}
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Users.ACTIVE)
+                                setPage(0);
+                                retrieveUsers({tradeStatus: 'actively_trading'})
+                            }}
+                            style={{
+                                border:
+                                    selectedUsers === Users.ACTIVE ? '3px solid #00AEEF' : 'none',
+                                width: "19%"
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedUsers == Users.ACTIVE ? 'primary' : 'inherit'}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedUsers == Users.NO_TRADING ? 'primary' : 'inherit'}
-                                >
-                                    Users with No Trading Activities
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedUsers == Users.NO_TRADING ? 'primary' : 'inherit'}
-                                >
-                                    {formatNumber(userStats.inactive_users)}
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={3}>
-                            <StatsCard
-                                onClick={() => {
-                                    setSelected(Users.INACTIVE)
-                                    setPage(0);
-                                    retrieveUsers({tradeStatus: ''})
-                                }}
-                                style={{
-                                    border:
-                                        selectedUsers === Users.INACTIVE ? '3px solid #00AEEF' : 'none',
-                                    color: 'white',
-                                    background: t.primaryAshBlue
-                                }}
+                                Active Trading Users
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedUsers == Users.ACTIVE ? 'primary' : 'inherit'}
                             >
-                                <Typography variant="inherit">Inactive Users</Typography>
-                                <Typography variant="h5">NA</Typography>
-                            </StatsCard>
-                        </Grid>
-                    </Grid>
+                                {formatNumber(userStats.active_users)}
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Users.PENDING)
+                                setPage(0);
+                                retrieveUsers({tradeStatus: ''})
+                            }}
+                            style={{
+                                border:
+                                    selectedUsers === Users.PENDING ? '3px solid #00AEEF' : 'none',
+                                width: "19%"
+                            }}
+                        >
+                            <Typography variant="inherit">Pending Approval</Typography>
+                            <Typography variant="h5">NA</Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Users.NO_TRADING)
+                                setPage(0);
+                                retrieveUsers({tradeStatus: 'not_actively_trading'})
+                            }}
+                            style={{
+                                border:
+                                    selectedUsers === Users.NO_TRADING
+                                        ? '3px solid #00AEEF'
+                                        : 'none',
+                                width: "19%"
+                            }}
+                        >
+                            <Typography
+                                variant="inherit"
+                                color={selectedUsers == Users.NO_TRADING ? 'primary' : 'inherit'}
+                            >
+                                Users with No Trading Activities
+                            </Typography>
+                            <Typography
+                                variant="h5"
+                                color={selectedUsers == Users.NO_TRADING ? 'primary' : 'inherit'}
+                            >
+                                {formatNumber(userStats.inactive_users)}
+                            </Typography>
+                        </StatsCard>
+                        <StatsCard
+                            onClick={() => {
+                                setSelected(Users.INACTIVE)
+                                setPage(0);
+                                retrieveUsers({tradeStatus: ''})
+                            }}
+                            style={{
+                                border:
+                                    selectedUsers === Users.INACTIVE ? '3px solid #00AEEF' : 'none',
+                                color: 'white',
+                                background: t.primaryAshBlue,
+                                width: "19%"
+                            }}
+                        >
+                            <Typography variant="inherit">Inactive Users</Typography>
+                            <Typography variant="h5">NA</Typography>
+                        </StatsCard>
+                    </Flex>
                     <TableCard>
                         <TableFilters>
                             <div className="filter" onClick={() => filterByStatus()}>Filter by Status</div>
@@ -314,7 +326,8 @@ function UsersPage() {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img alt={row.user?.first_name} src={applyTransformation(row.user.profile_picture, 48, 48)}
+                                                    <img alt={row.user?.first_name}
+                                                         src={applyTransformation(row.user.profile_picture, 48, 48)}
                                                          width={40}
                                                          height={40}
                                                          style={{borderRadius: '50%'}}/>
@@ -534,3 +547,12 @@ const TableFilters = styled.div`
     font-weight: bold;
   }
 `
+
+const Flex = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 21px;
+  margin-bottom: 15px;
+`;
