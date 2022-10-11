@@ -112,7 +112,7 @@ function ArchivedPage() {
                         </Typography>
                     </Header>
                     <Breadcrumbs>
-                        <img
+                        <img loading="lazy"
                             src="/icons/Inventory-Black.svg"
                             width={'20px'}
                             height={'18px'}
@@ -158,7 +158,7 @@ function ArchivedPage() {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}
+                                                    <img loading="lazy" src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}
                                                          width={48}
                                                          height={48}/>
                                                 </TableCell>

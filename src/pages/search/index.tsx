@@ -146,7 +146,7 @@ function SearchPage() {
                                                 {idx + 1}
                                             </TableCell>
                                             <TableCell component="th" scope="row">
-                                                <img src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
+                                                <img loading="lazy" src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
                                                      height={48}/>
                                             </TableCell>
                                             <TableCell align="left">{row.vin}</TableCell>
@@ -200,7 +200,7 @@ function SearchPage() {
                                                     {idx + 1}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={row?.product_images.length > 0 ? row?.product_images[0] : null}
                                                         width={48} height={48} alt={trimString(row?.id)}/>
                                                 </TableCell>

@@ -156,7 +156,7 @@ function SalesPage() {
                         />
                     </Header>
                     <Breadcrumbs>
-                        <img
+                        <img loading="lazy"
                             src="/icons/Vehicle-Blue.svg"
                             width={'20px'}
                             height={'18px'}
@@ -258,7 +258,7 @@ function SalesPage() {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={row?.product_images.length > 0 ? applyTransformation(row?.product_images[0], 48, 48) : null}
+                                                    <img loading="lazy" src={row?.product_images.length > 0 ? applyTransformation(row?.product_images[0], 48, 48) : null}
                                                          width={48} height={48} alt={trimString(row?.id)}/>
                                                 </TableCell>
                                                 <TableCell align="right">{row?.car?.vin}</TableCell>

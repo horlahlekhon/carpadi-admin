@@ -73,7 +73,7 @@ function TopBar() {
                 />
             </FormControl>
             <User onClick={() => router.push('/user-profile')}>
-                {currentUser?.profile_picture && <img
+                {currentUser?.profile_picture && <img loading="lazy"
                     className="image"
                     src="/images/Big-Default-Car.png"
                     alt="James Dalles"

@@ -165,7 +165,7 @@ function TradesPage({response}) {
                         </ActionBar>
                     </Header>
                     <Breadcrumbs>
-                        <img
+                        <img loading="lazy"
                             src="/icons/Trade-Black.svg"
                             width={'20px'}
                             height={'18px'}
@@ -366,7 +366,7 @@ function TradesPage({response}) {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>
+                                                    <img loading="lazy" src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>
                                                 </TableCell>
                                                 <TableCell
                                                     align="left">{row.id.substring(row.id.length - 7)}</TableCell>

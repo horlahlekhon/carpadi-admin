@@ -298,7 +298,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                         onClick={() => setSelectedCar(row)}
                                                     >
                                                         <TableCell component="th" scope="row">
-                                                            <img
+                                                            <img loading="lazy"
                                                                 src={row.pictures.length > 0 ? row.pictures[0] : null}
                                                                 width={48}
                                                                 height={48}
@@ -344,7 +344,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                             <InfoSection container spacing={3}>
                                 <Grid item xs={12} style={{display: 'flex'}}>
                                     <VehicleDetails style={{width: 700}}>
-                                        <img
+                                        <img loading="lazy"
                                             src={selectedCar?.pictures.length > 0 ? selectedCar?.pictures[0] : null}
                                             width={185}
                                             height={135}
@@ -352,7 +352,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                             alt={selectedCar?.information?.brand?.name}
                                         />
                                         <div className="stats">
-                                            <img
+                                            <img loading="lazy"
                                                 src="/images/Toyota-Full.png"
                                                 width={80}
                                                 height={22}

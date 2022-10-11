@@ -206,7 +206,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                 {modalView === 'createCarProfile' && (
                     <>
                         <Info>
-                            <img
+                            <img loading="lazy"
                                 src="/images/Fetched-car-Green.png"
                                 alt="Trash"
                                 height={98}
@@ -408,8 +408,8 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                         <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
                             {uploadedPictures.map((image, idx) => (
                                 <div className='image' key={idx}>
-                                    <img src={image.secure_url} className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'
+                                    <img loading="lazy" src={image.secure_url} className="image"/>
+                                    <img loading="lazy" src="/icons/Delete-Circular-Green.svg" className='delete'
                                          onClick={() => removePicture(image.secure_url)}/>
                                 </div>
                             ))}

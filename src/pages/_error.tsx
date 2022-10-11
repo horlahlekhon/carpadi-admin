@@ -10,14 +10,14 @@ function DefaultErrorPage() {
         <Container>
             <MainSection>
                 <div className='actions'>
-                    <img src='/logos/blue-full.png' style={{width: '270px', marginLeft: '-15px'}}/>
+                    <img loading="lazy" src='/logos/blue-full.png' style={{width: '270px', marginLeft: '-15px'}}/>
                     <div className='error-code'>500</div>
                     <div className='error-text'>That’s an error.</div>
                     <div className='error-text'>An unknown error occurred. We are working towards resolving it.</div>
 
                     <Button text='Return Home' width={208} marginTop={40} onClick={() => router.replace('/')}/>
                 </div>
-                <img className='image' src="/errors/500.jpg"/>
+                <img loading="lazy" className='image' src="/errors/500.jpg"/>
             </MainSection>
         </Container>
     )

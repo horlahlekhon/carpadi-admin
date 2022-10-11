@@ -125,7 +125,7 @@ function TradingActivitiesPage({uid}) {
                                     <CardHeader>
                                         <div className='profile'>
                                             <ProfileImage>
-                                                <img src={user?.user?.profile_picture} width={'100%'}
+                                                <img loading="lazy" src={user?.user?.profile_picture} width={'100%'}
                                                      height={'100%'} alt={user?.user?.first_name}
                                                      style={{borderRadius: '100%'}}/>
                                             </ProfileImage>
@@ -167,7 +167,7 @@ function TradingActivitiesPage({uid}) {
                                                             style={{marginTop: 24, marginBottom: 0}}>
                                                     Trading with
                                                 </Typography>
-                                                <img
+                                                <img loading="lazy"
                                                     src="/images/Toyota-Full.png"
                                                     width={80}
                                                     height={22}
@@ -178,7 +178,7 @@ function TradingActivitiesPage({uid}) {
                                                 <Typography
                                                     variant="h6">{trade?.car?.make} {trade?.car?.model}</Typography>
 
-                                                <img
+                                                <img loading="lazy"
                                                     src={trade?.car?.image}
                                                     height={300}
                                                     width={450}

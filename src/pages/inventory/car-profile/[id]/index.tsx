@@ -682,7 +682,7 @@ function CarProfilePage({pageId}) {
                             </Typography>
                         </Header>
                         <Breadcrumbs>
-                            <img
+                            <img loading="lazy"
                                 src="/icons/Inventory-Black.svg"
                                 width={'20px'}
                                 height={'18px'}
@@ -781,25 +781,25 @@ function CarProfilePage({pageId}) {
                                 <div className="left">
                                     <Flex>
                                         <div className="slideshow">
-                                            <img
+                                            <img loading="lazy"
                                                 className="main"
                                                 src={car.pictures[carouselIdx]}
                                                 height={255}
                                                 width='100%'
                                             />
-                                            <img
+                                            <img loading="lazy"
                                                 src="/images/Previous-Slideshow.png"
                                                 alt="Prev"
                                                 className="previous"
                                                 onClick={prevImage}
                                             />
-                                            <img src="/images/Next-Slideshow.png" alt="Next" className="next"
+                                            <img loading="lazy" src="/images/Next-Slideshow.png" alt="Next" className="next"
                                                  onClick={nextImage}/>
                                         </div>
                                         <div className="gallery">
                                             <ImageGrid>
                                                 {car.pictures.map((img, i) => (
-                                                    <img src={img} className="image" key={i} alt={'image' + i}/>
+                                                    <img loading="lazy" src={img} className="image" key={i} alt={'image' + i}/>
                                                 ))}
                                             </ImageGrid>
                                         </div>
@@ -1281,8 +1281,8 @@ function CarProfilePage({pageId}) {
                                         <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
                                             {car.pictures.map((url, idx) => (
                                                 <div className='image' key={idx}>
-                                                    <img src={url} className="image"/>
-                                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'
+                                                    <img loading="lazy" src={url} className="image"/>
+                                                    <img loading="lazy" src="/icons/Delete-Circular-Green.svg" className='delete'
                                                          onClick={() => removePicture(url)}/>
                                                 </div>
                                             ))}
@@ -1321,7 +1321,7 @@ function CarProfilePage({pageId}) {
                                 {modalView === 'deleteCarProfile' && (
                                     <>
                                         <Info>
-                                            <img
+                                            <img loading="lazy"
                                                 src="/icons/Trash-Red.svg"
                                                 alt="Trash"
                                                 height={40}
@@ -1355,7 +1355,7 @@ function CarProfilePage({pageId}) {
                                         <InfoSection container spacing={3}>
                                             <Grid item xs={12} style={{display: 'flex'}}>
                                                 <VehicleDetails style={{width: 700}}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                                         width={185}
                                                         height={135}
@@ -1363,7 +1363,7 @@ function CarProfilePage({pageId}) {
                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
-                                                        <img
+                                                        <img loading="lazy"
                                                             src="/images/Toyota-Full.png"
                                                             width={80}
                                                             height={22}

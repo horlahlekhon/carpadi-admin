@@ -224,7 +224,7 @@ function TradeProfilePage({pageId}) {
                             </Typography>
                         </Header>
                         <Breadcrumbs>
-                            <img
+                            <img loading="lazy"
                                 src="/icons/Trade-Black.svg"
                                 width={'20px'}
                                 height={'18px'}
@@ -359,7 +359,7 @@ function TradeProfilePage({pageId}) {
                                             Created Trade for
                                         </Typography>
                                         <VehicleDetails style={{marginBottom: 70}}>
-                                            <img
+                                            <img loading="lazy"
                                                 src={tradeData.car.image}
                                                 height={135}
                                                 width={185}
@@ -367,7 +367,7 @@ function TradeProfilePage({pageId}) {
                                                 alt={String(tradeData.id)}
                                             />
                                             <div className="stats">
-                                                <img
+                                                <img loading="lazy"
                                                     src="/images/Toyota-Full.png"
                                                     width={80}
                                                     height={22}
@@ -658,7 +658,7 @@ function TradeProfilePage({pageId}) {
                                 {modalView === 'deleteTrade' && (
                                     <>
                                         <Info>
-                                            <img
+                                            <img loading="lazy"
                                                 src="/icons/Trash-Red.svg"
                                                 alt="Trash"
                                                 height={40}
@@ -693,14 +693,14 @@ function TradeProfilePage({pageId}) {
                                         <InfoSection container spacing={3}>
                                             <Grid item xs={12} style={{display: 'flex'}}>
                                                 <VehicleDetails style={{width: 700}}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={tradeData.car.image}
                                                         width={185}
                                                         height={135}
                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
-                                                        <img
+                                                        <img loading="lazy"
                                                             src="/images/Toyota-Full.png"
                                                             width={80}
                                                             height={22}

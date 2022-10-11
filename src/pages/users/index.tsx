@@ -168,7 +168,7 @@ function UsersPage() {
                         </Typography>
                     </Header>
                     <Breadcrumbs>
-                        <img
+                        <img loading="lazy"
                             src="/icons/Trade-Black.svg"
                             width={'20px'}
                             height={'18px'}
@@ -327,7 +327,7 @@ function UsersPage() {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img alt={row.user?.first_name}
+                                                    <img loading="lazy" alt={row.user?.first_name}
                                                          src={applyTransformation(row.user.profile_picture, 48, 48)}
                                                          width={40}
                                                          height={40}

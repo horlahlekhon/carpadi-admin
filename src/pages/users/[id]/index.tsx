@@ -183,7 +183,7 @@ function UserProfilePage({pageId}) {
                                     <div className="user-info">
                                         <div className="profile">
                                             <ProfileImage style={{borderRadius: '50%'}}>
-                                                <img src={user?.user?.profile_picture || "/icons/Users-Blue.svg"}
+                                                <img loading="lazy" src={user?.user?.profile_picture || "/icons/Users-Blue.svg"}
                                                      width={'100%'}
                                                      height={'100%'} style={{borderRadius: '50%'}}/>
                                             </ProfileImage>
@@ -247,7 +247,7 @@ function UserProfilePage({pageId}) {
                                                                 <div className="left"
                                                                      title={tr?.transaction_type === 'credit' ? 'Credit' : 'Debit'}
                                                                 >
-                                                                    <img
+                                                                    <img loading="lazy"
                                                                         className="icon"
                                                                         src={tr?.transaction_type === 'credit' ? "/icons/Deposit-Green.svg" : "/icons/Withdraw-Red.svg"}
                                                                         alt={tr?.transaction_type}
@@ -403,7 +403,7 @@ function UserProfilePage({pageId}) {
                                 {modalView === 'deleteAccount' && (
                                     <>
                                         <Info>
-                                            <img
+                                            <img loading="lazy"
                                                 src="/icons/Trash-Red.svg"
                                                 alt="Trash"
                                                 height={40}
@@ -432,7 +432,7 @@ function UserProfilePage({pageId}) {
                                 {modalView === 'suspendAccount' && (
                                     <>
                                         <Info>
-                                            <img
+                                            <img loading="lazy"
                                                 src="/icons/Caution-Yellow.svg"
                                                 alt="Caution"
                                                 height={40}
