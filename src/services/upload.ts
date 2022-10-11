@@ -2,20 +2,18 @@ import getConfig from 'next/config';
 import {UploadTypes} from "../lib/enums";
 import {randomString} from "../helpers/condeGenerators";
 import Resizer from "react-image-file-resizer";
-import AWS from 'aws-sdk'
+import S3FileUpload from '../lib/aws-s3/lib/ReactS3'
 
 
 const {publicRuntimeConfig} = getConfig();
 
-AWS.config.update({
-    accessKeyId: publicRuntimeConfig.accessKeyId,
-    secretAccessKey: publicRuntimeConfig.secretAccessKey
-})
-
-const myBucket = new AWS.S3({
-    params: {Bucket: publicRuntimeConfig.bucket},
+const config = {
+    bucketName: publicRuntimeConfig.bucket,
+    dirName: `assets/${UploadTypes.ANY}`,
     region: publicRuntimeConfig.region,
-})
+    accessKeyId: publicRuntimeConfig.accessKeyId,
+    secretAccessKey: publicRuntimeConfig.secretAccessKey,
+}
 
 /**
  * Upload file to cloudinary
@@ -27,21 +25,22 @@ const myBucket = new AWS.S3({
 const uploadFile = async (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload') => {
     const rand = randomString();
     const fileExtension = file.name.split('.').pop()
-    const params = {
-        Body: file,
-        Bucket: publicRuntimeConfig.bucket,
-        Key: `assets/${uploadType}/${resourceId}_${rand}.${fileExtension}`
-    };
-    const res = await myBucket.upload(params).promise()
+    const fileName = `${resourceId}_${rand}.${fileExtension}`
+
+    const res = await S3FileUpload
+        .uploadFile(file, {...config, dirName: `assets/${uploadType}`}, fileName)
+
+    console.log(res)
     return !!res ? {
         data: {
-            secure_url: `${publicRuntimeConfig.cloudfront}/${uploadType}/${resourceId}_${rand}.${fileExtension}`
+            secure_url: `${publicRuntimeConfig.cloudfront}/${uploadType}/${fileName}`
         }, status: true
     } : {status: false, data: "image upload failed"}
 }
 
-const deleteUpload = (id) => {
-    console.log(id)
+const deleteUpload = async (fileName, uploadType = UploadTypes.ANY,) => {
+    return await S3FileUpload.deleteFile(fileName, {...config, dirName: `assets/${uploadType}`})
+
 }
 
 const resizeFile = (file, {width = 300, height = 300, format = "JPEG"}) => {
