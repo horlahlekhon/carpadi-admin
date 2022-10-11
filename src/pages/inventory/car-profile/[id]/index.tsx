@@ -564,30 +564,31 @@ function CarProfilePage({pageId}) {
 
     const saveDocuments = () => {
         setIsSaving(true)
-        // let newDocs = vehicleDocuments.filter(x => x?.id == null)
-        // newDocs = newDocs.map(doc => {
-        //     return {
-        //         name: doc?.name,
-        //         description: doc?.description,
-        //         is_verified: doc?.is_verified,
-        //         asset: doc?.asset,
-        //         car: car?.id,
-        //     }
-        // })
-        // createCarDocument(newDocs)
-        //     .then((res) => {
-        //         if (res.status) {
-        //             toast.success(`Created documents`)
-        //         } else {
-        //             toast.error(res.data)
-        //         }
-        //     })
-        //     .catch((error) => {
-        //         toast.error(error)
-        //     })
-        //     .finally(() => {
-        //         retrieveDocuments()
-        //     })
+        let newDocs = vehicleDocuments.filter(x => x?.id == null)
+        newDocs = newDocs.map(doc => {
+            return {
+                name: doc?.name,
+                description: doc?.description,
+                is_verified: doc?.is_verified,
+                document_type: doc?.document_type,
+                asset: doc?.asset,
+                car: car?.id,
+            }
+        })
+        createCarDocument(newDocs)
+            .then((res) => {
+                if (res.status) {
+                    toast.success(`Created documents`)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                retrieveDocuments()
+            })
 
         vehicleDocuments.forEach((doc, idx) => {
             if (doc?.id) {
@@ -611,30 +612,31 @@ function CarProfilePage({pageId}) {
                             retrieveDocuments()
                         })
                 }
-            } else {
-                const d = {
-                    name: doc?.name,
-                    description: doc?.description,
-                    is_verified: doc?.is_verified,
-                    document_type: doc?.document_type,
-                    asset: doc?.asset,
-                    car: car?.id,
-                }
-                createCarDocument(d)
-                    .then((res) => {
-                        if (res.status) {
-                            toast.success(`Created ${d?.name}`)
-                        } else {
-                            toast.error(res.data)
-                        }
-                    })
-                    .catch((error) => {
-                        toast.error(error)
-                    })
-                    .finally(() => {
-                        retrieveDocuments()
-                    })
             }
+            // else {
+            //     const d = {
+            //         name: doc?.name,
+            //         description: doc?.description,
+            //         is_verified: doc?.is_verified,
+            //         document_type: doc?.document_type,
+            //         asset: doc?.asset,
+            //         car: car?.id,
+            //     }
+            //     createCarDocument(d)
+            //         .then((res) => {
+            //             if (res.status) {
+            //                 toast.success(`Created ${d?.name}`)
+            //             } else {
+            //                 toast.error(res.data)
+            //             }
+            //         })
+            //         .catch((error) => {
+            //             toast.error(error)
+            //         })
+            //         .finally(() => {
+            //             retrieveDocuments()
+            //         })
+            // }
             if (idx >= vehicleDocuments.length - 1) {
                 setIsSaving(false)
                 setModalState(false)
