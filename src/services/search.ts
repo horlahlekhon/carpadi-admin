@@ -16,7 +16,23 @@ const searchResults = (limit = 10, offset = 0, type = '', query = '') => {
                 return {status: false, data: error};
             })
     } else if (type === 'inventory') {
-        return fetchWrapper.get(`${baseUrl}/cars?limit=${limit}&offset=${offset}&vin=${query}&license_plate=${query}`)
+        return fetchWrapper.get(`${baseUrl}/cars?limit=${limit}&offset=${offset}&search=${query}`)
+            .then((response) => {
+                return {status: true, data: response}
+            })
+            .catch((error) => {
+                return {status: false, data: error};
+            })
+    } else if (type === 'users') {
+        return fetchWrapper.get(`${baseUrl}/merchants?limit=${limit}&offset=${offset}&search=${query}`)
+            .then((response) => {
+                return {status: true, data: response}
+            })
+            .catch((error) => {
+                return {status: false, data: error};
+            })
+    } else if (type === 'trade') {
+        return fetchWrapper.get(`${baseUrl}/trades?limit=${limit}&offset=${offset}&search=${query}`)
             .then((response) => {
                 return {status: true, data: response}
             })
