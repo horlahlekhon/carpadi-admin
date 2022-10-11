@@ -22,15 +22,14 @@ const config = {
  * @param actionName
  * @param file [Required]
  */
-const uploadFile = async (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload') => {
+const uploadFile = async (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload') : Promise<{ status: boolean, data: any }> => {
     const rand = randomString();
     const fileExtension = file.name.split('.').pop()
     const fileName = `${resourceId}_${rand}.${fileExtension}`
 
     const res = await S3FileUpload
         .uploadFile(file, {...config, dirName: `assets/${uploadType}`}, fileName)
-
-    console.log(res)
+    
     return !!res ? {
         data: {
             secure_url: `${publicRuntimeConfig.cloudfront}/${uploadType}/${fileName}`
