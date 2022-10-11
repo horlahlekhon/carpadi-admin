@@ -40,7 +40,8 @@ function UserProfilePage({pageId}) {
         "banks": [],
         "created": null,
         "modified": null,
-        "bvn": null
+        "bvn": null,
+        "is_approved": false
     })
     const [wallet, setWalletData] = useState({
         "id": "NA",
@@ -131,7 +132,7 @@ function UserProfilePage({pageId}) {
     const updateUser = (data) => {
         if (data && userId !== 'NA' && userId !== undefined) {
             merchantService
-                .updateSingleMerchant(userId, {...user.user, ...data})
+                .updateSingleMerchant(userId, {...data})
                 .then((response) => {
                     if (response.status) {
                         retrieveUser()
@@ -145,6 +146,28 @@ function UserProfilePage({pageId}) {
                 })
                 .finally(() => {
                     setModalState(false)
+                })
+        }
+    }
+
+    const approveUser = () => {
+        setPageLoading(true)
+        if (userId !== 'NA' && userId !== undefined) {
+            merchantService
+                .updateSingleMerchant(userId, {is_approved: true})
+                .then((response) => {
+                    if (response.status) {
+                        retrieveUser()
+                        toast.success('User Account Approved')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+                .finally(() => {
+                    setPageLoading(false)
                 })
         }
     }
@@ -169,21 +192,22 @@ function UserProfilePage({pageId}) {
                             <SplitContainer>
                                 <div className="left">
                                     <Button
-                                        text={user?.user?.is_active ? 'Approved': 'Pending Approval'}
+                                        text={user?.is_approved ? 'Approved' : 'Pending Approval'}
                                         title="This user is already approved"
                                         width={165}
                                         outlined={true}
                                         marginLeft="auto"
                                         marginTop={4}
-                                        disabled={user?.user?.is_active}
+                                        disabled={user?.is_approved}
                                         onClick={() => {
-                                            toast.error('This function has not been implemented')
+                                            approveUser()
                                         }}
                                     />
                                     <div className="user-info">
                                         <div className="profile">
                                             <ProfileImage style={{borderRadius: '50%'}}>
-                                                <img loading="lazy" src={user?.user?.profile_picture || "/icons/Users-Blue.svg"}
+                                                <img loading="lazy"
+                                                     src={user?.user?.profile_picture || "/icons/Users-Blue.svg"}
                                                      width={'100%'}
                                                      height={'100%'} style={{borderRadius: '50%'}}/>
                                             </ProfileImage>
@@ -248,9 +272,9 @@ function UserProfilePage({pageId}) {
                                                                      title={tr?.transaction_type === 'credit' ? 'Credit' : 'Debit'}
                                                                 >
                                                                     <img loading="lazy"
-                                                                        className="icon"
-                                                                        src={tr?.transaction_type === 'credit' ? "/icons/Deposit-Green.svg" : "/icons/Withdraw-Red.svg"}
-                                                                        alt={tr?.transaction_type}
+                                                                         className="icon"
+                                                                         src={tr?.transaction_type === 'credit' ? "/icons/Deposit-Green.svg" : "/icons/Withdraw-Red.svg"}
+                                                                         alt={tr?.transaction_type}
                                                                     />
                                                                     <div className="stacked">
                                                                         <div
@@ -404,10 +428,10 @@ function UserProfilePage({pageId}) {
                                     <>
                                         <Info>
                                             <img loading="lazy"
-                                                src="/icons/Trash-Red.svg"
-                                                alt="Trash"
-                                                height={40}
-                                                width={40}
+                                                 src="/icons/Trash-Red.svg"
+                                                 alt="Trash"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"
@@ -433,10 +457,10 @@ function UserProfilePage({pageId}) {
                                     <>
                                         <Info>
                                             <img loading="lazy"
-                                                src="/icons/Caution-Yellow.svg"
-                                                alt="Caution"
-                                                height={40}
-                                                width={40}
+                                                 src="/icons/Caution-Yellow.svg"
+                                                 alt="Caution"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"

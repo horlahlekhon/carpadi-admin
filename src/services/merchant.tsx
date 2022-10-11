@@ -37,7 +37,7 @@ const retrieveMerchantStats = () => {
 }
 
 const updateSingleMerchant = (id, data) => {
-    return fetchWrapper.put(`${baseUrl}/users/${id}/`, data)
+    return fetchWrapper.patch(`${baseUrl}/merchants/${id}/`, data)
         .then((response) => {
             return {status: true, data: response}
         })
