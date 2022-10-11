@@ -2,12 +2,20 @@ import getConfig from 'next/config';
 import {UploadTypes} from "../lib/enums";
 import {randomString} from "../helpers/condeGenerators";
 import Resizer from "react-image-file-resizer";
+import AWS from 'aws-sdk'
 
 
 const {publicRuntimeConfig} = getConfig();
-const baseUrl = `https://api.Cloudinary.com/v1_1/${publicRuntimeConfig.cloudinaryCloudName}`;
-const cloudName = `${publicRuntimeConfig.cloudinaryCloudName}`;
-const preset = `${publicRuntimeConfig.cloudinaryPreset}`;
+
+AWS.config.update({
+    accessKeyId: publicRuntimeConfig.accessKeyId,
+    secretAccessKey: publicRuntimeConfig.secretAccessKey
+})
+
+const myBucket = new AWS.S3({
+    params: {Bucket: publicRuntimeConfig.bucket},
+    region: publicRuntimeConfig.region,
+})
 
 /**
  * Upload file to cloudinary
@@ -16,20 +24,20 @@ const preset = `${publicRuntimeConfig.cloudinaryPreset}`;
  * @param actionName
  * @param file [Required]
  */
-const uploadFile = (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload') => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('upload_preset', preset);
-    formData.append('public_id', `${uploadType}_${resourceId}_${randomString()}`);
-    // formData.append('transformation', 'w_600,h_410');
-    return fetch(`${baseUrl}/${actionName}`, {method: 'POST', body: formData})
-        .then(async (response) => {
-            let res = await response.json()
-            return {status: true, data: res}
-        })
-        .catch((error) => {
-            return {status: false, data: error};
-        })
+const uploadFile = async (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload') => {
+    const rand = randomString();
+    const fileExtension = file.name.split('.').pop()
+    const params = {
+        Body: file,
+        Bucket: publicRuntimeConfig.bucket,
+        Key: `assets/${uploadType}/${resourceId}_${rand}.${fileExtension}`
+    };
+    const res = await myBucket.upload(params).promise()
+    return !!res ? {
+        data: {
+            secure_url: `${publicRuntimeConfig.cloudfront}/${uploadType}/${resourceId}_${rand}.${fileExtension}`
+        }, status: true
+    } : {status: false, data: "image upload failed"}
 }
 
 const deleteUpload = (id) => {
@@ -54,7 +62,7 @@ const resizeFile = (file, {width = 300, height = 300, format = "JPEG"}) => {
 }
 
 const applyTransformation = (url: string, width: number, height: number) => {
-    if(url) {
+    if (url) {
         const splitUrl = url.split('upload/')
         if (splitUrl.length == 2) {
             return `${splitUrl[0]}upload/w_${width},h_${height}/${splitUrl[1]}`

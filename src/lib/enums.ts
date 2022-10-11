@@ -69,7 +69,7 @@ enum UploadTypes {
     CAR_FEATURE = "car-feature",
     CAR_PRODUCT = "car-product",
     CAR_DOCUMENT = "car-document",
-    ANY = 'any'
+    ANY = 'general'
 }
 
 enum ActivityTypes {

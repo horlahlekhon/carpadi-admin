@@ -32,7 +32,7 @@ function UsersPage() {
         NO_TRADING = 'NoTrading',
         TOTAL = 'Total',
         INACTIVE = 'Inactive',
-        PENDING = 'Pending'
+        PENDING = 'Unapproved'
     }
 
     const [pageLoading, setPageLoading] = useState(false)
@@ -51,7 +51,8 @@ function UsersPage() {
         {
             "total_users": 0,
             "active_users": 0,
-            "inactive_users": 0
+            "inactive_users": 0,
+            "unapproved_users": 0
         }
     )
 
@@ -250,7 +251,7 @@ function UsersPage() {
                             }}
                         >
                             <Typography variant="inherit">Pending Approval</Typography>
-                            <Typography variant="h5">NA</Typography>
+                            <Typography variant="h5">{formatNumber(userStats.unapproved_users)}</Typography>
                         </StatsCard>
                         <StatsCard
                             onClick={() => {
