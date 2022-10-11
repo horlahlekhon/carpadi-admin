@@ -7,7 +7,6 @@ const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
 const retrieveActivities = ({limit = 10, offset = 0, activityType = ''}) => {
-    console.log(activityType)
     return fetchWrapper.get(`${baseUrl}/activities?limit=${limit}&offset=${offset}` + `${activityType === '' ? '' : ('&activity_type=' + activityType)}`)
         .then((response) => {
             return {status: true, data: response}
