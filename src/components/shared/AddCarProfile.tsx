@@ -127,7 +127,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
             data['bought_price'] = bought_price
         }
         uploadedPictures.forEach(async (picture) => {
-            const p = await resizeFile(picture?.file, {width: 500, height: 300, format: 'JPEG'})
+            const p = await resizeFile(picture?.file, {width: 500, height: 300, format: 'WEBP'})
             // uploadFile(p, UploadTypes.CAR, vin)
             //     .then((res) => {
             //         if (res.status) {

@@ -244,7 +244,7 @@ function CarProfilePage({pageId}) {
     const handleFile = (files) => {
         let arr = Array.from(files)
         arr.forEach(async (file) => {
-            const resizedFile = await resizeFile(file, {width: 500, height: 300})
+            const resizedFile = await resizeFile(file, {width: 500, height: 300, format: 'WEBP'})
             setIsSaving(true)
             uploadFile(resizedFile)
                 .then((res) => {

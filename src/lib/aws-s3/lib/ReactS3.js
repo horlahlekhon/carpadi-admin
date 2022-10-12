@@ -4,17 +4,17 @@ import { dateISOString, xAmzDate, dateYMD } from "./Date";
 import { throwError } from './ErrorThrower';
 
 class S3FileUpload {
-    static async uploadFile(file, config, fileName) {
+    static async uploadFile(file, config, fileName, fileExt) {
 
         // Error Thrower :x:
         throwError(config, file);
 
         const fd = new FormData();
-        const key = `${config.dirName ? config.dirName + "/" : ""}${file.name}`;
+        const key = `${config.dirName ? config.dirName + "/" : ""}${fileName}`;
         const url = `https://${config.bucketName}.s3.amazonaws.com/`;
         fd.append("key", key);
         // fd.append("acl", "public-read");
-        fd.append("Content-Type", file.type);
+        fd.append("Content-Type", fileExt);
         fd.append("x-amz-meta-uuid", "14365123651274");
         fd.append("x-amz-server-side-encryption", "AES256");
         fd.append("X-Amz-Credential", `${config.accessKeyId}/${dateYMD}/${config.region}/s3/aws4_request`);

@@ -30,7 +30,7 @@ import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "./CPToast";
 import {createSale} from "../../services/sale";
-import {uploadFile} from "../../services/upload";
+import {convertToWebp, uploadFile} from "../../services/upload";
 import {CarStates, UploadTypes} from "../../lib/enums";
 
 const CreateSale = ({modalOpen = true, onClick, car = null}) => {
@@ -92,9 +92,10 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
         handleFile(fileUploaded);
     };
 
-    const handleFileChange2 = event => {
+    const handleFileChange2 = async (event) => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded, UploadTypes.CAR_FEATURE, selectedCar?.id)
+        const f = await convertToWebp(fileUploaded)
+        uploadFile(f, UploadTypes.CAR_FEATURE, selectedCar?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;

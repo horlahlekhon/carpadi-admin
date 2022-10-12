@@ -24,11 +24,11 @@ const config = {
  */
 const uploadFile = async (file, uploadType = UploadTypes.ANY, resourceId = '', actionName = 'image/upload') : Promise<{ status: boolean, data: any }> => {
     const rand = randomString();
-    const fileExtension = file.name.split('.').pop()
+    const fileExtension = file?.name ? file.name.split('.').pop() : 'webp'
     const fileName = `${resourceId}_${rand}.${fileExtension}`
 
     const res = await S3FileUpload
-        .uploadFile(file, {...config, dirName: `assets/${uploadType}`}, fileName)
+        .uploadFile(file, {...config, dirName: `assets/${uploadType}`}, fileName, fileExtension)
     
     return !!res ? {
         data: {
@@ -54,7 +54,24 @@ const resizeFile = (file, {width = 300, height = 300, format = "JPEG"}) => {
             (uri) => {
                 resolve(uri);
             },
-            "base64"
+            "file"
+        );
+    });
+}
+
+const convertToWebp = (file) => {
+    return new Promise((resolve) => {
+        Resizer.imageFileResizer(
+            file,
+            file.width,
+            file.height,
+            'WEBP',
+            50,
+            0,
+            (uri) => {
+                resolve(uri);
+            },
+            "file"
         );
     });
 }
@@ -74,5 +91,6 @@ export {
     uploadFile,
     deleteUpload,
     resizeFile,
-    applyTransformation
+    applyTransformation,
+    convertToWebp
 }
