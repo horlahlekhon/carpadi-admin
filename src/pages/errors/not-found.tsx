@@ -18,7 +18,10 @@ function NotFoundPage() {
                     <div className='error-text'>That’s an error.</div>
                     <div className='error-text'>The requested resource was not found</div>
 
-                    <Button text='Return Home' width={208} marginTop={40} onClick={() => router.replace('/')}/>
+                    <Button text='Return Home' width={208} marginTop={40}
+                            onClick={() => router.replace('/').then(() => {
+                                router.reload()
+                            })}/>
                 </div>
                 <img loading="lazy" className='image' src="/errors/404.svg"/>
             </MainSection>

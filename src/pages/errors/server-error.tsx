@@ -18,7 +18,10 @@ function ServerErrorPage() {
                     <div className='error-text'>That’s an error.</div>
                     <div className='error-text'>An unknown error occurred. We are working towards resolving it.</div>
 
-                    <Button text='Return Home' width={208} marginTop={40} onClick={() => router.replace('/')}/>
+                    <Button text='Return Home' width={208} marginTop={40}
+                            onClick={() => router.replace('/').then(() => {
+                                router.reload()
+                            })}/>
                 </div>
                 <img loading="lazy" className='image' src="/errors/500.jpg"/>
             </MainSection>
