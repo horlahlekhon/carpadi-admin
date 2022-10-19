@@ -13,8 +13,11 @@ import CPToast from "../../../components/shared/CPToast";
 import {TradeStates} from "../../../lib/enums";
 import {updateCar} from "../../../services/car";
 import Loader from "../../../components/layouts/core/Loader";
+import CPModal from "../../../components/shared/CPModal";
+import {useModal} from "mui-modal-provider";
 
 function TradeProfilePage({pageId}) {
+    const {showModal} = useModal();
     const router = useRouter()
     const tradeId = pageId || 'NA'
     const tradeType = router.query.type || 'NA'
@@ -65,7 +68,7 @@ function TradeProfilePage({pageId}) {
         setTradeData({...tradeData, [prop]: event.target.value, 'price_per_slot': pps})
     }
 
-    const showModal = (viewName: string, title: string) => {
+    const showModalX = (viewName: string, title: string) => {
         setModalView(viewName)
         setModalTitle(title)
         setModalState(true)
@@ -82,7 +85,7 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade Deleted')
                     router.push('/trade')
                 } else {
-                    toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data})
                 }
             })
             .catch((error) => {
@@ -102,7 +105,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade Updated')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data})
                 }
             })
             .catch((error) => {
@@ -120,7 +124,8 @@ function TradeProfilePage({pageId}) {
                 if (response.status) {
                     setTradeData(response.data)
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data})
                 }
             })
             .catch((error) => {
@@ -139,7 +144,8 @@ function TradeProfilePage({pageId}) {
                     if (response.status) {
                         toast.success('Resale price updated!')
                     } else {
-                        toast.error(response.data)
+                        // toast.error(response.data)
+                        showModal(CPModal, {title: "Oops...", message: response.data})
                     }
                 })
                 .catch((error) => {
@@ -159,7 +165,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade marked as completed')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data})
                 }
             })
             .catch((error) => {
@@ -180,7 +187,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade settlement initiated!')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data})
                 }
             })
             .catch((error) => {
@@ -201,7 +209,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade settlement rolled back!')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data})
                 }
             })
             .catch((error) => {
@@ -225,10 +234,10 @@ function TradeProfilePage({pageId}) {
                         </Header>
                         <Breadcrumbs>
                             <img loading="lazy"
-                                src="/icons/Trade-Black.svg"
-                                width={'20px'}
-                                height={'18px'}
-                                style={{marginRight: '12px'}}
+                                 src="/icons/Trade-Black.svg"
+                                 width={'20px'}
+                                 height={'18px'}
+                                 style={{marginRight: '12px'}}
                             />
                             <div
                                 onClick={() => {
@@ -306,7 +315,7 @@ function TradeProfilePage({pageId}) {
                                         }
                                         title='Trade is already active'
                                         onClick={() => {
-                                            showModal('deleteTrade', '')
+                                            showModalX('deleteTrade', '')
                                         }}
                                     />
                                     <Button
@@ -333,7 +342,7 @@ function TradeProfilePage({pageId}) {
                                             (tradeData.slots_available - tradeData.remaining_slots) > 0
                                         }
                                         title='Trade slots already purchased'
-                                        onClick={() => showModal('editTrade', 'Edit Trade')}
+                                        onClick={() => showModalX('editTrade', 'Edit Trade')}
                                     />
                                     <Button
                                         text="Go to Car Profile"
@@ -360,18 +369,18 @@ function TradeProfilePage({pageId}) {
                                         </Typography>
                                         <VehicleDetails style={{marginBottom: 70}}>
                                             <img loading="lazy"
-                                                src={tradeData.car.image}
-                                                height={135}
-                                                width={185}
-                                                style={{borderRadius: '8px'}}
-                                                alt={String(tradeData.id)}
+                                                 src={tradeData.car.image}
+                                                 height={135}
+                                                 width={185}
+                                                 style={{borderRadius: '8px'}}
+                                                 alt={String(tradeData.id)}
                                             />
                                             <div className="stats">
                                                 <img loading="lazy"
-                                                    src="/images/Toyota-Full.png"
-                                                    width={80}
-                                                    height={22}
-                                                    style={{marginBottom: -15}}
+                                                     src="/images/Toyota-Full.png"
+                                                     width={80}
+                                                     height={22}
+                                                     style={{marginBottom: -15}}
                                                 />
                                                 <Typography
                                                     variant="h5"
@@ -659,10 +668,10 @@ function TradeProfilePage({pageId}) {
                                     <>
                                         <Info>
                                             <img loading="lazy"
-                                                src="/icons/Trash-Red.svg"
-                                                alt="Trash"
-                                                height={40}
-                                                width={40}
+                                                 src="/icons/Trash-Red.svg"
+                                                 alt="Trash"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"
@@ -694,17 +703,17 @@ function TradeProfilePage({pageId}) {
                                             <Grid item xs={12} style={{display: 'flex'}}>
                                                 <VehicleDetails style={{width: 700}}>
                                                     <img loading="lazy"
-                                                        src={tradeData.car.image}
-                                                        width={185}
-                                                        height={135}
-                                                        style={{borderRadius: '8px'}}
+                                                         src={tradeData.car.image}
+                                                         width={185}
+                                                         height={135}
+                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
                                                         <img loading="lazy"
-                                                            src="/images/Toyota-Full.png"
-                                                            width={80}
-                                                            height={22}
-                                                            style={{marginBottom: -15}}
+                                                             src="/images/Toyota-Full.png"
+                                                             width={80}
+                                                             height={22}
+                                                             style={{marginBottom: -15}}
                                                         />
                                                         <Typography
                                                             variant="h5"

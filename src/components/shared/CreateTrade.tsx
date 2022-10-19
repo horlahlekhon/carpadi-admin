@@ -21,9 +21,12 @@ import {retrieveCars} from "../../services/car";
 import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import {retrieveSettings} from "../../services/setting";
 import {CarStates} from "../../lib/enums";
+import {useModal} from 'mui-modal-provider';
+import CPModal from "./CPModal";
 
 
 const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
+    const {showModal} = useModal();
     const router = useRouter()
     const rowsPerPage = 50
     const [modalView, setModalView] = useState('addCar')
@@ -188,7 +191,8 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                     onClick()
                     handleNavigation(`/trade/${data.data.id}`)
                 } else {
-                    toast.error(data?.data || "An error occurred")
+                    const e = data?.data || "An error occurred"
+                    showModal(CPModal, {title: "Oops...", message: e})
                 }
                 setLoading(false)
             })
@@ -299,11 +303,11 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                                     >
                                                         <TableCell component="th" scope="row">
                                                             <img loading="lazy"
-                                                                src={row.pictures.length > 0 ? row.pictures[0] : null}
-                                                                width={48}
-                                                                height={48}
-                                                                alt={row?.information?.brand?.name}
-                                                                style={{borderRadius: '8px'}}
+                                                                 src={row.pictures.length > 0 ? row.pictures[0] : null}
+                                                                 width={48}
+                                                                 height={48}
+                                                                 alt={row?.information?.brand?.name}
+                                                                 style={{borderRadius: '8px'}}
                                                             />
                                                         </TableCell>
                                                         <TableCell align="left">
@@ -345,18 +349,18 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                 <Grid item xs={12} style={{display: 'flex'}}>
                                     <VehicleDetails style={{width: 700}}>
                                         <img loading="lazy"
-                                            src={selectedCar?.pictures.length > 0 ? selectedCar?.pictures[0] : null}
-                                            width={185}
-                                            height={135}
-                                            style={{borderRadius: '8px'}}
-                                            alt={selectedCar?.information?.brand?.name}
+                                             src={selectedCar?.pictures.length > 0 ? selectedCar?.pictures[0] : null}
+                                             width={185}
+                                             height={135}
+                                             style={{borderRadius: '8px'}}
+                                             alt={selectedCar?.information?.brand?.name}
                                         />
                                         <div className="stats">
                                             <img loading="lazy"
-                                                src="/images/Toyota-Full.png"
-                                                width={80}
-                                                height={22}
-                                                style={{marginBottom: -15}}
+                                                 src="/images/Toyota-Full.png"
+                                                 width={80}
+                                                 height={22}
+                                                 style={{marginBottom: -15}}
                                             />
                                             <Typography variant="h5" className="trade">
                                                 {trimString(selectedCar?.information?.id)}

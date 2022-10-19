@@ -3807,6 +3807,11 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.3.tgz#574c8138ce1d2b5861f0b44579dbadd60c6615b2"
   integrity sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==
 
+mui-modal-provider@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/mui-modal-provider/-/mui-modal-provider-2.1.0.tgz#7165bb518496c7f7de7d4e665ee446e1692a5b4c"
+  integrity sha512-ZWw32U36MnNao2SU+i7goJveaOVZwWow1aGq4ptSOd0z1P2tyxIJUmwW8tlAEQ8iMq60ad8RIYVantPmw6fHYA==
+
 nanoid@^3.1.30:
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
