@@ -242,7 +242,7 @@ function UsersPage() {
                             onClick={() => {
                                 setSelected(Users.PENDING)
                                 setPage(0);
-                                retrieveUsers({tradeStatus: ''})
+                                retrieveUsers({status: 'disapproved'})
                             }}
                             style={{
                                 border:
