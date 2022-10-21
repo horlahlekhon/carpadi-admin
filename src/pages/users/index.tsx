@@ -70,7 +70,7 @@ function UsersPage() {
             })
     }
 
-    const retrieveUsers = ({tradeStatus = '', page = 0, status = ''}) => {
+    const retrieveUsers = ({tradeStatus = '', page = 0, status = '', is_approved=''}) => {
         setPageLoading(true)
         setUsers([])
         setPagination({
@@ -78,7 +78,7 @@ function UsersPage() {
             "next": null,
             "previous": null,
         })
-        merchantService.retrieveMerchants(rowsPerPage, page, tradeStatus, '', status)
+        merchantService.retrieveMerchants(rowsPerPage, page, tradeStatus, '', status, is_approved)
             .then((response) => {
                 if (response.status) {
                     setUsers(response.data.results)
@@ -242,7 +242,7 @@ function UsersPage() {
                             onClick={() => {
                                 setSelected(Users.PENDING)
                                 setPage(0);
-                                retrieveUsers({status: 'disapproved'})
+                                retrieveUsers({is_approved: 'False'})
                             }}
                             style={{
                                 border:
@@ -284,7 +284,7 @@ function UsersPage() {
                             onClick={() => {
                                 setSelected(Users.INACTIVE)
                                 setPage(0);
-                                retrieveUsers({tradeStatus: ''})
+                                retrieveUsers({status: 'inactive'})
                             }}
                             style={{
                                 border:
