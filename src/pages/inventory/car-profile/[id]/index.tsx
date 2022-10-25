@@ -1125,8 +1125,8 @@ function CarProfilePage({pageId}) {
                                                 <MenuItem value="" disabled>
                                                     <em>None</em>
                                                 </MenuItem>
-                                                {inspectorList.map((i) => (
-                                                    <MenuItem value={i.id}>{i?.username}</MenuItem>))}
+                                                {inspectorList.map((i, _) => (
+                                                    <MenuItem key={_} value={i.id}>{i?.username}</MenuItem>))}
                                             </Select>
                                         </FormControl>
                                         <Flex style={{marginBottom: '5px', marginTop: 5}}>
@@ -1452,7 +1452,7 @@ function CarProfilePage({pageId}) {
                                                         <div className="value">{inspection?.owners_phone}</div>
                                                     </Statistic>
                                                     <Statistic>
-                                                        <div className="key">Inspector's UserName</div>
+                                                        <div className="key">Inspector&apos;s UserName</div>
                                                         <div
                                                             className="value">{inspection?.inspector?.username || 'NA'}</div>
                                                     </Statistic>
