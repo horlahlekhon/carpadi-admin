@@ -1,6 +1,7 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
+    Avatar,
     Grid,
     Paper,
     Table,
@@ -70,7 +71,7 @@ function UsersPage() {
             })
     }
 
-    const retrieveUsers = ({tradeStatus = '', page = 0, status = '', is_approved=''}) => {
+    const retrieveUsers = ({tradeStatus = '', page = 0, status = '', is_approved = ''}) => {
         setPageLoading(true)
         setUsers([])
         setPagination({
@@ -169,10 +170,10 @@ function UsersPage() {
                     </Header>
                     <Breadcrumbs>
                         <img loading="lazy"
-                            src="/icons/Trade-Black.svg"
-                            width={'20px'}
-                            height={'18px'}
-                            style={{marginRight: '12px'}}
+                             src="/icons/Trade-Black.svg"
+                             width={'20px'}
+                             height={'18px'}
+                             style={{marginRight: '12px'}}
                         />
                         <div
                             onClick={() => {
@@ -327,11 +328,14 @@ function UsersPage() {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img loading="lazy" alt={row.user?.first_name}
-                                                         src={applyTransformation(row.user.profile_picture, 48, 48)}
-                                                         width={40}
-                                                         height={40}
-                                                         style={{borderRadius: '50%'}}/>
+                                                    {/*<img loading="lazy" alt={row.user?.first_name}*/}
+                                                    {/*     src={applyTransformation(row.user.profile_picture, 48, 48)}*/}
+                                                    {/*     width={40}*/}
+                                                    {/*     height={40}*/}
+                                                    {/*     style={{borderRadius: '50%'}}/>*/}
+                                                    <Avatar alt={row.user?.first_name}
+                                                            style={{width: '48px', height: '48px'}}
+                                                            src={applyTransformation(row.user.profile_picture, 48, 48)}>{String(row?.user?.first_name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
 
                                                 </TableCell>
                                                 <TableCell

@@ -1,6 +1,7 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
+    Avatar,
     Paper,
     Table,
     TableBody,
@@ -158,9 +159,9 @@ function SoldInventoryPage() {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img loading="lazy" src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}
-                                                         width={48}
-                                                         height={48}/>
+                                                    <Avatar alt={row.vin}
+                                                            style={{width: '48px', height: '48px'}}
+                                                            src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}>{String(row?.information?.brand?.name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                 </TableCell>
                                                 <TableCell align="left">{row.vin}</TableCell>
                                                 <TableCell align="left">{row?.information?.brand?.name}</TableCell>

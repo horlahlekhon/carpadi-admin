@@ -1,6 +1,7 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
+    Avatar,
     Grid,
     Paper,
     Table,
@@ -366,7 +367,10 @@ function TradesPage({response}) {
                                                     {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img loading="lazy" src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>
+                                                    {/*<img loading="lazy" src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>*/}
+                                                    <Avatar alt={row.vin}
+                                                            style={{width: '48px', height: '48px'}}
+                                                            src={applyTransformation(row.car.image, 48, 48)}>{String(row.car.make).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                 </TableCell>
                                                 <TableCell
                                                     align="left">{row.id.substring(row.id.length - 7)}</TableCell>
