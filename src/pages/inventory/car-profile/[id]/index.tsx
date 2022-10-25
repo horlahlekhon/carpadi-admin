@@ -5,7 +5,7 @@ import {
     Modal,
     TextField,
     Select,
-    FormControl, Grid, InputLabel
+    FormControl, Grid, InputLabel, MenuItem
 } from '@material-ui/core'
 import {t} from '../../../../styles/theme'
 import {useRouter} from 'next/router'
@@ -30,7 +30,7 @@ import CPToast from "../../../../components/shared/CPToast";
 import {resizeFile, uploadFile} from "../../../../services/upload";
 import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
-import {createInspection, retrieveInspection} from "../../../../services/inspection";
+import {createInspection, retrieveInspection, retrieveInspectors} from "../../../../services/inspection";
 import {authService} from "../../../../services/auth";
 import {getColorName} from "../../../../helpers/utils";
 import Moment from "moment";
@@ -194,9 +194,11 @@ function CarProfilePage({pageId}) {
     const [documentValue, setDocumentValue] = useState(null)
     const [docIdx, setDocIdx] = useState(null)
     const [vehicleDocuments, setVehicleDocuments] = useState([])
+    const [inspectorList, setInspectors] = useState([])
     const hiddenFileInput = useRef(null);
     const hiddenFileInput2 = useRef(null);
     const [pageLoading, setPageLoading] = useState(false)
+    const [inspectorId, setInspectorID] = useState(null)
 
     const showModal = (viewName: string, title: string, customTagline: string = null!) => {
         setModalView(viewName)
@@ -422,6 +424,21 @@ function CarProfilePage({pageId}) {
         }
     }
 
+    function getInspectors() {
+        retrieveInspectors()
+            .then((response) => {
+                if (response.status) {
+                    setInspectors(response.data?.results || [])
+                    showModal('createInspection', 'Add Inspection')
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
+    }
+
     const updateInspectionFields = (field, value) => {
         if (field == 'inspection_date' && Moment(value).toDate() < Moment().toDate()) {
             toast.dismiss()
@@ -438,7 +455,7 @@ function CarProfilePage({pageId}) {
         const data = {
             ...newInspection,
             inspection_date: Moment(newInspection?.inspection_date).toISOString(),
-            inspector: authService?.userValue?.id,
+            inspector: inspectorId,
             car: car?.id
         }
         setIsSaving(true)
@@ -685,10 +702,10 @@ function CarProfilePage({pageId}) {
                         </Header>
                         <Breadcrumbs>
                             <img loading="lazy"
-                                src="/icons/Inventory-Black.svg"
-                                width={'20px'}
-                                height={'18px'}
-                                style={{marginRight: '12px'}}
+                                 src="/icons/Inventory-Black.svg"
+                                 width={'20px'}
+                                 height={'18px'}
+                                 style={{marginRight: '12px'}}
                             />
                             <div
                                 onClick={() => {
@@ -735,7 +752,7 @@ function CarProfilePage({pageId}) {
                                             width={210}
                                             outlined={true}
                                             marginRight="16px"
-                                            onClick={() => showModal('createInspection', 'Add Inspection')}
+                                            onClick={() => getInspectors()}
                                         />
                                     }
 
@@ -784,24 +801,26 @@ function CarProfilePage({pageId}) {
                                     <Flex>
                                         <div className="slideshow">
                                             <img loading="lazy"
-                                                className="main"
-                                                src={car.pictures[carouselIdx]}
-                                                height={255}
-                                                width='100%'
+                                                 className="main"
+                                                 src={car.pictures[carouselIdx]}
+                                                 height={255}
+                                                 width='100%'
                                             />
                                             <img loading="lazy"
-                                                src="/images/Previous-Slideshow.png"
-                                                alt="Prev"
-                                                className="previous"
-                                                onClick={prevImage}
+                                                 src="/images/Previous-Slideshow.png"
+                                                 alt="Prev"
+                                                 className="previous"
+                                                 onClick={prevImage}
                                             />
-                                            <img loading="lazy" src="/images/Next-Slideshow.png" alt="Next" className="next"
+                                            <img loading="lazy" src="/images/Next-Slideshow.png" alt="Next"
+                                                 className="next"
                                                  onClick={nextImage}/>
                                         </div>
                                         <div className="gallery">
                                             <ImageGrid>
                                                 {car.pictures.map((img, i) => (
-                                                    <img loading="lazy" src={img} className="image" key={i} alt={'image' + i}/>
+                                                    <img loading="lazy" src={img} className="image" key={i}
+                                                         alt={'image' + i}/>
                                                 ))}
                                             </ImageGrid>
                                         </div>
@@ -920,7 +939,8 @@ function CarProfilePage({pageId}) {
                                     </Detail>
                                     <Detail style={{alignItems: 'end'}}>
                                         <div className="key">Description</div>
-                                        <div className="value" style={{marginLeft: '25px'}}>{car?.information?.description || 'NA'}</div>
+                                        <div className="value"
+                                             style={{marginLeft: '25px'}}>{car?.information?.description || 'NA'}</div>
                                     </Detail>
                                     {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL, CarStates.INSPECTED].includes(car?.status) && (
                                         <Button text='Create Trade' width='100%' marginTop={30}
@@ -1093,6 +1113,22 @@ function CarProfilePage({pageId}) {
                                                 />
                                             </Flex>
                                         </InputGrid>
+                                        <FormControl variant="outlined" fullWidth>
+                                            <InputLabel id="demo-simple-select-outlined-label">Inspector</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-outlined-label"
+                                                id="demo-simple-select-outlined"
+                                                value={inspectorId}
+                                                onChange={(e) => setInspectorID(e.target.value)}
+                                                label="Inspector"
+                                            >
+                                                <MenuItem value="" disabled>
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                {inspectorList.map((i) => (
+                                                    <MenuItem value={i.id}>{i?.username}</MenuItem>))}
+                                            </Select>
+                                        </FormControl>
                                         <Flex style={{marginBottom: '5px', marginTop: 5}}>
                                             <HeaderText style={{marginTop: 10}}>Enter Review</HeaderText>
                                             <TextField
@@ -1289,7 +1325,8 @@ function CarProfilePage({pageId}) {
                                             {car.pictures.map((url, idx) => (
                                                 <div className='image' key={idx}>
                                                     <img loading="lazy" src={url} className="image"/>
-                                                    <img loading="lazy" src="/icons/Delete-Circular-Green.svg" className='delete'
+                                                    <img loading="lazy" src="/icons/Delete-Circular-Green.svg"
+                                                         className='delete'
                                                          onClick={() => removePicture(url)}/>
                                                 </div>
                                             ))}
@@ -1329,10 +1366,10 @@ function CarProfilePage({pageId}) {
                                     <>
                                         <Info>
                                             <img loading="lazy"
-                                                src="/icons/Trash-Red.svg"
-                                                alt="Trash"
-                                                height={40}
-                                                width={40}
+                                                 src="/icons/Trash-Red.svg"
+                                                 alt="Trash"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"
@@ -1363,18 +1400,18 @@ function CarProfilePage({pageId}) {
                                             <Grid item xs={12} style={{display: 'flex'}}>
                                                 <VehicleDetails style={{width: 700}}>
                                                     <img loading="lazy"
-                                                        src={car?.pictures.length > 0 ? car.pictures[0] : null}
-                                                        width={185}
-                                                        height={135}
-                                                        alt={car?.name}
-                                                        style={{borderRadius: '8px'}}
+                                                         src={car?.pictures.length > 0 ? car.pictures[0] : null}
+                                                         width={185}
+                                                         height={135}
+                                                         alt={car?.name}
+                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
                                                         <img loading="lazy"
-                                                            src="/images/Toyota-Full.png"
-                                                            width={80}
-                                                            height={22}
-                                                            style={{marginBottom: -15}}
+                                                             src="/images/Toyota-Full.png"
+                                                             width={80}
+                                                             height={22}
+                                                             style={{marginBottom: -15}}
                                                         />
                                                         <Typography variant="h5" className="trade">
                                                             {trimString(inspection?.id || 'NA')}

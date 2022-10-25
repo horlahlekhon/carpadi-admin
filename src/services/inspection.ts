@@ -18,7 +18,17 @@ const retrieveInspection = (id) => {
 }
 
 const createInspection = (data) => {
-    return fetchWrapper.post(`${baseUrl}/inspections/`, data)
+    return fetchWrapper.post(`${baseUrl}/inspections/inspections/`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
+const retrieveInspectors = () => {
+    return fetchWrapper.get(`${baseUrl}/inspections/inspectors/`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -30,5 +40,6 @@ const createInspection = (data) => {
 
 export {
     retrieveInspection,
-    createInspection
+    createInspection,
+    retrieveInspectors
 }
