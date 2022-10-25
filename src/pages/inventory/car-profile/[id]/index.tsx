@@ -423,9 +423,9 @@ function CarProfilePage({pageId}) {
     }
 
     const updateInspectionFields = (field, value) => {
-        if (field == 'inspection_date' && Moment(value).toDate() > Moment().toDate()) {
+        if (field == 'inspection_date' && Moment(value).toDate() < Moment().toDate()) {
             toast.dismiss()
-            toast.error("Date cannot be greater than today")
+            toast.error("Date cannot be less than today")
             return
         } else {
             let obj = {...newInspection}
@@ -918,6 +918,10 @@ function CarProfilePage({pageId}) {
                                         <div className="key">Vehicle Age</div>
                                         <div className="value">{formatNumber(car?.information?.age) || 'NA'}</div>
                                     </Detail>
+                                    <Detail style={{alignItems: 'end'}}>
+                                        <div className="key">Description</div>
+                                        <div className="value" style={{marginLeft: '25px'}}>{car?.information?.description || 'NA'}</div>
+                                    </Detail>
                                     {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL, CarStates.INSPECTED].includes(car?.status) && (
                                         <Button text='Create Trade' width='100%' marginTop={30}
                                                 disabled={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) || car?.inspection?.status !== InspectionStates.COMPLETED}
@@ -1089,18 +1093,19 @@ function CarProfilePage({pageId}) {
                                                 />
                                             </Flex>
                                         </InputGrid>
-                                        <InputGrid style={{marginTop: 5}}>
-                                            <Flex style={{marginBottom: '5px'}}>
-                                                <HeaderText style={{marginTop: 10}}>Enter Review</HeaderText>
-                                                <TextField
-                                                    className="text-field"
-                                                    fullWidth
-                                                    variant='standard'
-                                                    value={newInspection?.owners_review}
-                                                    onChange={(e) => updateInspectionFields('owners_review', e.target.value)}
-                                                />
-                                            </Flex>
-                                        </InputGrid>
+                                        <Flex style={{marginBottom: '5px', marginTop: 5}}>
+                                            <HeaderText style={{marginTop: 10}}>Enter Review</HeaderText>
+                                            <TextField
+                                                className="text-field"
+                                                fullWidth
+                                                variant='standard'
+                                                multiline
+                                                rows={3}
+                                                maxRows={6}
+                                                value={newInspection?.owners_review}
+                                                onChange={(e) => updateInspectionFields('owners_review', e.target.value)}
+                                            />
+                                        </Flex>
                                         <Flex style={{marginBottom: '5px'}}>
                                             <HeaderText style={{marginTop: 10}}>Enter Owners Address</HeaderText>
                                             <TextField
@@ -1108,8 +1113,8 @@ function CarProfilePage({pageId}) {
                                                 fullWidth
                                                 variant='standard'
                                                 multiline
-                                                rows={2}
-                                                maxRows={4}
+                                                rows={3}
+                                                maxRows={6}
                                                 value={newInspection?.address}
                                                 onChange={(e) => updateInspectionFields('address', e.target.value)}
                                             />
@@ -1415,16 +1420,16 @@ function CarProfilePage({pageId}) {
                                                         <div className="value">{inspection?.owners_phone}</div>
                                                     </Statistic>
                                                     <Statistic>
-                                                        <div className="key">Owners Review</div>
-                                                        <div className="value">{inspection?.owners_review || 'NA'}</div>
-                                                    </Statistic>
-                                                    <Statistic>
                                                         <div className="key">Inspection Verdict</div>
                                                         <div className="value">{inspection?.inspection_verdict}</div>
                                                     </Statistic>
                                                     <Statistic>
                                                         <div className="key">Address</div>
                                                         <div className="value">{inspection?.address}</div>
+                                                    </Statistic>
+                                                    <Statistic>
+                                                        <div className="key">Owners Review</div>
+                                                        <div className="value">{inspection?.owners_review || 'NA'}</div>
                                                     </Statistic>
                                                 </Grid>
                                             </div>

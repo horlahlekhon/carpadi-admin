@@ -8,7 +8,7 @@ const baseUrl = `${publicRuntimeConfig.apiUrl}`;
 
 
 const retrieveInspection = (id) => {
-    return fetchWrapper.get(`${baseUrl}/inspections/${id}`)
+    return fetchWrapper.get(`${baseUrl}/inspections/inspections/${id}`)
         .then((response) => {
             return {status: true, data: response}
         })

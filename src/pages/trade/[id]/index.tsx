@@ -277,7 +277,7 @@ function TradeProfilePage({pageId}) {
                                     </Typography>
                                 </div>
                                 <div className="button-group">
-                                    <Button
+                                    {tradeData?.trade_status === TradeStates.PURCHASED && <Button
                                         text="Complete Trade"
                                         width={150}
                                         outlined={true}
@@ -289,8 +289,20 @@ function TradeProfilePage({pageId}) {
                                         onClick={() => {
                                             completeTrade()
                                         }}
-                                    />
-                                    <Button
+                                    />}
+                                    {tradeData?.trade_status === TradeStates.COMPLETED && <Button
+                                        text="Rollback Trade"
+                                        width={150}
+                                        outlined={true}
+                                        marginRight="10px"
+                                        bgColor={t.alertError}
+                                        disabled={tradeData?.trade_status !== TradeStates.COMPLETED || tradeData?.remaining_slots > 0 || isLoading}
+                                        title='Trade must be completed or is already settled'
+                                        onClick={() => {
+                                            rollbackTrade()
+                                        }}
+                                    />}
+                                    {tradeData?.trade_status === TradeStates.COMPLETED && <Button
                                         text="Settle Trade"
                                         width={150}
                                         outlined={true}
@@ -300,7 +312,7 @@ function TradeProfilePage({pageId}) {
                                         onClick={() => {
                                             settleTrade()
                                         }}
-                                    />
+                                    />}
                                     <Button
                                         text="Delete Trade"
                                         width={150}

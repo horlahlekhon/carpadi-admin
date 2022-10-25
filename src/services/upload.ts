@@ -42,7 +42,7 @@ const deleteUpload = async (fileName, uploadType = UploadTypes.ANY,) => {
 
 }
 
-const resizeFile = (file, {width = 300, height = 300, format = "JPEG"}) => {
+const resizeFile = (file, {width = 300, height = 300, format = "WEBP"}) => {
     return new Promise((resolve) => {
         Resizer.imageFileResizer(
             file,
