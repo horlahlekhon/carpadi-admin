@@ -1411,13 +1411,18 @@ function CarProfilePage({pageId}) {
                                                             className="value">{trimString(inspection?.owners_name, 25) || 'NA'}</div>
                                                     </Statistic>
                                                     <Statistic>
+                                                        <div className="key">Owners Phone</div>
+                                                        <div className="value">{inspection?.owners_phone}</div>
+                                                    </Statistic>
+                                                    <Statistic>
+                                                        <div className="key">Inspector's UserName</div>
+                                                        <div
+                                                            className="value">{inspection?.inspector?.username || 'NA'}</div>
+                                                    </Statistic>
+                                                    <Statistic>
                                                         <div className="key">Inspection Date</div>
                                                         <div
                                                             className="value">{formatDate(inspection?.inspection_date)}</div>
-                                                    </Statistic>
-                                                    <Statistic>
-                                                        <div className="key">Owners Phone</div>
-                                                        <div className="value">{inspection?.owners_phone}</div>
                                                     </Statistic>
                                                     <Statistic>
                                                         <div className="key">Inspection Verdict</div>
