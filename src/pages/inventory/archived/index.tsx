@@ -44,7 +44,7 @@ function ArchivedPage() {
     }
 
     const handleNavigation = (action: string) => {
-        router.push(`${action}`)
+        router.push(`${action}`, undefined, {shallow: true})
     }
 
     const useStyles = makeStyles((theme) => ({
