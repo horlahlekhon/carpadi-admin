@@ -286,7 +286,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             />
                             <TextField
                                 className="text-field"
-                                type='number'
+                                type='text'
                                 fullWidth
                                 label="Bought Price"
                                 placeholder="Bought Price"
@@ -390,7 +390,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 placeholder="Current Mileage"
                                 value={car?.mileage || 'NA'}
                                 variant='standard'
-                                type='number'
+                                type='text'
                                 onChange={(e) => setCarDetail('mileage', e.target.value)}
                             />
                         </InputGrid>

@@ -55,7 +55,8 @@ function TradeProfilePage({pageId}) {
         date_of_sale: null,
         sold_slots_price: 0,
         carpadi_rot: 0,
-        total_carpadi_rot: 0
+        total_carpadi_rot: 0,
+        trade_margin: 0
     })
     const [pageLoading, setPageLoading] = useState(false)
 
@@ -577,7 +578,7 @@ function TradeProfilePage({pageId}) {
                                                                 placeholder="Enter price"
                                                                 label="Enter price"
                                                                 fullWidth
-                                                                type="number"
+                                                                type="text"
                                                                 value={tradeData?.car?.resale_price || tradeData.sold_slots_price}
                                                                 onChange={handleTradeChange('sold_slots_price')}
                                                             ></TextField>
@@ -614,7 +615,7 @@ function TradeProfilePage({pageId}) {
                                                                     Trade Margin
                                                                 </Typography>
                                                                 <Typography
-                                                                    variant="h5">&#8358; {formatNumber(tradeData?.total_carpadi_rot)}</Typography>
+                                                                    variant="h5">&#8358; {formatNumber(tradeData?.trade_margin)}</Typography>
                                                             </PriceCard>
                                                         </Grid>
                                                         <Grid item xs={12}>
@@ -763,7 +764,7 @@ function TradeProfilePage({pageId}) {
                                                     placeholder="Slot Quantity"
                                                     label="Slot Quantity"
                                                     value={tradeData.slots_available}
-                                                    type='number'
+                                                    type='text'
                                                     onChange={handleTradeChange('slots_available')}
                                                 />
                                                 <FlexRow className="input">

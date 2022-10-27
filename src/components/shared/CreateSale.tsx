@@ -472,7 +472,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 label="Enter price"
                                 style={{width: 400}}
                                 value={sellingPrice}
-                                type='number'
+                                type='text'
                                 onChange={(e) => setSellingPrice(Number(e.target.value))}
                             ></TextField>
                         </FlexRow>

@@ -504,7 +504,7 @@ function SalesProfilePage({pageId}) {
                                                     <TextField
                                                         placeholder="Enter price"
                                                         style={{width: 400}}
-                                                        type='number'
+                                                        type='text'
                                                         value={sale?.selling_price}
                                                         onChange={(e) => handleSaleChange('selling_price', e.target.value)}
                                                     ></TextField>

@@ -1,8 +1,8 @@
 module.exports = {
-    reactStrictMode: true,
+    reactStrictMode: false,
     publicRuntimeConfig: {
-        accessKeyId: process.env.KEY_ID || '',
-        secretAccessKey: process.env.ACCESS_KEY || '',
+        accessKeyId: process.env.KEY_ID || 'AKIAZEW6KCSPYAHB3ZDW',
+        secretAccessKey: process.env.ACCESS_KEY || '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',
         region: process.env.REGION || 'eu-west-2',
         bucket: process.env.S3_BUCKET || 'carpadi',
         cloudfront: process.env.CLOUDFRONT_URL || 'https://d16encqm9nbktq.cloudfront.net',
@@ -14,6 +14,6 @@ module.exports = {
     },
     compiler: {
         styledComponents: true,
-        ssr: true
+        ssr: false
     }
 }
