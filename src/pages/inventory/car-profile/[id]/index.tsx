@@ -31,12 +31,10 @@ import {resizeFile, uploadFile} from "../../../../services/upload";
 import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
 import {createInspection, retrieveInspection, retrieveInspectors} from "../../../../services/inspection";
-import {authService} from "../../../../services/auth";
 import {getColorName} from "../../../../helpers/utils";
 import Moment from "moment";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {Add} from "@material-ui/icons";
-import {doc} from "prettier";
 import {
     createCarDocument,
     deleteCarDocument,
@@ -44,6 +42,7 @@ import {
     updateCarDocument
 } from "../../../../services/car-documents";
 import Loader from "../../../../components/layouts/core/Loader";
+import _ from "lodash";
 
 
 function CarProfilePage({pageId}) {
@@ -224,7 +223,7 @@ function CarProfilePage({pageId}) {
 
     const handleFileChange2 = event => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded, UploadTypes.CAR_DOCUMENT, car?.id)
+        _.debounce(uploadFile(fileUploaded, UploadTypes.CAR_DOCUMENT, car?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;
@@ -240,7 +239,7 @@ function CarProfilePage({pageId}) {
             })
             .finally(() => {
                 setIsSaving(false)
-            })
+            }), 1500)
     };
 
     const handleFile = (files) => {
@@ -557,7 +556,7 @@ function CarProfilePage({pageId}) {
     const uploadDocument = (idx) => {
         setDocIdx(idx)
         setIsSaving(true)
-        hiddenFileInput2.current.click();
+        hiddenFileInput2.current.click()
     }
 
     const verifyDocument = (id: any) => {
@@ -1040,7 +1039,7 @@ function CarProfilePage({pageId}) {
                                                             onClick={() => verifyDocument(doc?.id)}
                                                         />
                                                         <Button
-                                                            text={!!doc?.asset ? "Download" : "Upload"}
+                                                            text={!!doc?.asset ? "Download" : idx === docIdx && isSaving ? "..." : "Upload"}
                                                             outlined={true}
                                                             width={80}
                                                             height={28}
