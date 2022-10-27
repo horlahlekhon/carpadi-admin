@@ -86,7 +86,7 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade Deleted')
                     router.push('/trade')
                 } else {
-                    showModal(CPModal, {title: "Oops...", message: response.data})
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -107,7 +107,7 @@ function TradeProfilePage({pageId}) {
                     retrieveTrade()
                 } else {
                     // toast.error(response.data)
-                    showModal(CPModal, {title: "Oops...", message: response.data})
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -126,7 +126,7 @@ function TradeProfilePage({pageId}) {
                     setTradeData(response.data)
                 } else {
                     // toast.error(response.data)
-                    showModal(CPModal, {title: "Oops...", message: response.data})
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -146,11 +146,14 @@ function TradeProfilePage({pageId}) {
                         toast.success('Resale price updated!')
                     } else {
                         // toast.error(response.data)
-                        showModal(CPModal, {title: "Oops...", message: response.data})
+                        showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                     }
                 })
                 .catch((error) => {
                     toast.error(error.data)
+                })
+                .finally(() => {
+                    setEditDetails(false)
                 })
         }
     }
@@ -167,7 +170,7 @@ function TradeProfilePage({pageId}) {
                     retrieveTrade()
                 } else {
                     // toast.error(response.data)
-                    showModal(CPModal, {title: "Oops...", message: response.data})
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -189,7 +192,7 @@ function TradeProfilePage({pageId}) {
                     retrieveTrade()
                 } else {
                     // toast.error(response.data)
-                    showModal(CPModal, {title: "Oops...", message: response.data})
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -211,7 +214,7 @@ function TradeProfilePage({pageId}) {
                     retrieveTrade()
                 } else {
                     // toast.error(response.data)
-                    showModal(CPModal, {title: "Oops...", message: response.data})
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -501,7 +504,7 @@ function TradeProfilePage({pageId}) {
                                         <Grid item xs={6}>
                                             <PriceCard>
                                                 <Typography variant="body1">
-                                                    Projected Carpai Profit on Trade
+                                                    Projected Carpadi Profit on Trade
                                                 </Typography>
                                                 <Typography
                                                     variant="h5">&#8358; {formatNumber(tradeData?.total_carpadi_rot)}</Typography>
