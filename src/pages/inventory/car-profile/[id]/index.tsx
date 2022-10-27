@@ -1277,7 +1277,7 @@ function CarProfilePage({pageId}) {
                                                 variant='standard'
                                                 value={car?.information?.age || 0}
                                                 onChange={(e) => setInfoField('age', e.target.value)}
-                                                type='number'
+                                                type='text'
                                             />
                                             <TextField
                                                 className="text-field"
@@ -1287,7 +1287,7 @@ function CarProfilePage({pageId}) {
                                                 variant='standard'
                                                 value={car?.information?.mileage || 0}
                                                 onChange={(e) => setInfoField('mileage', e.target.value)}
-                                                type='number'
+                                                type='text'
                                             />
                                         </InputGrid>
                                         <InputGrid>
@@ -1299,7 +1299,7 @@ function CarProfilePage({pageId}) {
                                                 variant='standard'
                                                 value={car?.bought_price || 0}
                                                 onChange={(e) => setField('bought_price', e.target.value)}
-                                                type='number'
+                                                type='text'
                                             />
                                         </InputGrid>
                                         <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle
@@ -1452,7 +1452,7 @@ function CarProfilePage({pageId}) {
                                                         <div className="value">{inspection?.owners_phone}</div>
                                                     </Statistic>
                                                     <Statistic>
-                                                        <div className="key">Inspector&apos;s UserName</div>
+                                                        <div className="key">Inspector</div>
                                                         <div
                                                             className="value">{inspection?.inspector?.username || 'NA'}</div>
                                                     </Statistic>
