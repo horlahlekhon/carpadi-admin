@@ -346,7 +346,7 @@ function TradeProfilePage({pageId}) {
                                         }}
                                         disabled={isLoading}
                                     />
-                                    <Button
+                                    {tradeData?.trade_status !== TradeStates.CLOSED && (<Button
                                         text="Edit Trade"
                                         width={150}
                                         outlined={true}
@@ -359,7 +359,7 @@ function TradeProfilePage({pageId}) {
                                         }
                                         title='Trade slots already purchased'
                                         onClick={() => showModalX('editTrade', 'Edit Trade')}
-                                    />
+                                    />)}
                                     <Button
                                         text="Go to Car Profile"
                                         width={155}
