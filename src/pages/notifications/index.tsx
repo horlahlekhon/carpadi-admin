@@ -275,13 +275,13 @@ function NotificationsPage() {
                             <input type="text" placeholder="Start a conversation ..."/>
                             <div className="actionbar">
                                 <div className="attachments">
-                                    <img
+                                    <img loading="lazy"
                                         src="/icons/Typography-Dark-Blue.svg"
                                         width={22}
                                         height={16}
                                         className="attachments-icon"
                                     />
-                                    <img
+                                    <img loading="lazy"
                                         src="/icons/Image-Grey.svg"
                                         width={22}
                                         height={20}

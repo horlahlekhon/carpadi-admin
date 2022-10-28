@@ -30,7 +30,7 @@ import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import CPToast from "./CPToast";
 import {createSale} from "../../services/sale";
-import {uploadFile} from "../../services/upload";
+import {convertToWebp, uploadFile} from "../../services/upload";
 import {CarStates, UploadTypes} from "../../lib/enums";
 
 const CreateSale = ({modalOpen = true, onClick, car = null}) => {
@@ -92,9 +92,10 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
         handleFile(fileUploaded);
     };
 
-    const handleFileChange2 = event => {
+    const handleFileChange2 = async (event) => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded, UploadTypes.CAR_FEATURE, selectedCar?.id)
+        const f = await convertToWebp(fileUploaded)
+        uploadFile(f, UploadTypes.CAR_FEATURE, selectedCar?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;
@@ -369,7 +370,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                                     onClick={() => setSelectedCar(row)}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        <img
+                                                        <img loading="lazy"
                                                             src={row.pictures.length > 0 ? row.pictures[0] : null}
                                                             width={48}
                                                             height={48}
@@ -418,7 +419,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                         <InfoSection container spacing={3} style={{width: 700}}>
                             <Grid item xs={6}>
                                 <VehicleDetails>
-                                    <img
+                                    <img loading="lazy"
                                         src={selectedCar?.pictures.length > 0 ? selectedCar?.pictures[0] : null}
                                         width={185}
                                         height={135}
@@ -426,7 +427,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                         alt={selectedCar?.name}
                                     />
                                     <div className="stats">
-                                        <img
+                                        <img loading="lazy"
                                             src="/images/Toyota-Full.png"
                                             width={80}
                                             height={22}
@@ -471,7 +472,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 label="Enter price"
                                 style={{width: 400}}
                                 value={sellingPrice}
-                                type='number'
+                                type='text'
                                 onChange={(e) => setSellingPrice(Number(e.target.value))}
                             ></TextField>
                         </FlexRow>
@@ -550,14 +551,14 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             <PriceSection container spacing={3}>
                                 <Grid item xs={6}>
                                     <VehicleDetail>
-                                        <img
+                                        <img loading="lazy"
                                             src={selectedCar?.pictures.length > 0 ? selectedCar?.pictures[0] : null}
                                             height={135}
                                             width={185}
                                             style={{borderRadius: '8px'}}
                                         />
                                         <div className="stats">
-                                            <img
+                                            <img loading="lazy"
                                                 src="/images/Toyota-Full.png"
                                                 width={80}
                                                 height={22}
@@ -591,7 +592,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                             <Features>
                                 {keyFeatures.map((kf, idx) => (
                                     <div className="key-features" key={idx}>
-                                        <img src={kf.feature_images[0]} alt="Feature"/>
+                                        <img loading="lazy" src={kf.feature_images[0]} alt="Feature"/>
                                         <Typography variant="subtitle1" className="text">
                                             {kf.name}
                                         </Typography>
@@ -605,7 +606,7 @@ const CreateSale = ({modalOpen = true, onClick, car = null}) => {
                                 <div className="gallery">
                                     <ImageGrid>
                                         {salesImages.map((im, idx) => (
-                                            <img
+                                            <img loading="lazy"
                                                 key={idx}
                                                 src={im?.url}
                                                 className="image"

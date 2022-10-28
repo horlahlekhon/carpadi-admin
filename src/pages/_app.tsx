@@ -9,6 +9,7 @@ import CssBaseline from '@material-ui/core/CssBaseline'
 import {theme, GlobalStyles} from '../styles/theme'
 import {animations} from '../lib/animations'
 import {authService} from "../services/auth"
+import ModalProvider from 'mui-modal-provider';
 
 const MyApp = ({Component, pageProps, router}): JSX.Element => {
     const getLayout = Component.getLayout || ((page) => page)
@@ -25,7 +26,7 @@ const MyApp = ({Component, pageProps, router}): JSX.Element => {
     useEffect(() => {
         authService.autoAuthenticate();
         authService.isAuthenticated.subscribe((isAuthenticated) => {
-            if(!isAuthenticated  && router.route !== '/login') {
+            if (!isAuthenticated && router.route !== '/login') {
                 router.push(`/login?returnUrl=${router.route}`)
             }
         })
@@ -47,7 +48,9 @@ const MyApp = ({Component, pageProps, router}): JSX.Element => {
                                 variants={animation.variants}
                                 transition={animation.transition}
                             >
-                                <Component {...pageProps} />
+                                <ModalProvider legacy={true}>
+                                    <Component {...pageProps} />
+                                </ModalProvider>
                             </m.div>
                         </AnimatePresence>
                     </LazyMotion>

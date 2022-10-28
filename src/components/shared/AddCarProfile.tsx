@@ -7,7 +7,7 @@ import {useRef, useState} from "react";
 import {toast} from "react-hot-toast";
 import styled from "styled-components";
 import {retrieveVINDetails} from "../../services/vehicle";
-import {uploadFile} from "../../services/upload";
+import {resizeFile, uploadFile} from "../../services/upload";
 import ntc from "../../lib/ntc";
 import {trimString} from "../../helpers/formatters";
 import {createCar} from "../../services/car";
@@ -126,46 +126,69 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
         if (bought_price) {
             data['bought_price'] = bought_price
         }
-        uploadedPictures.forEach(async (picture) => {
-            uploadFile(picture?.file, UploadTypes.CAR, vin)
-                .then((res) => {
-                    if (res.status) {
-                        data.car_pictures.push(res.data?.secure_url)
+        if (uploadedPictures.length > 0) {
+            uploadedPictures.forEach(async (picture) => {
+                const p = await resizeFile(picture?.file, {width: 950, height: 500, format: 'WEBP'})
+                // uploadFile(p, UploadTypes.CAR, vin)
+                //     .then((res) => {
+                //         if (res.status) {
+                //             data.car_pictures.push(res.data?.secure_url)
+                //         } else {
+                //             toast.error(res.data)
+                //         }
+                //     })
+                //     .catch((error) => {
+                //         toast.error(error)
+                //     })
+                const res = await uploadFile(p, UploadTypes.CAR, vin);
+                if (res.status) {
+                    data.car_pictures.push(res.data?.secure_url)
+                    if (data.car_pictures.length === uploadedPictures.length) {
+                        createCar(data)
+                            .then((response) => {
+                                if (response.status) {
+                                    toast.success('Created Successfully!')
+                                    onClick()
+                                    if (response.data?.id) {
+                                        handleNavigation(`/inventory/car-profile/${response.data.id}?status=car listings`)
+                                    }
+                                } else {
+                                    toast.error(response.data)
+                                }
+                            })
+                            .catch((error) => {
+                                toast.error(error)
+                            })
+                            .finally(() => {
+                                setisUploading(false)
+                                setLoading(false)
+                            })
+                    }
+                } else {
+                    toast.error(res.data)
+                }
+            })
+        } else {
+            createCar(data)
+                .then((response) => {
+                    if (response.status) {
+                        toast.success('Created Successfully!')
+                        onClick()
+                        if (response.data?.id) {
+                            handleNavigation(`/inventory/car-profile/${response.data.id}?status=car listings`)
+                        }
                     } else {
-                        toast.error(res.data)
+                        toast.error(response.data)
                     }
                 })
                 .catch((error) => {
                     toast.error(error)
                 })
-            const res = await uploadFile(picture?.file, UploadTypes.CAR, vin);
-            if (res.status) {
-                data.car_pictures.push(res.data?.secure_url)
-                if (data.car_pictures.length === uploadedPictures.length) {
-                    createCar(data)
-                        .then((response) => {
-                            if (response.status) {
-                                toast.success('Created Successfully!')
-                                onClick()
-                                if (response.data?.id) {
-                                    handleNavigation(`/inventory/car-profile/${response.data.id}?status=car listings`)
-                                }
-                            } else {
-                                toast.error(response.data)
-                            }
-                        })
-                        .catch((error) => {
-                            toast.error(error)
-                        })
-                        .finally(() => {
-                            setisUploading(false)
-                            setLoading(false)
-                        })
-                }
-            } else {
-                toast.error(res.data)
-            }
-        })
+                .finally(() => {
+                    setisUploading(false)
+                    setLoading(false)
+                })
+        }
 
     }
 
@@ -205,11 +228,11 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                 {modalView === 'createCarProfile' && (
                     <>
                         <Info>
-                            <img
-                                src="/images/Fetched-car-Green.png"
-                                alt="Trash"
-                                height={98}
-                                width={98}
+                            <img loading="lazy"
+                                 src="/images/Fetched-car-Green.png"
+                                 alt="Trash"
+                                 height={98}
+                                 width={98}
                             />
                             <Typography
                                 variant="h6"
@@ -263,7 +286,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                             />
                             <TextField
                                 className="text-field"
-                                type='number'
+                                type='text'
                                 fullWidth
                                 label="Bought Price"
                                 placeholder="Bought Price"
@@ -367,7 +390,7 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                 placeholder="Current Mileage"
                                 value={car?.mileage || 'NA'}
                                 variant='standard'
-                                type='number'
+                                type='text'
                                 onChange={(e) => setCarDetail('mileage', e.target.value)}
                             />
                         </InputGrid>
@@ -407,8 +430,8 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                         <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
                             {uploadedPictures.map((image, idx) => (
                                 <div className='image' key={idx}>
-                                    <img src={image.secure_url} className="image"/>
-                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'
+                                    <img loading="lazy" src={image.secure_url} className="image"/>
+                                    <img loading="lazy" src="/icons/Delete-Circular-Green.svg" className='delete'
                                          onClick={() => removePicture(image.secure_url)}/>
                                 </div>
                             ))}
@@ -432,15 +455,27 @@ const AddCarProfile = ({modalOpen = true, onClick}) => {
                                         onClick={() => handleFileClick(event)}/>
                             </div>
                         </ImageUpload>
-                        <Button
-                            text={isLoading ? 'Saving ...' : 'Create Car Profile'}
-                            width={510}
-                            marginLeft="auto"
-                            marginRight="auto"
-                            marginTop={50}
-                            disabled={(uploadedPictures.length < 3) || isLoading}
-                            onClick={() => saveCarProfile()}
-                        />
+                        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+                            <Button
+                                text={isLoading ? 'Saving ...' : 'Skip'}
+                                width={200}
+                                marginLeft="auto"
+                                marginRight="10px"
+                                marginTop={50}
+                                outlined={true}
+                                disabled={isLoading}
+                                onClick={() => saveCarProfile()}
+                            />
+                            <Button
+                                text={isLoading ? 'Saving ...' : 'Create Car Profile'}
+                                width={200}
+                                marginLeft="auto"
+                                marginRight="auto"
+                                marginTop={50}
+                                disabled={(uploadedPictures.length < 3) || isLoading}
+                                onClick={() => saveCarProfile()}
+                            />
+                        </div>
                     </>
                 )}
             </ModalBody>

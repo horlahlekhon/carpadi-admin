@@ -126,7 +126,7 @@ function InventoryPage() {
                         </ActionBar>
                     </Header>
                     <Breadcrumbs>
-                        <img
+                        <img loading="lazy"
                             src="/icons/Inventory-Black.svg"
                             width={'20px'}
                             height={'18px'}
@@ -271,7 +271,7 @@ function InventoryPage() {
                                                             aria-label="toggle password visibility"
                                                             onClick={handleFileClick}
                                                         >
-                                                            <img src='/images/Upload.png' height={20} width={22}/>
+                                                            <img loading="lazy" src='/images/Upload.png' height={20} width={22}/>
                                                             <Typography variant='subtitle2' color='primary'
                                                                         style={{marginLeft: 2}}>Upload</Typography>
                                                         </IconButton>
@@ -329,13 +329,13 @@ function InventoryPage() {
                                 <>
                                     <FlexRow
                                         style={{justifyContent: 'space-between', alignItems: 'start', marginTop: 8}}>
-                                        <img
+                                        <img loading="lazy"
                                             src="/images/Big-Default-Car.png"
                                             width={185}
                                             height={135}
                                             style={{borderRadius: '8px'}}
                                         />
-                                        <img
+                                        <img loading="lazy"
                                             src="/images/Toyota-Full.png"
                                             width={80}
                                             height={22}
@@ -366,7 +366,7 @@ function InventoryPage() {
                                         fontWeight: 'bold',
                                         color: t.lightGrey
                                     }}>
-                                        <img src='/icons/Caution-Yellow.svg' alt='caution' height={20} width={20}
+                                        <img loading="lazy" src='/icons/Caution-Yellow.svg' alt='caution' height={20} width={20}
                                              style={{marginRight: 4}}/>
                                         <span>There’s no current UI for managing created brands, If you wish to delete contact the development team</span>
                                     </div>

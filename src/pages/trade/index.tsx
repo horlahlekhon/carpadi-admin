@@ -1,6 +1,7 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
+    Avatar,
     Grid,
     Paper,
     Table,
@@ -24,6 +25,7 @@ import Moment from 'moment';
 import CPToast from "../../components/shared/CPToast";
 import Loader from "../../components/layouts/core/Loader";
 import CreateTrade from "../../components/shared/CreateTrade";
+import {applyTransformation} from "../../services/upload";
 
 function TradesPage({response}) {
     enum Trades {
@@ -63,7 +65,7 @@ function TradesPage({response}) {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1);
-        retrieveTrades(selectedTrade === Trades.ACTIVE ? 'ongoing' : selectedTrade === Trades.SOLD ? 'completed' : 'sold', newPage - 1)
+        retrieveTrades(selectedTrade === Trades.ACTIVE ? 'ongoing' : selectedTrade === Trades.SOLD ? 'completed' : 'sold', ((newPage - 1) * rowsPerPage))
     }
 
     const handleNavigation = (action: string) => {
@@ -164,7 +166,7 @@ function TradesPage({response}) {
                         </ActionBar>
                     </Header>
                     <Breadcrumbs>
-                        <img
+                        <img loading="lazy"
                             src="/icons/Trade-Black.svg"
                             width={'20px'}
                             height={'18px'}
@@ -362,10 +364,13 @@ function TradesPage({response}) {
                                         .map((row, idx) => (
                                             <TableRow key={idx}>
                                                 <TableCell component="th" scope="row">
-                                                    {idx}
+                                                    {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={row.car.image} width={48} height={48}/>
+                                                    {/*<img loading="lazy" src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>*/}
+                                                    <Avatar alt={row.vin}
+                                                            style={{width: '48px', height: '48px'}}
+                                                            src={applyTransformation(row.car.image, 48, 48)}>{String(row.car.make).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                 </TableCell>
                                                 <TableCell
                                                     align="left">{row.id.substring(row.id.length - 7)}</TableCell>
@@ -405,7 +410,7 @@ function TradesPage({response}) {
                         </TableContainer>
                         <TableFooter>
                             <div>
-                                Showing page {page + 1} of {Math.ceil(trades.length / rowsPerPage)}/{' '}
+                                Showing page {page + 1} of {Math.ceil(paginationKeys.count / rowsPerPage)}/{' '}
                                 {paginationKeys.count} Total Items
                             </div>
 

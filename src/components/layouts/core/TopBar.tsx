@@ -13,13 +13,15 @@ import {SearchOutlined} from '@material-ui/icons'
 import {t} from '../../../styles/theme'
 import {authService} from "../../../services/auth"
 import {useRouter} from "next/router";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {allowedSearchModules} from "../../../lib/constants";
 
 function TopBar() {
     const router = useRouter()
     const currentDate = new Date().toISOString();
     const currentUser = authService.userValue;
     const [query, setQuery] = useState('');
+    const [cRoute, setCRoute] = useState('');
 
     const handleNavigation = (action: string) => {
         router.push(`${action}`)
@@ -29,8 +31,13 @@ function TopBar() {
 
     const handleSearch = () => {
         const paths = router.route.split('/')
-        handleNavigation(`/search?type=${paths[1]}&searchTerm=${query}`)
+        let path = allowedSearchModules.includes(paths[1]) ? (paths[1] !== 'search' ? paths[1] : localStorage.getItem('recentSearchModule')) : paths[1];
+        handleNavigation(`/search?type=${path}&searchTerm=${query}`)
     }
+    
+    useEffect(() => {
+        setCRoute(router.route.split('/')[1])
+    }, [router])
 
     return (
         <Header>
@@ -56,6 +63,7 @@ function TopBar() {
                             </IconButton>
                         </InputAdornment>
                     }
+                    disabled={!allowedSearchModules.includes(cRoute)}
                     value={query}
                     onChange={(e) => {
                         if (e.target.value === '' || e.target.value === undefined || e.target.value === null) {
@@ -73,10 +81,10 @@ function TopBar() {
                 />
             </FormControl>
             <User onClick={() => router.push('/user-profile')}>
-                {currentUser?.profile_picture && <img
-                    className="image"
-                    src="/images/Big-Default-Car.png"
-                    alt="James Dalles"
+                {currentUser?.profile_picture && <img loading="lazy"
+                                                      className="image"
+                                                      src="/images/Big-Default-Car.png"
+                                                      alt="James Dalles"
                 />}
                 {!currentUser?.profile_picture && <Avatar
                     className='image'>{String(currentUser?.first_name).slice(0, 1) + String(currentUser?.last_name).slice(0, 1)}</Avatar>}

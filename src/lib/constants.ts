@@ -13,4 +13,6 @@ const months = [
     'december'
 ]
 
-export {months}
+const allowedSearchModules = ['sales', 'inventory', 'users', 'trade', 'search']
+
+export {months, allowedSearchModules}

@@ -300,7 +300,7 @@ function SettingsPage() {
                                     <TextField
                                         placeholder="Enter Fee"
                                         style={{width: 400}}
-                                        type='number'
+                                        type='text'
                                         value={fees?.transfer_fee}
                                         onChange={(e) => handleFeeChange('transfer_fee', e.target.value)}
                                     ></TextField>
@@ -313,7 +313,7 @@ function SettingsPage() {
                                     <TextField
                                         placeholder="Enter Fee"
                                         style={{width: 400}}
-                                        type='number'
+                                        type='text'
                                         value={fees?.close_trade_fee}
                                         onChange={(e) => handleFeeChange('close_trade_fee', e.target.value)}
                                     ></TextField>
@@ -326,7 +326,7 @@ function SettingsPage() {
                                     <TextField
                                         placeholder="Enter Percentage"
                                         style={{width: 400}}
-                                        type='number'
+                                        type='text'
                                         value={fees?.merchant_trade_rot_percentage}
                                         onChange={(e) => handleFeeChange('merchant_trade_rot_percentage', e.target.value)}
                                     ></TextField>
@@ -339,7 +339,7 @@ function SettingsPage() {
                                     <TextField
                                         placeholder="Enter Percentage"
                                         style={{width: 400}}
-                                        type='number'
+                                        type='text'
                                         value={fees?.carpadi_commision}
                                         onChange={(e) => handleFeeChange('carpadi_commision', e.target.value)}
                                     ></TextField>

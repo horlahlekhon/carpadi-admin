@@ -26,7 +26,7 @@ function UserProfilePage() {
                 </Typography>
             </Header>
             <MainSection>
-                {user?.profile_picture && <img
+                {user?.profile_picture && <img loading="lazy"
                     className="image"
                     src="/images/Big-Default-Car.png"
                     alt="James Dalles"

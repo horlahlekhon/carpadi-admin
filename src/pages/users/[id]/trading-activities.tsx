@@ -118,7 +118,7 @@ function TradingActivitiesPage({pageId}) {
                                     <CardHeader>
                                         <div className='profile'>
                                             <ProfileImage>
-                                                <img src={user?.user?.profile_picture} width={'100%'}
+                                                <img loading="lazy" src={user?.user?.profile_picture} width={'100%'}
                                                      height={'100%'} alt={user?.user?.first_name}
                                                      style={{borderRadius: '100%'}}/>
                                             </ProfileImage>
@@ -163,7 +163,7 @@ function TradingActivitiesPage({pageId}) {
                                         {activityTab === ActivityStatus.ACTIVE &&
                                             activities.map((trade, i) => (
                                                 <ActivityCard key={i}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={trade?.trade_car?.images}
                                                         alt={trade?.trade_car?.manufacturer}
                                                         className="image"
@@ -236,7 +236,7 @@ function TradingActivitiesPage({pageId}) {
                                         {activityTab === ActivityStatus.SOLD &&
                                             activities.map((trade, i) => (
                                                 <ActivityCard key={i}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={trade?.trade_car?.images}
                                                         alt={trade?.trade_car?.manufacturer}
                                                         className="image"
@@ -309,14 +309,14 @@ function TradingActivitiesPage({pageId}) {
                                         {activityTab === ActivityStatus.CLOSED &&
                                             activities.map((trade, i) => (
                                                 <ActivityCard key={i}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={trade?.trade_car?.images}
                                                         alt={trade?.trade_car?.manufacturer}
                                                         className="image"
                                                     />
                                                     <div className='content'>
                                                         <div className='header'>
-                                                            <img src="/images/Toyota-Full.png" height={11} width={40}
+                                                            <img loading="lazy" src="/images/Toyota-Full.png" height={11} width={40}
                                                                  alt={trade?.trade_car?.manufacturer}/>
                                                             <div
                                                                 className='text'>{trade?.trade_car?.manufacturer} {trade?.trade_car?.model} {trade?.trade_car?.year}</div>

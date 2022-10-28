@@ -1,6 +1,7 @@
 import MainLayout from '../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
+    Avatar,
     Grid,
     Paper,
     Table,
@@ -24,6 +25,7 @@ import {toast} from "react-hot-toast";
 import {retrieveSales} from "../../services/sale";
 import {formatDate, formatNumber, trimString} from "../../helpers/formatters";
 import Loader from "../../components/layouts/core/Loader";
+import {applyTransformation} from "../../services/upload";
 
 function SalesPage() {
     enum Sales {
@@ -63,6 +65,7 @@ function SalesPage() {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage - 1)
+        getSales(selectedSales.valueOf(), ((newPage - 1) * rowsPerPage))
     }
 
     const handleNavigation = (action: string) => {
@@ -154,7 +157,7 @@ function SalesPage() {
                         />
                     </Header>
                     <Breadcrumbs>
-                        <img
+                        <img loading="lazy"
                             src="/icons/Vehicle-Blue.svg"
                             width={'20px'}
                             height={'18px'}
@@ -253,11 +256,14 @@ function SalesPage() {
                                                 // style={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row">
-                                                    {idx + 1}
+                                                    {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img src={row?.product_images.length > 0 ? row?.product_images[0] : null}
-                                                         width={48} height={48} alt={trimString(row?.id)}/>
+                                                    {/*<img loading="lazy" src={row?.product_images.length > 0 ? applyTransformation(row?.product_images[0], 48, 48) : null}*/}
+                                                    {/*     width={48} height={48} alt={trimString(row?.id)}/>*/}
+                                                    <Avatar alt={trimString(row?.id)}
+                                                            style={{width: '48px', height: '48px'}}
+                                                            src={row.product_images.length > 0 ? applyTransformation(row.product_images[0], 48, 48) : null}>{String(row?.car?.name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                 </TableCell>
                                                 <TableCell align="right">{row?.car?.vin}</TableCell>
                                                 <TableCell align="right">{row?.car?.make}</TableCell>
@@ -283,7 +289,7 @@ function SalesPage() {
                         </TableContainer>
                         <TableFooter>
                             <div>
-                                Showing page {page + 1} of {Math.ceil(sales.length / rowsPerPage)}/{' '}
+                                Showing page {page + 1} of {Math.ceil(paginationKeys.count / rowsPerPage)}/{' '}
                                 {paginationKeys.count} Total Items
                             </div>
 

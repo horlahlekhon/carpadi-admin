@@ -40,7 +40,8 @@ function UserProfilePage({pageId}) {
         "banks": [],
         "created": null,
         "modified": null,
-        "bvn": null
+        "bvn": null,
+        "is_approved": false
     })
     const [wallet, setWalletData] = useState({
         "id": "NA",
@@ -131,7 +132,7 @@ function UserProfilePage({pageId}) {
     const updateUser = (data) => {
         if (data && userId !== 'NA' && userId !== undefined) {
             merchantService
-                .updateSingleMerchant(userId, {...user.user, ...data})
+                .updateSingleMerchant(userId, {...data})
                 .then((response) => {
                     if (response.status) {
                         retrieveUser()
@@ -145,6 +146,28 @@ function UserProfilePage({pageId}) {
                 })
                 .finally(() => {
                     setModalState(false)
+                })
+        }
+    }
+
+    const approveUser = () => {
+        setPageLoading(true)
+        if (userId !== 'NA' && userId !== undefined) {
+            merchantService
+                .updateSingleMerchant(userId, {is_approved: true})
+                .then((response) => {
+                    if (response.status) {
+                        retrieveUser()
+                        toast.success('User Account Approved')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error.data)
+                })
+                .finally(() => {
+                    setPageLoading(false)
                 })
         }
     }
@@ -168,10 +191,23 @@ function UserProfilePage({pageId}) {
                         <Body>
                             <SplitContainer>
                                 <div className="left">
+                                    <Button
+                                        text={user?.is_approved ? 'Approved' : 'Pending Approval'}
+                                        title="This user is already approved"
+                                        width={165}
+                                        outlined={true}
+                                        marginLeft="auto"
+                                        marginTop={4}
+                                        disabled={user?.is_approved}
+                                        onClick={() => {
+                                            approveUser()
+                                        }}
+                                    />
                                     <div className="user-info">
                                         <div className="profile">
                                             <ProfileImage style={{borderRadius: '50%'}}>
-                                                <img src={user?.user?.profile_picture || "/icons/Users-Blue.svg"}
+                                                <img loading="lazy"
+                                                     src={user?.user?.profile_picture || "/icons/Users-Blue.svg"}
                                                      width={'100%'}
                                                      height={'100%'} style={{borderRadius: '50%'}}/>
                                             </ProfileImage>
@@ -201,13 +237,17 @@ function UserProfilePage({pageId}) {
                                             <div className="key">Email Address</div>
                                             <div className="value">{user?.user?.email}</div>
                                         </Statistic>
+                                        <Statistic>
+                                            <div className="key">Phone Number</div>
+                                            <div className="value">{user?.user?.phone}</div>
+                                        </Statistic>
                                         <div
                                             className={user?.user?.is_active ? "user-status" : "user-status-error"}>Email {user?.user?.is_active ? 'Verified' : 'Unverified'}</div>
                                         <Statistic style={{fontWeight: 600}}>
                                             <div className="key">Address</div>
                                         </Statistic>
                                         <p>
-                                            NA
+                                            Address not available
                                         </p>
                                     </div>
                                 </div>
@@ -231,10 +271,10 @@ function UserProfilePage({pageId}) {
                                                                 <div className="left"
                                                                      title={tr?.transaction_type === 'credit' ? 'Credit' : 'Debit'}
                                                                 >
-                                                                    <img
-                                                                        className="icon"
-                                                                        src={tr?.transaction_type === 'credit' ? "/icons/Deposit-Green.svg" : "/icons/Withdraw-Red.svg"}
-                                                                        alt={tr?.transaction_type}
+                                                                    <img loading="lazy"
+                                                                         className="icon"
+                                                                         src={tr?.transaction_type === 'credit' ? "/icons/Deposit-Green.svg" : "/icons/Withdraw-Red.svg"}
+                                                                         alt={tr?.transaction_type}
                                                                     />
                                                                     <div className="stacked">
                                                                         <div
@@ -387,11 +427,11 @@ function UserProfilePage({pageId}) {
                                 {modalView === 'deleteAccount' && (
                                     <>
                                         <Info>
-                                            <img
-                                                src="/icons/Trash-Red.svg"
-                                                alt="Trash"
-                                                height={40}
-                                                width={40}
+                                            <img loading="lazy"
+                                                 src="/icons/Trash-Red.svg"
+                                                 alt="Trash"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"
@@ -416,11 +456,11 @@ function UserProfilePage({pageId}) {
                                 {modalView === 'suspendAccount' && (
                                     <>
                                         <Info>
-                                            <img
-                                                src="/icons/Caution-Yellow.svg"
-                                                alt="Caution"
-                                                height={40}
-                                                width={40}
+                                            <img loading="lazy"
+                                                 src="/icons/Caution-Yellow.svg"
+                                                 alt="Caution"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"

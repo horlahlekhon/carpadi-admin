@@ -13,8 +13,11 @@ import CPToast from "../../../components/shared/CPToast";
 import {TradeStates} from "../../../lib/enums";
 import {updateCar} from "../../../services/car";
 import Loader from "../../../components/layouts/core/Loader";
+import CPModal from "../../../components/shared/CPModal";
+import {useModal} from "mui-modal-provider";
 
 function TradeProfilePage({pageId}) {
+    const {showModal} = useModal();
     const router = useRouter()
     const tradeId = pageId || 'NA'
     const tradeType = router.query.type || 'NA'
@@ -52,7 +55,8 @@ function TradeProfilePage({pageId}) {
         date_of_sale: null,
         sold_slots_price: 0,
         carpadi_rot: 0,
-        total_carpadi_rot: 0
+        total_carpadi_rot: 0,
+        trade_margin: 0
     })
     const [pageLoading, setPageLoading] = useState(false)
 
@@ -65,7 +69,7 @@ function TradeProfilePage({pageId}) {
         setTradeData({...tradeData, [prop]: event.target.value, 'price_per_slot': pps})
     }
 
-    const showModal = (viewName: string, title: string) => {
+    const showModalX = (viewName: string, title: string) => {
         setModalView(viewName)
         setModalTitle(title)
         setModalState(true)
@@ -82,7 +86,7 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade Deleted')
                     router.push('/trade')
                 } else {
-                    toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -102,7 +106,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade Updated')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -120,7 +125,8 @@ function TradeProfilePage({pageId}) {
                 if (response.status) {
                     setTradeData(response.data)
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -139,11 +145,15 @@ function TradeProfilePage({pageId}) {
                     if (response.status) {
                         toast.success('Resale price updated!')
                     } else {
-                        toast.error(response.data)
+                        // toast.error(response.data)
+                        showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                     }
                 })
                 .catch((error) => {
                     toast.error(error.data)
+                })
+                .finally(() => {
+                    setEditDetails(false)
                 })
         }
     }
@@ -159,7 +169,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade marked as completed')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -180,7 +191,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade settlement initiated!')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -201,7 +213,8 @@ function TradeProfilePage({pageId}) {
                     toast.success('Trade settlement rolled back!')
                     retrieveTrade()
                 } else {
-                    toast.error(response.data)
+                    // toast.error(response.data)
+                    showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})
                 }
             })
             .catch((error) => {
@@ -224,11 +237,11 @@ function TradeProfilePage({pageId}) {
                             </Typography>
                         </Header>
                         <Breadcrumbs>
-                            <img
-                                src="/icons/Trade-Black.svg"
-                                width={'20px'}
-                                height={'18px'}
-                                style={{marginRight: '12px'}}
+                            <img loading="lazy"
+                                 src="/icons/Trade-Black.svg"
+                                 width={'20px'}
+                                 height={'18px'}
+                                 style={{marginRight: '12px'}}
                             />
                             <div
                                 onClick={() => {
@@ -268,7 +281,7 @@ function TradeProfilePage({pageId}) {
                                     </Typography>
                                 </div>
                                 <div className="button-group">
-                                    <Button
+                                    {tradeData?.trade_status === TradeStates.PURCHASED && <Button
                                         text="Complete Trade"
                                         width={150}
                                         outlined={true}
@@ -280,8 +293,20 @@ function TradeProfilePage({pageId}) {
                                         onClick={() => {
                                             completeTrade()
                                         }}
-                                    />
-                                    <Button
+                                    />}
+                                    {tradeData?.trade_status === TradeStates.COMPLETED && <Button
+                                        text="Rollback Trade"
+                                        width={150}
+                                        outlined={true}
+                                        marginRight="10px"
+                                        bgColor={t.alertError}
+                                        disabled={tradeData?.trade_status !== TradeStates.COMPLETED || tradeData?.remaining_slots > 0 || isLoading}
+                                        title='Trade must be completed or is already settled'
+                                        onClick={() => {
+                                            rollbackTrade()
+                                        }}
+                                    />}
+                                    {tradeData?.trade_status === TradeStates.COMPLETED && <Button
                                         text="Settle Trade"
                                         width={150}
                                         outlined={true}
@@ -291,7 +316,7 @@ function TradeProfilePage({pageId}) {
                                         onClick={() => {
                                             settleTrade()
                                         }}
-                                    />
+                                    />}
                                     <Button
                                         text="Delete Trade"
                                         width={150}
@@ -306,7 +331,7 @@ function TradeProfilePage({pageId}) {
                                         }
                                         title='Trade is already active'
                                         onClick={() => {
-                                            showModal('deleteTrade', '')
+                                            showModalX('deleteTrade', '')
                                         }}
                                     />
                                     <Button
@@ -321,7 +346,7 @@ function TradeProfilePage({pageId}) {
                                         }}
                                         disabled={isLoading}
                                     />
-                                    <Button
+                                    {tradeData?.trade_status !== TradeStates.CLOSED && (<Button
                                         text="Edit Trade"
                                         width={150}
                                         outlined={true}
@@ -329,11 +354,12 @@ function TradeProfilePage({pageId}) {
                                         disabled={
                                             tradeData?.trade_status === TradeStates.PURCHASED ||
                                             tradeData?.trade_status === TradeStates.COMPLETED ||
-                                            tradeData?.trade_status === TradeStates.CLOSED || isLoading
+                                            tradeData?.trade_status === TradeStates.CLOSED || isLoading ||
+                                            (tradeData.slots_available - tradeData.remaining_slots) > 0
                                         }
-                                        title='Trade is already purchased'
-                                        onClick={() => showModal('editTrade', 'Edit Trade')}
-                                    />
+                                        title='Trade slots already purchased'
+                                        onClick={() => showModalX('editTrade', 'Edit Trade')}
+                                    />)}
                                     <Button
                                         text="Go to Car Profile"
                                         width={155}
@@ -358,19 +384,19 @@ function TradeProfilePage({pageId}) {
                                             Created Trade for
                                         </Typography>
                                         <VehicleDetails style={{marginBottom: 70}}>
-                                            <img
-                                                src={tradeData.car.image}
-                                                height={135}
-                                                width={185}
-                                                style={{borderRadius: '8px'}}
-                                                alt={String(tradeData.id)}
+                                            <img loading="lazy"
+                                                 src={tradeData.car.image}
+                                                 height={135}
+                                                 width={185}
+                                                 style={{borderRadius: '8px'}}
+                                                 alt={String(tradeData.id)}
                                             />
                                             <div className="stats">
-                                                <img
-                                                    src="/images/Toyota-Full.png"
-                                                    width={80}
-                                                    height={22}
-                                                    style={{marginBottom: -15}}
+                                                <img loading="lazy"
+                                                     src="/images/Toyota-Full.png"
+                                                     width={80}
+                                                     height={22}
+                                                     style={{marginBottom: -15}}
                                                 />
                                                 <Typography
                                                     variant="h5"
@@ -423,7 +449,7 @@ function TradeProfilePage({pageId}) {
                                         <Statistic>
                                             <div className="key">Trading Duration in Months</div>
                                             <div className="value">
-                                                {Math.ceil(tradeData.estimated_sales_duration / 30)} Months
+                                                {Math.ceil(tradeData.estimated_sales_duration / 30)} Month(s)
                                             </div>
                                         </Statistic>
                                         <Statistic>
@@ -478,7 +504,7 @@ function TradeProfilePage({pageId}) {
                                         <Grid item xs={6}>
                                             <PriceCard>
                                                 <Typography variant="body1">
-                                                    Projected Carpai Profit on Trade
+                                                    Projected Carpadi Profit on Trade
                                                 </Typography>
                                                 <Typography
                                                     variant="h5">&#8358; {formatNumber(tradeData?.total_carpadi_rot)}</Typography>
@@ -555,7 +581,7 @@ function TradeProfilePage({pageId}) {
                                                                 placeholder="Enter price"
                                                                 label="Enter price"
                                                                 fullWidth
-                                                                type="number"
+                                                                type="text"
                                                                 value={tradeData?.car?.resale_price || tradeData.sold_slots_price}
                                                                 onChange={handleTradeChange('sold_slots_price')}
                                                             ></TextField>
@@ -592,7 +618,7 @@ function TradeProfilePage({pageId}) {
                                                                     Trade Margin
                                                                 </Typography>
                                                                 <Typography
-                                                                    variant="h5">&#8358; {formatNumber(tradeData?.total_carpadi_rot)}</Typography>
+                                                                    variant="h5">&#8358; {formatNumber(tradeData?.trade_margin)}</Typography>
                                                             </PriceCard>
                                                         </Grid>
                                                         <Grid item xs={12}>
@@ -657,11 +683,11 @@ function TradeProfilePage({pageId}) {
                                 {modalView === 'deleteTrade' && (
                                     <>
                                         <Info>
-                                            <img
-                                                src="/icons/Trash-Red.svg"
-                                                alt="Trash"
-                                                height={40}
-                                                width={40}
+                                            <img loading="lazy"
+                                                 src="/icons/Trash-Red.svg"
+                                                 alt="Trash"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"
@@ -692,18 +718,18 @@ function TradeProfilePage({pageId}) {
                                         <InfoSection container spacing={3}>
                                             <Grid item xs={12} style={{display: 'flex'}}>
                                                 <VehicleDetails style={{width: 700}}>
-                                                    <img
-                                                        src={tradeData.car.image}
-                                                        width={185}
-                                                        height={135}
-                                                        style={{borderRadius: '8px'}}
+                                                    <img loading="lazy"
+                                                         src={tradeData.car.image}
+                                                         width={185}
+                                                         height={135}
+                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
-                                                        <img
-                                                            src="/images/Toyota-Full.png"
-                                                            width={80}
-                                                            height={22}
-                                                            style={{marginBottom: -15}}
+                                                        <img loading="lazy"
+                                                             src="/images/Toyota-Full.png"
+                                                             width={80}
+                                                             height={22}
+                                                             style={{marginBottom: -15}}
                                                         />
                                                         <Typography
                                                             variant="h5"
@@ -741,7 +767,7 @@ function TradeProfilePage({pageId}) {
                                                     placeholder="Slot Quantity"
                                                     label="Slot Quantity"
                                                     value={tradeData.slots_available}
-                                                    type='number'
+                                                    type='text'
                                                     onChange={handleTradeChange('slots_available')}
                                                 />
                                                 <FlexRow className="input">

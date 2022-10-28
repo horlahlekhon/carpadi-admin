@@ -144,7 +144,7 @@ function ManageTradePage({pageId}) {
                             </Typography>
                         </Header>
                         <Breadcrumbs>
-                            <img
+                            <img loading="lazy"
                                 src="/icons/Trade-Black.svg"
                                 width={'20px'}
                                 height={'18px'}
@@ -213,7 +213,7 @@ function ManageTradePage({pageId}) {
                                                         {idx}
                                                     </TableCell>
                                                     <TableCell component="th" scope="row">
-                                                        <img
+                                                        <img loading="lazy"
                                                             src={row.merchant.image}
                                                             width={48}
                                                             height={48}

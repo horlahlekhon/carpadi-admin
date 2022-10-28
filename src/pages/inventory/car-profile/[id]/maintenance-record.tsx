@@ -421,7 +421,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                     </Typography>
                 </Header>
                 <Breadcrumbs>
-                    <img
+                    <img loading="lazy"
                         src="/icons/Inventory-Black.svg"
                         width={'20px'}
                         height={'18px'}
@@ -447,7 +447,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                 <Body>
                     <TopTab>
                         <VehicleDetails>
-                            <img
+                            <img loading="lazy"
                                 src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                 height={91}
                                 width={125}
@@ -455,7 +455,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 alt={car?.information?.manufacturer}
                             />
                             <div className="stats">
-                                <img
+                                <img loading="lazy"
                                     src="/images/Toyota-Full.png"
                                     width={80}
                                     height={20}
@@ -526,7 +526,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                     flexDirection: 'row',
                                                     alignItems: 'center'
                                                 }}>
-                                                    <img src={sp?.maintenance_data?.part_picture}
+                                                    <img loading="lazy" src={sp?.maintenance_data?.part_picture}
                                                          alt={sp?.maintenance_data?.name} height={93} width={93}/>
                                                     <div style={{
                                                         marginLeft: 10,
@@ -712,7 +712,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 <InfoSection container spacing={3}>
                                     <Grid item xs={12}>
                                         <VehicleDetails2 style={{width: 700}}>
-                                            <img
+                                            <img loading="lazy"
                                                 src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                                 width={185}
                                                 height={135}
@@ -720,7 +720,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                 alt={car?.information?.make}
                                             />
                                             <div className="stats">
-                                                <img
+                                                <img loading="lazy"
                                                     src="/images/Toyota-Full.png"
                                                     width={80}
                                                     height={22}
@@ -826,7 +826,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                 <InfoSection container spacing={3}>
                                     <Grid item xs={12}>
                                         <VehicleDetails2 style={{width: 700}}>
-                                            <img
+                                            <img loading="lazy"
                                                 src={car?.pictures.length > 0 ? car.pictures[0] : null}
                                                 width={185}
                                                 height={135}
@@ -834,7 +834,7 @@ function SingleUnderInspectionMaintenancePage({pageId}) {
                                                 alt={car?.information?.make}
                                             />
                                             <div className="stats">
-                                                <img
+                                                <img loading="lazy"
                                                     src="/images/Toyota-Full.png"
                                                     width={80}
                                                     height={22}

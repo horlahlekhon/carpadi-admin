@@ -69,7 +69,7 @@ enum UploadTypes {
     CAR_FEATURE = "car-feature",
     CAR_PRODUCT = "car-product",
     CAR_DOCUMENT = "car-document",
-    ANY = 'any'
+    ANY = 'general'
 }
 
 enum ActivityTypes {
@@ -88,6 +88,19 @@ enum TransactionStates {
     Pending = "pending",
 }
 
+
+enum RequiredCarDocuments {
+    ProofOfOwnership = "proof_of_ownership",
+    AllocationOfLicensePlate = "allocation_of_licence_plate",
+    VehicleLicense = "vehicle_license",
+    CustomPapersOrPurchaseReceipt = "custom_papers_or_purchase_receipt",
+    PoliceCMR = "police_CMR",
+    Insurance = "insurance",
+    RoadWorthiness = "road_worthiness",
+    Others = "others",
+    OwnerInformation = "owner_identification"
+}
+
 export {
     CarStates,
     TradeStates,
@@ -98,5 +111,6 @@ export {
     InspectionStates,
     UploadTypes,
     ActivityTypes,
-    TransactionStates
+    TransactionStates,
+    RequiredCarDocuments
 }

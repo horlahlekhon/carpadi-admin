@@ -22,7 +22,8 @@ export const authService = {
     },
     login,
     logout,
-    autoAuthenticate
+    autoAuthenticate,
+    refreshToken
 };
 
 
@@ -44,6 +45,23 @@ function login(username, password) {
         .catch((error) => {
             return {status: false, data: error};
         })
+}
+
+/**
+ * Refresh JWT
+ */
+function refreshToken() {
+    if (process.browser) {
+        const refreshToken = JSON.parse(String(localStorage.getItem('refreshToken')));
+        return fetchWrapper.post(`${baseUrl}/token-refresh/`, {refresh: refreshToken})
+            .then(data => {
+                authSubject.next(true);
+                localStorage.setItem('token', JSON.stringify(data.access));
+            })
+            .catch((error) => {
+                logout()
+            })
+    }
 }
 
 /**
@@ -70,14 +88,13 @@ function autoAuthenticate() {
             // @ts-ignore
             if ((decodedToken?.exp * 1000) > currentTimestamp) {
                 authSubject.next(true);
+            } else {
+                refreshToken()
+                    .then(() => {
+                        
+                    })
             }
-            // else {
-            //     logout()
-            // }
         }
-        // else {
-        //     logout()
-        // }
     }
 }
 

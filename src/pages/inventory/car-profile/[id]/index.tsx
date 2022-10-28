@@ -5,7 +5,7 @@ import {
     Modal,
     TextField,
     Select,
-    FormControl, Grid, InputLabel
+    FormControl, Grid, InputLabel, MenuItem
 } from '@material-ui/core'
 import {t} from '../../../../styles/theme'
 import {useRouter} from 'next/router'
@@ -21,22 +21,20 @@ import {
     CarStates,
     CarTransmissionTypes,
     FuelTypes,
-    InspectionStates,
+    InspectionStates, RequiredCarDocuments,
     TradeStates,
     UploadTypes
 } from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
 import CPToast from "../../../../components/shared/CPToast";
-import {uploadFile} from "../../../../services/upload";
+import {resizeFile, uploadFile} from "../../../../services/upload";
 import {updateVehicle} from "../../../../services/vehicle";
 import CreateSale from "../../../../components/shared/CreateSale";
-import {createInspection, retrieveInspection} from "../../../../services/inspection";
-import {authService} from "../../../../services/auth";
+import {createInspection, retrieveInspection, retrieveInspectors} from "../../../../services/inspection";
 import {getColorName} from "../../../../helpers/utils";
 import Moment from "moment";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {Add} from "@material-ui/icons";
-import {doc} from "prettier";
 import {
     createCarDocument,
     deleteCarDocument,
@@ -44,6 +42,7 @@ import {
     updateCarDocument
 } from "../../../../services/car-documents";
 import Loader from "../../../../components/layouts/core/Loader";
+import _ from "lodash";
 
 
 function CarProfilePage({pageId}) {
@@ -53,49 +52,64 @@ function CarProfilePage({pageId}) {
             "name": 'Proof of ownership',
             "description": 'Proof of ownership',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.ProofOfOwnership
         },
         {
             "asset": null,
             "name": 'Allocation of plate number',
             "description": 'Allocation of plate number',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.AllocationOfLicensePlate
         },
         {
             "asset": null,
             "name": 'Vehicle license',
             "description": 'Vehicle license',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.VehicleLicense
         },
         {
             "asset": null,
             "name": 'Customs paper/Receipt of purchase',
             "description": 'Customs paper/Receipt of purchase',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.CustomPapersOrPurchaseReceipt
         },
         {
             "asset": null,
             "name": 'Police CMR',
             "description": 'Police CMR',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.PoliceCMR
         },
         {
             "asset": null,
             "name": 'Insurance',
             "description": 'Insurance',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.Insurance
         },
         {
             "asset": null,
             "name": 'Road worthiness',
             "description": 'Road worthiness',
             "car": null,
-            "is_preloaded": true
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.RoadWorthiness
+        },
+        {
+            "asset": null,
+            "name": 'Owner Information',
+            "description": 'Owner Information',
+            "car": null,
+            "is_preloaded": true,
+            "document_type": RequiredCarDocuments.OwnerInformation
         },
     ]
     const router = useRouter()
@@ -146,6 +160,7 @@ function CarProfilePage({pageId}) {
         "name": null,
         "licence_plate": null
     })
+    const [editedCar, setEditedCarData] = useState({})
     const [newInspection, setNewInspection] = useState({
         "owners_name": null,
         "owners_review": null,
@@ -178,9 +193,11 @@ function CarProfilePage({pageId}) {
     const [documentValue, setDocumentValue] = useState(null)
     const [docIdx, setDocIdx] = useState(null)
     const [vehicleDocuments, setVehicleDocuments] = useState([])
+    const [inspectorList, setInspectors] = useState([])
     const hiddenFileInput = useRef(null);
     const hiddenFileInput2 = useRef(null);
     const [pageLoading, setPageLoading] = useState(false)
+    const [inspectorId, setInspectorID] = useState(null)
 
     const showModal = (viewName: string, title: string, customTagline: string = null!) => {
         setModalView(viewName)
@@ -206,7 +223,7 @@ function CarProfilePage({pageId}) {
 
     const handleFileChange2 = event => {
         const fileUploaded = event.target.files[0];
-        uploadFile(fileUploaded, UploadTypes.CAR_DOCUMENT, car?.id)
+        _.debounce(uploadFile(fileUploaded, UploadTypes.CAR_DOCUMENT, car?.id)
             .then((res) => {
                 if (res.status) {
                     const url = res.data.secure_url;
@@ -222,14 +239,15 @@ function CarProfilePage({pageId}) {
             })
             .finally(() => {
                 setIsSaving(false)
-            })
+            }), 1500)
     };
 
     const handleFile = (files) => {
         let arr = Array.from(files)
-        arr.forEach((file) => {
+        arr.forEach(async (file) => {
+            const resizedFile = await resizeFile(file, {width: 500, height: 300, format: 'WEBP'})
             setIsSaving(true)
-            uploadFile(file)
+            uploadFile(resizedFile)
                 .then((res) => {
                     if (res.status) {
                         let arr = car.pictures
@@ -323,15 +341,7 @@ function CarProfilePage({pageId}) {
     }
     const updateCarData = () => {
         setIsSaving(true)
-        const data = {
-            "car_pictures": car.pictures,
-            "status": car.status,
-            "bought_price": car.bought_price,
-            "colour": car?.colour,
-            "description": car.description,
-            "name": car.name,
-            "licence_plate": car.licence_plate
-        }
+        const data = editedCar;
         const vehicleData = {
             "transmission": car?.information?.transmission,
             "fuel_type": car?.information?.fuel_type,
@@ -378,12 +388,16 @@ function CarProfilePage({pageId}) {
 
     function setColor(colorCode) {
         setCarData({...car, 'colour': colorCode})
+        setEditedCarData({...editedCar, 'colour': colorCode})
     }
 
     function setField(fieldName, value) {
         let obj = {...car}
+        let obj2 = {...editedCar}
         obj[fieldName] = value;
+        obj2[fieldName] = value;
         setCarData(obj)
+        setEditedCarData(obj2)
     }
 
     function setInfoField(fieldName, value) {
@@ -409,17 +423,38 @@ function CarProfilePage({pageId}) {
         }
     }
 
+    function getInspectors() {
+        retrieveInspectors()
+            .then((response) => {
+                if (response.status) {
+                    setInspectors(response.data?.results || [])
+                    showModal('createInspection', 'Add Inspection')
+                } else {
+                    toast.error(response.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error.data)
+            })
+    }
+
     const updateInspectionFields = (field, value) => {
-        let obj = {...newInspection}
-        obj[field] = value;
-        setNewInspection(obj)
+        if (field == 'inspection_date' && Moment(value).toDate() < Moment().toDate()) {
+            toast.dismiss()
+            toast.error("Date cannot be less than today")
+            return
+        } else {
+            let obj = {...newInspection}
+            obj[field] = value;
+            setNewInspection(obj)
+        }
     }
 
     function addInspection(): void {
         const data = {
             ...newInspection,
             inspection_date: Moment(newInspection?.inspection_date).toISOString(),
-            inspector: authService?.userValue?.id,
+            inspector: inspectorId,
             car: car?.id
         }
         setIsSaving(true)
@@ -475,7 +510,8 @@ function CarProfilePage({pageId}) {
             "asset": null,
             "name": '',
             "description": '',
-            "car": null
+            "car": null,
+            "document_type": RequiredCarDocuments.Others
         };
         let docs = [...vehicleDocuments, document];
         setVehicleDocuments(docs)
@@ -513,13 +549,14 @@ function CarProfilePage({pageId}) {
     const updateDocumentValue = (idx: number, field: string, value: string) => {
         let docs = [...vehicleDocuments]
         docs[idx][field] = value;
+        docs[idx]['is_modified'] = true;
         setVehicleDocuments(docs)
     }
 
     const uploadDocument = (idx) => {
         setDocIdx(idx)
         setIsSaving(true)
-        hiddenFileInput2.current.click();
+        hiddenFileInput2.current.click()
     }
 
     const verifyDocument = (id: any) => {
@@ -543,43 +580,79 @@ function CarProfilePage({pageId}) {
 
     const saveDocuments = () => {
         setIsSaving(true)
+        let newDocs = vehicleDocuments.filter(x => x?.id == null)
+        newDocs = newDocs.map(doc => {
+            return {
+                name: doc?.name,
+                description: doc?.description,
+                is_verified: doc?.is_verified,
+                document_type: doc?.document_type,
+                asset: doc?.asset,
+                car: car?.id,
+            }
+        })
+        createCarDocument(newDocs)
+            .then((res) => {
+                if (res.status) {
+                    toast.success(`Created documents`)
+                } else {
+                    toast.error(res.data)
+                }
+            })
+            .catch((error) => {
+                toast.error(error)
+            })
+            .finally(() => {
+                retrieveDocuments()
+            })
+
         vehicleDocuments.forEach((doc, idx) => {
             if (doc?.id) {
-                const d = {
-                    name: doc?.name,
-                    description: doc?.description,
+                if (doc?.is_modified) {
+                    const d = {
+                        name: doc?.name,
+                        description: doc?.description,
+                    }
+                    updateCarDocument(doc?.id, d)
+                        .then((res) => {
+                            if (res.status) {
+                                toast.success(`Updated ${doc?.name}`)
+                            } else {
+                                toast.error(res.data)
+                            }
+                        })
+                        .catch((error) => {
+                            toast.error(error)
+                        })
+                        .finally(() => {
+                            retrieveDocuments()
+                        })
                 }
-                updateCarDocument(doc?.id, d)
-                    .then((res) => {
-                        if (res.status) {
-                            toast.success(`Updated ${doc?.name}`)
-                        } else {
-                            toast.error(res.data)
-                        }
-                    })
-                    .catch((error) => {
-                        toast.error(error)
-                    })
-                    .finally(() => {
-                        retrieveDocuments()
-                    })
-            } else {
-                doc.car = car?.id
-                createCarDocument(doc)
-                    .then((res) => {
-                        if (res.status) {
-                            toast.success(`Created ${doc?.name}`)
-                        } else {
-                            toast.error(res.data)
-                        }
-                    })
-                    .catch((error) => {
-                        toast.error(error)
-                    })
-                    .finally(() => {
-                        retrieveDocuments()
-                    })
             }
+            // else {
+            //     const d = {
+            //         name: doc?.name,
+            //         description: doc?.description,
+            //         is_verified: doc?.is_verified,
+            //         document_type: doc?.document_type,
+            //         asset: doc?.asset,
+            //         car: car?.id,
+            //     }
+            //     createCarDocument(d)
+            //         .then((res) => {
+            //             if (res.status) {
+            //                 toast.success(`Created ${d?.name}`)
+            //             } else {
+            //                 toast.error(res.data)
+            //             }
+            //         })
+            //         .catch((error) => {
+            //             toast.error(error)
+            //         })
+            //         .finally(() => {
+            //             retrieveDocuments()
+            //         })
+            // }
             if (idx >= vehicleDocuments.length - 1) {
                 setIsSaving(false)
                 setModalState(false)
@@ -587,13 +660,16 @@ function CarProfilePage({pageId}) {
         })
     }
 
-    const downloadDocument = (resourceUrl: any) => {
-        if (resourceUrl) {
+    const downloadDocument = (resourceUrl: string) => {
+        if (resourceUrl && String(resourceUrl).startsWith('http')) {
             let link = document.createElement("a");
             link.href = resourceUrl;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        } else {
+            toast.dismiss()
+            toast.error("Invalid image url")
         }
     }
 
@@ -613,7 +689,7 @@ function CarProfilePage({pageId}) {
                         {createTrade && <CreateTrade car={car} onClick={() => setCreateTrade(false)}/>}
                         <input
                             type="file"
-                            accept="image/*"
+                            accept="image/*,application/pdf"
                             ref={hiddenFileInput2}
                             onChange={handleFileChange2}
                             style={{display: 'none'}}
@@ -624,11 +700,11 @@ function CarProfilePage({pageId}) {
                             </Typography>
                         </Header>
                         <Breadcrumbs>
-                            <img
-                                src="/icons/Inventory-Black.svg"
-                                width={'20px'}
-                                height={'18px'}
-                                style={{marginRight: '12px'}}
+                            <img loading="lazy"
+                                 src="/icons/Inventory-Black.svg"
+                                 width={'20px'}
+                                 height={'18px'}
+                                 style={{marginRight: '12px'}}
                             />
                             <div
                                 onClick={() => {
@@ -675,7 +751,7 @@ function CarProfilePage({pageId}) {
                                             width={210}
                                             outlined={true}
                                             marginRight="16px"
-                                            onClick={() => showModal('createInspection', 'Add Inspection')}
+                                            onClick={() => getInspectors()}
                                         />
                                     }
 
@@ -694,14 +770,20 @@ function CarProfilePage({pageId}) {
                                         width={135}
                                         outlined={true}
                                         marginRight="16px"
-                                        onClick={() => showModal('editImages', 'Edit Car Images', 'Upload minimum of 5 images to complete profile')}
+                                        onClick={() => {
+                                            setEditedCarData({})
+                                            showModal('editImages', 'Edit Car Images', 'Upload minimum of 5 images to complete profile')
+                                        }}
                                     />
                                     <Button
                                         text="Edit Details"
                                         width={135}
                                         outlined={true}
                                         marginRight="16px"
-                                        onClick={() => showModal('editDetails', 'Edit Car Profile')}
+                                        onClick={() => {
+                                            setEditedCarData({})
+                                            showModal('editDetails', 'Edit Car Profile')
+                                        }}
                                     />
                                     <Button
                                         text="Car Documents"
@@ -717,25 +799,27 @@ function CarProfilePage({pageId}) {
                                 <div className="left">
                                     <Flex>
                                         <div className="slideshow">
-                                            <img
-                                                className="main"
-                                                src={car.pictures[carouselIdx]}
-                                                height={255}
-                                                width='100%'
+                                            <img loading="lazy"
+                                                 className="main"
+                                                 src={car.pictures[carouselIdx]}
+                                                 height={255}
+                                                 width='100%'
                                             />
-                                            <img
-                                                src="/images/Previous-Slideshow.png"
-                                                alt="Prev"
-                                                className="previous"
-                                                onClick={prevImage}
+                                            <img loading="lazy"
+                                                 src="/images/Previous-Slideshow.png"
+                                                 alt="Prev"
+                                                 className="previous"
+                                                 onClick={prevImage}
                                             />
-                                            <img src="/images/Next-Slideshow.png" alt="Next" className="next"
+                                            <img loading="lazy" src="/images/Next-Slideshow.png" alt="Next"
+                                                 className="next"
                                                  onClick={nextImage}/>
                                         </div>
                                         <div className="gallery">
                                             <ImageGrid>
                                                 {car.pictures.map((img, i) => (
-                                                    <img src={img} className="image" key={i} alt={'image' + i}/>
+                                                    <img loading="lazy" src={img} className="image" key={i}
+                                                         alt={'image' + i}/>
                                                 ))}
                                             </ImageGrid>
                                         </div>
@@ -852,7 +936,12 @@ function CarProfilePage({pageId}) {
                                         <div className="key">Vehicle Age</div>
                                         <div className="value">{formatNumber(car?.information?.age) || 'NA'}</div>
                                     </Detail>
-                                    {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL].includes(car?.status) && (
+                                    <Detail style={{alignItems: 'end'}}>
+                                        <div className="key">Description</div>
+                                        <div className="value"
+                                             style={{marginLeft: '25px'}}>{car?.information?.description || 'NA'}</div>
+                                    </Detail>
+                                    {[CarStates.NEW, CarStates.ONGOING_INSPECTION, CarStates.AVAILABLE, CarStates.ALL, CarStates.INSPECTED].includes(car?.status) && (
                                         <Button text='Create Trade' width='100%' marginTop={30}
                                                 disabled={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) || car?.inspection?.status !== InspectionStates.COMPLETED}
                                                 title={(car?.status !== CarStates.AVAILABLE && (car?.status !== CarStates.INSPECTED && !car?.bought_price)) ? 'Vehicle should be available for trade and must have been inspected' : ''}
@@ -895,10 +984,11 @@ function CarProfilePage({pageId}) {
                                     <div style={{marginTop: '30px', marginBottom: '30px'}}>
                                         <Autocomplete
                                             id="combo-box-demo"
-                                            options={carDocuments}
+                                            options={carDocuments.filter(x => vehicleDocuments.findIndex(a => a.name === x.name) == -1)}
                                             getOptionLabel={(option) => option.name}
                                             style={{width: 900, marginBottom: '20px'}}
                                             value={documentValue}
+                                            disabled={carDocuments.filter(x => vehicleDocuments.findIndex(a => a.name === x.name) == -1).length < 1}
                                             onChange={(event: any, newValue: any | null) => {
                                                 addDocument(newValue);
                                             }}
@@ -949,7 +1039,7 @@ function CarProfilePage({pageId}) {
                                                             onClick={() => verifyDocument(doc?.id)}
                                                         />
                                                         <Button
-                                                            text={doc?.asset ? "Download" : "Upload"}
+                                                            text={!!doc?.asset ? "Download" : idx === docIdx && isSaving ? "..." : "Upload"}
                                                             outlined={true}
                                                             width={80}
                                                             height={28}
@@ -1022,18 +1112,35 @@ function CarProfilePage({pageId}) {
                                                 />
                                             </Flex>
                                         </InputGrid>
-                                        <InputGrid style={{marginTop: 5}}>
-                                            <Flex style={{marginBottom: '5px'}}>
-                                                <HeaderText style={{marginTop: 10}}>Enter Review</HeaderText>
-                                                <TextField
-                                                    className="text-field"
-                                                    fullWidth
-                                                    variant='standard'
-                                                    value={newInspection?.owners_review}
-                                                    onChange={(e) => updateInspectionFields('owners_review', e.target.value)}
-                                                />
-                                            </Flex>
-                                        </InputGrid>
+                                        <FormControl variant="outlined" fullWidth>
+                                            <InputLabel id="demo-simple-select-outlined-label">Inspector</InputLabel>
+                                            <Select
+                                                labelId="demo-simple-select-outlined-label"
+                                                id="demo-simple-select-outlined"
+                                                value={inspectorId}
+                                                onChange={(e) => setInspectorID(e.target.value)}
+                                                label="Inspector"
+                                            >
+                                                <MenuItem value="" disabled>
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                {inspectorList.map((i, _) => (
+                                                    <MenuItem key={_} value={i.id}>{i?.username}</MenuItem>))}
+                                            </Select>
+                                        </FormControl>
+                                        <Flex style={{marginBottom: '5px', marginTop: 5}}>
+                                            <HeaderText style={{marginTop: 10}}>Enter Review</HeaderText>
+                                            <TextField
+                                                className="text-field"
+                                                fullWidth
+                                                variant='standard'
+                                                multiline
+                                                rows={3}
+                                                maxRows={6}
+                                                value={newInspection?.owners_review}
+                                                onChange={(e) => updateInspectionFields('owners_review', e.target.value)}
+                                            />
+                                        </Flex>
                                         <Flex style={{marginBottom: '5px'}}>
                                             <HeaderText style={{marginTop: 10}}>Enter Owners Address</HeaderText>
                                             <TextField
@@ -1041,8 +1148,8 @@ function CarProfilePage({pageId}) {
                                                 fullWidth
                                                 variant='standard'
                                                 multiline
-                                                rows={2}
-                                                maxRows={4}
+                                                rows={3}
+                                                maxRows={6}
                                                 value={newInspection?.address}
                                                 onChange={(e) => updateInspectionFields('address', e.target.value)}
                                             />
@@ -1096,6 +1203,7 @@ function CarProfilePage({pageId}) {
                                                 label={getColorName(car.colour) || 'Color'}
                                                 type='color'
                                                 variant='standard'
+                                                value={car?.colour}
                                                 onChange={(e) => setColor(e.target.value)}
                                             />
                                         </InputGrid>
@@ -1168,7 +1276,7 @@ function CarProfilePage({pageId}) {
                                                 variant='standard'
                                                 value={car?.information?.age || 0}
                                                 onChange={(e) => setInfoField('age', e.target.value)}
-                                                type='number'
+                                                type='text'
                                             />
                                             <TextField
                                                 className="text-field"
@@ -1178,7 +1286,7 @@ function CarProfilePage({pageId}) {
                                                 variant='standard'
                                                 value={car?.information?.mileage || 0}
                                                 onChange={(e) => setInfoField('mileage', e.target.value)}
-                                                type='number'
+                                                type='text'
                                             />
                                         </InputGrid>
                                         <InputGrid>
@@ -1190,7 +1298,7 @@ function CarProfilePage({pageId}) {
                                                 variant='standard'
                                                 value={car?.bought_price || 0}
                                                 onChange={(e) => setField('bought_price', e.target.value)}
-                                                type='number'
+                                                type='text'
                                             />
                                         </InputGrid>
                                         <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle
@@ -1215,8 +1323,9 @@ function CarProfilePage({pageId}) {
                                         <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
                                             {car.pictures.map((url, idx) => (
                                                 <div className='image' key={idx}>
-                                                    <img src={url} className="image"/>
-                                                    <img src="/icons/Delete-Circular-Green.svg" className='delete'
+                                                    <img loading="lazy" src={url} className="image"/>
+                                                    <img loading="lazy" src="/icons/Delete-Circular-Green.svg"
+                                                         className='delete'
                                                          onClick={() => removePicture(url)}/>
                                                 </div>
                                             ))}
@@ -1255,11 +1364,11 @@ function CarProfilePage({pageId}) {
                                 {modalView === 'deleteCarProfile' && (
                                     <>
                                         <Info>
-                                            <img
-                                                src="/icons/Trash-Red.svg"
-                                                alt="Trash"
-                                                height={40}
-                                                width={40}
+                                            <img loading="lazy"
+                                                 src="/icons/Trash-Red.svg"
+                                                 alt="Trash"
+                                                 height={40}
+                                                 width={40}
                                             />
                                             <Typography
                                                 variant="h6"
@@ -1289,19 +1398,19 @@ function CarProfilePage({pageId}) {
                                         <InfoSection container spacing={3}>
                                             <Grid item xs={12} style={{display: 'flex'}}>
                                                 <VehicleDetails style={{width: 700}}>
-                                                    <img
-                                                        src={car?.pictures.length > 0 ? car.pictures[0] : null}
-                                                        width={185}
-                                                        height={135}
-                                                        alt={car?.name}
-                                                        style={{borderRadius: '8px'}}
+                                                    <img loading="lazy"
+                                                         src={car?.pictures.length > 0 ? car.pictures[0] : null}
+                                                         width={185}
+                                                         height={135}
+                                                         alt={car?.name}
+                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
-                                                        <img
-                                                            src="/images/Toyota-Full.png"
-                                                            width={80}
-                                                            height={22}
-                                                            style={{marginBottom: -15}}
+                                                        <img loading="lazy"
+                                                             src="/images/Toyota-Full.png"
+                                                             width={80}
+                                                             height={22}
+                                                             style={{marginBottom: -15}}
                                                         />
                                                         <Typography variant="h5" className="trade">
                                                             {trimString(inspection?.id || 'NA')}
@@ -1338,17 +1447,18 @@ function CarProfilePage({pageId}) {
                                                             className="value">{trimString(inspection?.owners_name, 25) || 'NA'}</div>
                                                     </Statistic>
                                                     <Statistic>
-                                                        <div className="key">Inspection Date</div>
-                                                        <div
-                                                            className="value">{formatDate(inspection?.inspection_date)}</div>
-                                                    </Statistic>
-                                                    <Statistic>
                                                         <div className="key">Owners Phone</div>
                                                         <div className="value">{inspection?.owners_phone}</div>
                                                     </Statistic>
                                                     <Statistic>
-                                                        <div className="key">Owners Review</div>
-                                                        <div className="value">{inspection?.owners_review || 'NA'}</div>
+                                                        <div className="key">Inspector</div>
+                                                        <div
+                                                            className="value">{inspection?.inspector?.username || 'NA'}</div>
+                                                    </Statistic>
+                                                    <Statistic>
+                                                        <div className="key">Inspection Date</div>
+                                                        <div
+                                                            className="value">{formatDate(inspection?.inspection_date)}</div>
                                                     </Statistic>
                                                     <Statistic>
                                                         <div className="key">Inspection Verdict</div>
@@ -1357,6 +1467,10 @@ function CarProfilePage({pageId}) {
                                                     <Statistic>
                                                         <div className="key">Address</div>
                                                         <div className="value">{inspection?.address}</div>
+                                                    </Statistic>
+                                                    <Statistic>
+                                                        <div className="key">Owners Review</div>
+                                                        <div className="value">{inspection?.owners_review || 'NA'}</div>
                                                     </Statistic>
                                                 </Grid>
                                             </div>
@@ -1810,6 +1924,4 @@ const Statistic = styled.div`
   .value {
     font-weight: bold;
   }
-`
-
-
+`;

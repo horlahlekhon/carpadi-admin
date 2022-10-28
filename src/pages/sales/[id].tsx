@@ -270,7 +270,7 @@ function SalesProfilePage({pageId}) {
                             </Typography>
                         </Header>
                         <Breadcrumbs>
-                            <img
+                            <img loading="lazy"
                                 src="/icons/Vehicle-Blue.svg"
                                 width={'20px'}
                                 height={'18px'}
@@ -330,7 +330,7 @@ function SalesProfilePage({pageId}) {
                             <PriceSection container spacing={3}>
                                 <Grid item xs={6}>
                                     <VehicleDetails>
-                                        <img
+                                        <img loading="lazy"
                                             src={sale?.product_images.length > 0 ? sale.product_images[0] : null}
                                             alt={sale?.car?.make}
                                             height={135}
@@ -338,7 +338,7 @@ function SalesProfilePage({pageId}) {
                                             style={{borderRadius: '8px'}}
                                         />
                                         <div className="stats">
-                                            <img
+                                            <img loading="lazy"
                                                 src="/images/Toyota-Full.png"
                                                 width={80}
                                                 height={22}
@@ -365,14 +365,14 @@ function SalesProfilePage({pageId}) {
                                 </Typography>
                                 <div className="cta">
                                     <span>Set As Active</span>
-                                    {/*<Switch checked={state.saleActive}*/}
-                                    {/*        onChange={handleChange}*/}
-                                    {/*        name="saleActive" color='primary'></Switch>*/}
-                                    <ToggleSwitch
-                                        checked={state.saleActive}
-                                        onChange={handleChange}
-                                        name="saleActive"
-                                    />
+                                    <Switch checked={state.saleActive}
+                                            onChange={handleChange}
+                                            name="saleActive" color='primary'></Switch>
+                                    {/*<ToggleSwitch*/}
+                                    {/*    checked={state.saleActive}*/}
+                                    {/*    onChange={handleChange}*/}
+                                    {/*    name="saleActive"*/}
+                                    {/*/>*/}
                                 </div>
                             </SalesStatus>
                             <Typography variant="h6" color="secondary">
@@ -386,7 +386,7 @@ function SalesProfilePage({pageId}) {
                             </Typography>
                             <Flex>
                                 <div className="slideshow" style={{width: '500px'}}>
-                                    <img
+                                    <img loading="lazy"
                                         className="main"
                                         src={sale?.product_images.length > 0 ? sale.product_images[carouselIdx] : null}
                                         height={403}
@@ -394,19 +394,19 @@ function SalesProfilePage({pageId}) {
                                         style={{borderRadius: '14px'}}
                                         alt={sale?.status + ' sale'}
                                     />
-                                    <img
+                                    <img loading="lazy"
                                         src="/images/Previous-Slideshow.png"
                                         alt="Prev"
                                         className="previous"
                                         onClick={prevImage}
                                     />
-                                    <img src="/images/Next-Slideshow.png" alt="Next" className="next"
+                                    <img loading="lazy" src="/images/Next-Slideshow.png" alt="Next" className="next"
                                          onClick={nextImage}/>
                                 </div>
                                 <div className="gallery">
                                     <ImageGrid>
                                         {sale?.product_images.map((img, idx) => (
-                                            <img key={idx} src={img} className="image"/>
+                                            <img loading="lazy" key={idx} src={img} className="image"/>
                                         ))}
                                     </ImageGrid>
                                 </div>
@@ -417,7 +417,7 @@ function SalesProfilePage({pageId}) {
                             <Features>
                                 {sale?.car_features.map((ft, idx) => (
                                     <div className="key-features" key={idx}>
-                                        <img src={ft?.feature_images.length > 0 ? ft.feature_images[0] : null}
+                                        <img loading="lazy" src={ft?.feature_images.length > 0 ? ft.feature_images[0] : null}
                                              alt={ft?.name + 'feature image'}/>
                                         <Typography variant="subtitle1" className="text">
                                             {ft?.name || 'NA'}
@@ -459,7 +459,7 @@ function SalesProfilePage({pageId}) {
                                         <InfoSection container spacing={3}>
                                             <Grid item xs={12}>
                                                 <VehicleDetails style={{width: 700}}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={sale?.product_images.length > 0 ? sale.product_images[0] : null}
                                                         alt='Sales Image'
                                                         width={185}
@@ -467,7 +467,7 @@ function SalesProfilePage({pageId}) {
                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
-                                                        <img
+                                                        <img loading="lazy"
                                                             src="/images/Toyota-Full.png"
                                                             width={80}
                                                             height={22}
@@ -504,7 +504,7 @@ function SalesProfilePage({pageId}) {
                                                     <TextField
                                                         placeholder="Enter price"
                                                         style={{width: 400}}
-                                                        type='number'
+                                                        type='text'
                                                         value={sale?.selling_price}
                                                         onChange={(e) => handleSaleChange('selling_price', e.target.value)}
                                                     ></TextField>
@@ -514,14 +514,14 @@ function SalesProfilePage({pageId}) {
                                                 <HeaderText className="status">Sales Status</HeaderText>
                                                 <div className="cta">
                                                     <span>Set As Active</span>
-                                                    {/*<Switch checked={state.saleActive}*/}
-                                                    {/*        onChange={handleChange}*/}
-                                                    {/*        name="saleActive" color='primary'></Switch>*/}
-                                                    <ToggleSwitch
-                                                        checked={state.saleActive}
-                                                        onChange={handleChange}
-                                                        name="saleActive"
-                                                    />
+                                                    <Switch checked={state.saleActive}
+                                                            onChange={handleChange}
+                                                            name="saleActive" color='primary'></Switch>
+                                                    {/*<ToggleSwitch*/}
+                                                    {/*    checked={state.saleActive}*/}
+                                                    {/*    onChange={handleChange}*/}
+                                                    {/*    name="saleActive"*/}
+                                                    {/*/>*/}
                                                 </div>
                                             </SalesStatus>
                                         </FlexRow>
@@ -542,7 +542,7 @@ function SalesProfilePage({pageId}) {
                                         <InfoSection container spacing={3}>
                                             <Grid item xs={12}>
                                                 <VehicleDetails style={{width: 700}}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={sale?.product_images.length > 0 ? sale?.product_images[0] : null}
                                                         alt='Sale Image'
                                                         width={185}
@@ -550,7 +550,7 @@ function SalesProfilePage({pageId}) {
                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
-                                                        <img
+                                                        <img loading="lazy"
                                                             src="/images/Toyota-Full.png"
                                                             width={80}
                                                             height={22}
@@ -640,7 +640,7 @@ function SalesProfilePage({pageId}) {
                                         <InfoSection container spacing={3}>
                                             <Grid item xs={12}>
                                                 <VehicleDetails style={{width: 700}}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={sale?.product_images.length > 0 ? sale?.product_images[0] : null}
                                                         alt='Sale Image'
                                                         width={185}
@@ -648,7 +648,7 @@ function SalesProfilePage({pageId}) {
                                                         style={{borderRadius: '8px'}}
                                                     />
                                                     <div className="stats">
-                                                        <img
+                                                        <img loading="lazy"
                                                             src="/images/Toyota-Full.png"
                                                             width={80}
                                                             height={22}
@@ -669,7 +669,7 @@ function SalesProfilePage({pageId}) {
                                         <Features className="modal">
                                             {sale?.car_features.map((ft, idx) => (
                                                 <div className="key-features" key={idx}>
-                                                    <img
+                                                    <img loading="lazy"
                                                         src={ft?.feature_images.length > 0 ? ft?.feature_images[0] : null}
                                                         alt={ft?.name + " Feature"}/>
                                                     <Typography variant="subtitle1" className="text">
@@ -685,7 +685,7 @@ function SalesProfilePage({pageId}) {
                                             <div className="gallery">
                                                 <ImageGrid className="modal">
                                                     {sale?.product_images.map((url, idx) => (
-                                                        <img key={idx}
+                                                        <img loading="lazy" key={idx}
                                                              src={url}
                                                              className="image modal"
                                                         />
@@ -706,7 +706,7 @@ function SalesProfilePage({pageId}) {
                                 {modalView === 'deleteSale' && (
                                     <>
                                         <Info>
-                                            <img
+                                            <img loading="lazy"
                                                 src="/icons/Trash-Red.svg"
                                                 alt="Trash"
                                                 height={40}

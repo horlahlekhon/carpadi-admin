@@ -22,10 +22,11 @@ import {searchResults} from "../../services/search";
 import {toast} from "react-hot-toast";
 import CPToast from "../../components/shared/CPToast";
 import {formatDate, formatNumber, trimString} from '../../helpers/formatters'
+import {applyTransformation} from "../../services/upload";
+import {allowedSearchModules} from "../../lib/constants";
 
 
 function SearchPage() {
-    const allowedModules = ['sales', 'inventory']
     const rowsPerPage = 10
     const router = useRouter()
     const [page, setPage] = useState(0)
@@ -35,6 +36,7 @@ function SearchPage() {
         "next": null,
         "previous": null,
     })
+    const [searchTerm, setSearchTerm]= useState('')
 
     const retrieveSearchData = ({page = 0}) => {
         setData([])
@@ -63,10 +65,13 @@ function SearchPage() {
 
 
     useEffect(() => {
-        if (allowedModules.includes(String(router.query?.type))) {
+        if (allowedSearchModules.includes(String(router.query?.type))) {
+            localStorage.setItem('recentSearchModule', String(router.query?.type))
+            setSearchTerm(String(router.query?.type))
             retrieveSearchData({})
         } else {
             toast.error(`Module ${String(router.query?.type).toUpperCase()} does not support searches!`)
+            router.back()
         }
     }, [])
 
@@ -146,7 +151,8 @@ function SearchPage() {
                                                 {idx + 1}
                                             </TableCell>
                                             <TableCell component="th" scope="row">
-                                                <img src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
+                                                <img loading="lazy"
+                                                     src={row.pictures.length > 0 ? row.pictures[0] : null} width={48}
                                                      height={48}/>
                                             </TableCell>
                                             <TableCell align="left">{row.vin}</TableCell>
@@ -200,9 +206,9 @@ function SearchPage() {
                                                     {idx + 1}
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
-                                                    <img
-                                                        src={row?.product_images.length > 0 ? row?.product_images[0] : null}
-                                                        width={48} height={48} alt={trimString(row?.id)}/>
+                                                    <img loading="lazy"
+                                                         src={row?.product_images.length > 0 ? row?.product_images[0] : null}
+                                                         width={48} height={48} alt={trimString(row?.id)}/>
                                                 </TableCell>
                                                 <TableCell align="right">{row?.car?.vin}</TableCell>
                                                 <TableCell align="right">{row?.car?.make}</TableCell>
@@ -219,6 +225,131 @@ function SearchPage() {
                                                         width={66}
                                                         outlined={true}
                                                         onClick={() => handleNavigation(`sales/${row.id}`)}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                    {(String(router.query?.type) === 'trade') && (
+                        <TableContainer>
+                            <Table style={{minWidth: 650}} aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>No</TableCell>
+                                        <TableCell align="left">Image</TableCell>
+                                        <TableCell align="left">Trading ID</TableCell>
+                                        <TableCell align="left">Total Slots</TableCell>
+                                        <TableCell align="left">Available Slots</TableCell>
+                                        <TableCell align="left">Sold Slots</TableCell>
+                                        <TableCell align="left">Price Per Slot</TableCell>
+                                        <TableCell align="left">Total Slot Price</TableCell>
+                                        <TableCell align="left">Date Listed</TableCell>
+                                        <TableCell align="left">&nbsp;</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {data
+                                        .map((row, idx) => (
+                                            <TableRow key={idx}>
+                                                <TableCell component="th" scope="row">
+                                                    {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    <img loading="lazy" src={applyTransformation(row.car.image, 48, 48)}
+                                                         width={48} height={48}/>
+                                                </TableCell>
+                                                <TableCell
+                                                    align="left">{row.id.substring(row.id.length - 7)}</TableCell>
+                                                <TableCell align="left">{row.slots_available}</TableCell>
+                                                <TableCell align="left">{row.remaining_slots}</TableCell>
+                                                <TableCell
+                                                    align="left">{row.slots_available - row.remaining_slots}</TableCell>
+                                                <TableCell align="left">
+                                                    &#8358; {row.price_per_slot.toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                </TableCell>
+                                                <TableCell align="left">
+                                                    &#8358; {(row.price_per_slot * row.slots_available).toLocaleString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                </TableCell>
+                                                <TableCell
+                                                    align="left"
+                                                >
+                                                    {formatDate(row.created) || 'NA'}
+                                                </TableCell>
+                                                <TableCell align="left">
+                                                    <Button
+                                                        text="View"
+                                                        width={66}
+                                                        outlined={true}
+                                                        onClick={() =>
+                                                            handleNavigation(`trade/${row.id}?type=${'active'}`)
+                                                        }
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                    {(String(router.query?.type) === 'users') && (
+                        <TableContainer>
+                            <Table style={{minWidth: 650}} aria-label="simple table">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>No</TableCell>
+                                        <TableCell align="left">Image</TableCell>
+                                        <TableCell align="left">Full Name</TableCell>
+                                        <TableCell align="left">User Name</TableCell>
+                                        <TableCell align="left">Status</TableCell>
+                                        <TableCell align="left">Joined Date</TableCell>
+                                        <TableCell align="left">User ID</TableCell>
+                                        <TableCell align="left">&nbsp;</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {data
+                                        .map((row, idx) => (
+                                            <TableRow key={idx}>
+                                                <TableCell component="th" scope="row">
+                                                    {(idx + 1) + (page > 0 ? (rowsPerPage / page) : 0)}
+                                                </TableCell>
+                                                <TableCell component="th" scope="row">
+                                                    <img loading="lazy" alt={row.user?.first_name}
+                                                         src={applyTransformation(row.user.profile_picture, 48, 48)}
+                                                         width={40}
+                                                         height={40}
+                                                         style={{borderRadius: '50%'}}/>
+
+                                                </TableCell>
+                                                <TableCell
+                                                    align="left">{row.user?.first_name} {row.user?.last_name}</TableCell>
+                                                <TableCell align="left">{row.user.username}</TableCell>
+                                                <TableCell
+                                                    align="left"
+                                                >
+                                                    <ActivityTab
+                                                        style={{
+                                                            width: '100px',
+                                                            background:
+                                                                row.user.is_active
+                                                                    ? t.alertSuccessLite
+                                                                    : t.extraLiteGrey
+                                                        }}
+                                                    >
+                                                        {row.user.is_active ? 'Active' : 'Inactive'}
+                                                    </ActivityTab>
+                                                </TableCell>
+                                                <TableCell align="left">{formatDate(row.created)}</TableCell>
+                                                <TableCell align="left">{trimString(row.user.id)}</TableCell>
+                                                <TableCell align="left">
+                                                    <Button
+                                                        text="View"
+                                                        width={66}
+                                                        outlined={true}
+                                                        onClick={() => handleNavigation(`users/${row.id}`)}
                                                     />
                                                 </TableCell>
                                             </TableRow>
