@@ -207,7 +207,7 @@ function TradeProfilePage({pageId}) {
     function rollbackTrade() {
         tradeService
             .rollbackTrade(tradeId, {
-                car: tradeData?.car?.id
+                trade: tradeId
             })
             .then((response) => {
                 if (response.status) {
