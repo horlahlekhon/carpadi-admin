@@ -1694,11 +1694,13 @@ const Flex = styled.div`
   }
 `
 const ImageGrid = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  //display: flex;
+  //flex-direction: row;
+  //flex-wrap: wrap;
   margin-top: 10px;
-  justify-content: space-between;
+  //justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
 
   .image {
     margin-bottom: 14px;
@@ -1718,6 +1720,17 @@ const ImageGrid = styled.div`
     &:not(:last-child) {
       margin-right: 14px;
     }
+  }
+
+  @media screen and (max-width: 1700px) {
+    grid-template-columns: 1fr 1fr 1fr;
+    .image{
+      width: 85%;
+    }
+  }
+
+  @media screen and (max-width: 1350px) {
+    grid-template-columns: 1fr 1fr;
   }
 `
 const InputGrid = styled.div`
