@@ -26,6 +26,7 @@ import CPToast from "../../components/shared/CPToast";
 import Loader from "../../components/layouts/core/Loader";
 import CreateTrade from "../../components/shared/CreateTrade";
 import {applyTransformation} from "../../services/upload";
+import {randomColor} from "../../helpers/condeGenerators";
 
 function TradesPage({response}) {
     enum Trades {
@@ -369,7 +370,7 @@ function TradesPage({response}) {
                                                 <TableCell component="th" scope="row">
                                                     {/*<img loading="lazy" src={applyTransformation(row.car.image, 48, 48) } width={48} height={48}/>*/}
                                                     <Avatar alt={row.vin}
-                                                            style={{width: '48px', height: '48px'}}
+                                                            style={{width: '48px', height: '48px', backgroundColor: randomColor()}}
                                                             src={applyTransformation(row.car.image, 48, 48)}>{String(row.car.make).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                 </TableCell>
                                                 <TableCell

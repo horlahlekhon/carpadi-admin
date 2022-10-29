@@ -1,6 +1,7 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
+    Avatar,
     Paper,
     Table,
     TableBody,
@@ -22,6 +23,8 @@ import {toast, Toaster} from "react-hot-toast";
 import trade from "../index";
 import CPToast from "../../../components/shared/CPToast";
 import Loader from "../../../components/layouts/core/Loader";
+import {applyTransformation} from "../../../services/upload";
+import {randomColor} from "../../../helpers/condeGenerators";
 
 function ManageTradePage({pageId}) {
     enum Trades {
@@ -213,13 +216,16 @@ function ManageTradePage({pageId}) {
                                                         {idx}
                                                     </TableCell>
                                                     <TableCell component="th" scope="row">
-                                                        <img loading="lazy"
-                                                            src={row.merchant.image}
-                                                            width={48}
-                                                            height={48}
-                                                            style={{borderRadius: '50%'}}
-                                                            alt={`${row.merchant.name}-profile-picture`}
-                                                        />
+                                                        {/*<img loading="lazy"*/}
+                                                        {/*    src={row.merchant.image}*/}
+                                                        {/*    width={48}*/}
+                                                        {/*    height={48}*/}
+                                                        {/*    style={{borderRadius: '50%'}}*/}
+                                                        {/*    alt={`${row.merchant.name}-profile-picture`}*/}
+                                                        {/*/>*/}
+                                                        <Avatar alt={row.vin}
+                                                                style={{width: '48px', height: '48px', backgroundColor: randomColor()}}
+                                                                src={row.merchant.image}>{String(row.merchant.name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                     </TableCell>
                                                     <TableCell align="left"
                                                                style={{textTransform: 'capitalize'}}>{row.merchant.name}</TableCell>
