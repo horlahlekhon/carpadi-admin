@@ -528,7 +528,7 @@ function TradeProfilePage({pageId}) {
                                                 <div className="value">
                                                     &#8358;{' '}
                                                     {formatNumber(
-                                                        tradeData.car.bought_price + tradeData.return_on_trade
+                                                        tradeData.car.bought_price + tradeData.car.maintenance_cost + tradeData.return_on_trade
                                                     )}
                                                 </div>
                                             </Statistic>
