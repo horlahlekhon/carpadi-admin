@@ -17,7 +17,7 @@ function SideNav() {
     }
 
     const handleResize = () => {
-        if (window.innerWidth <= 1080) {
+        if (window.innerWidth <= 1200) {
             setIsFullNav(false)
         } else {
             setIsFullNav(true)

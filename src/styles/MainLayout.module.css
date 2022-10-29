@@ -1,18 +1,40 @@
 .layout {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
 }
 
 .layout .main {
-  background: #F0F0F0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+    background: #F0F0F0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .layout .main main {
-  padding: 18px 23px;
-  overflow-y: auto;
-  height: calc(100vh - 68px);
+    padding: 18px 23px;
+    overflow-y: auto;
+    height: calc(100vh - 68px);
+}
+
+.no-view{
+    display: none;
+}
+
+@media only screen and (max-width: 1079px) {
+    .layout {
+        display: none;
+    }
+    
+    .noview{
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-content: center;
+        text-align: center;
+        background: #243773;
+        color: whitesmoke;
+    }
 }
