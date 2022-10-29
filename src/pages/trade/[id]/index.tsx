@@ -15,6 +15,7 @@ import {updateCar} from "../../../services/car";
 import Loader from "../../../components/layouts/core/Loader";
 import CPModal from "../../../components/shared/CPModal";
 import {useModal} from "mui-modal-provider";
+import {dateToDays} from "../../../helpers/utils";
 
 function TradeProfilePage({pageId}) {
     const {showModal} = useModal();
@@ -433,6 +434,10 @@ function TradeProfilePage({pageId}) {
                                         <Statistic>
                                             <div className="key">Total Trading Slots</div>
                                             <div className="value">{tradeData.slots_available}</div>
+                                        </Statistic>
+                                        <Statistic>
+                                            <div className="key">Trade Age</div>
+                                            <div className="value">{dateToDays(tradeData.created)} Days(s)</div>
                                         </Statistic>
                                         <Statistic>
                                             <div className="key">Price Per Slot</div>
