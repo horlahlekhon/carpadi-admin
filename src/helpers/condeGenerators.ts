@@ -11,3 +11,8 @@ export const randomString = (length = 5) => {
 
     return result;
 }
+
+export const randomColor = () => {
+    const randomColor = Math.floor(Math.random() * 16777215).toString(16);
+    return `#${randomColor}`
+}

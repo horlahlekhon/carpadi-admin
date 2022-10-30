@@ -24,6 +24,7 @@ import {CarStates} from "../../../lib/enums";
 import {formatDate} from "../../../helpers/formatters";
 import Loader from "../../../components/layouts/core/Loader";
 import {applyTransformation} from "../../../services/upload";
+import {randomColor} from "../../../helpers/condeGenerators";
 
 function AvailableForTradePage() {
     const rowsPerPage = 10
@@ -114,10 +115,10 @@ function AvailableForTradePage() {
                     </Header>
                     <Breadcrumbs>
                         <img loading="lazy"
-                            src="/icons/Inventory-Black.svg"
-                            width={'20px'}
-                            height={'18px'}
-                            style={{marginRight: '12px'}}
+                             src="/icons/Inventory-Black.svg"
+                             width={'20px'}
+                             height={'18px'}
+                             style={{marginRight: '12px'}}
                         />
                         <div
                             onClick={() => {
@@ -160,7 +161,11 @@ function AvailableForTradePage() {
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
                                                     <Avatar alt={row.vin}
-                                                            style={{width: '48px', height: '48px'}}
+                                                            style={{
+                                                                width: '48px',
+                                                                height: '48px',
+                                                                backgroundColor: randomColor()
+                                                            }}
                                                             src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}>{String(row?.information?.brand?.name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                 </TableCell>
                                                 <TableCell align="left">{row.vin}</TableCell>

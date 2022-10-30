@@ -24,6 +24,7 @@ import {CarStates} from "../../../lib/enums";
 import {formatDate} from "../../../helpers/formatters";
 import Loader from "../../../components/layouts/core/Loader";
 import {applyTransformation} from "../../../services/upload";
+import {randomColor} from "../../../helpers/condeGenerators";
 
 function CarListingsPage() {
     const rowsPerPage = 10
@@ -162,7 +163,7 @@ function CarListingsPage() {
                                                 </TableCell>
                                                 <TableCell component="th" scope="row">
                                                     <Avatar alt={row.vin}
-                                                            style={{width: '48px', height: '48px'}}
+                                                            style={{width: '48px', height: '48px', backgroundColor: randomColor()}}
                                                             src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}>{String(row?.information?.brand?.name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                     {/*<img loading="lazy"*/}
                                                     {/*     src={row.pictures.length > 0 ? applyTransformation(row.pictures[0], 48, 48) : null}*/}

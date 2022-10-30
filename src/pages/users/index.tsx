@@ -25,6 +25,7 @@ import CPToast from "../../components/shared/CPToast";
 import {formatDate, formatNumber, trimString} from '../../helpers/formatters'
 import Loader from "../../components/layouts/core/Loader";
 import {applyTransformation} from "../../services/upload";
+import {randomColor} from "../../helpers/condeGenerators";
 
 
 function UsersPage() {
@@ -334,7 +335,7 @@ function UsersPage() {
                                                     {/*     height={40}*/}
                                                     {/*     style={{borderRadius: '50%'}}/>*/}
                                                     <Avatar alt={row.user?.first_name}
-                                                            style={{width: '48px', height: '48px'}}
+                                                            style={{width: '48px', height: '48px', backgroundColor: randomColor()}}
                                                             src={applyTransformation(row.user.profile_picture, 48, 48)}>{String(row?.user?.first_name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
 
                                                 </TableCell>
