@@ -28,7 +28,8 @@ const MyApp = ({Component, pageProps, router}): JSX.Element => {
         authService.autoAuthenticate();
         authService.isAuthenticated.subscribe((isAuthenticated) => {
             if (!isAuthenticated && router.route !== '/login') {
-                router.push(`/login?returnUrl=${router.route}`)
+                // router.push(`/login?returnUrl=${router.route}`)
+                router.push(`/login?returnUrl=/`)
             }
         })
     })
