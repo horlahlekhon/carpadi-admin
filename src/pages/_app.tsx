@@ -10,6 +10,7 @@ import {theme, GlobalStyles} from '../styles/theme'
 import {animations} from '../lib/animations'
 import {authService} from "../services/auth"
 import ModalProvider from 'mui-modal-provider';
+import ErrorBoundary from "../components/shared/ErrorBoundary";
 
 const MyApp = ({Component, pageProps, router}): JSX.Element => {
     const getLayout = Component.getLayout || ((page) => page)
@@ -49,7 +50,9 @@ const MyApp = ({Component, pageProps, router}): JSX.Element => {
                                 transition={animation.transition}
                             >
                                 <ModalProvider legacy={true}>
-                                    <Component {...pageProps} />
+                                    <ErrorBoundary>
+                                        <Component {...pageProps} />
+                                    </ErrorBoundary>
                                 </ModalProvider>
                             </m.div>
                         </AnimatePresence>
