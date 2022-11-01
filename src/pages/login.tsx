@@ -26,8 +26,8 @@ function LoginPage() {
     const router = useRouter();
     const [values, setValues] = useState({
         showPassword: false,
-        password: null,
-        username: null,
+        password: '',
+        username: '',
         isLoading: false
     })
 
@@ -158,6 +158,7 @@ function LoginPage() {
                                     size="normal"
                                 />
                                 <Button width="372px" marginTop="32px" text={values.isLoading ? "Loading..." : "Login"}
+                                        disabled={values.password === '' || values.username === ''}
                                         onClick={loginUser}/>
                             </CardContent>
                         </Card>
@@ -166,9 +167,11 @@ function LoginPage() {
             </Container>
             <NoView>
                 <div>
-                    <Typography variant={'h5'} style={{height: 'fit-content', fontWeight: 'bold'}}>Sorry, you cannot access this app on
+                    <Typography variant={'h5'} style={{height: 'fit-content', fontWeight: 'bold'}}>Sorry, you cannot
+                        access this app on
                         mobile.</Typography>
-                    <Typography variant={'body1'} style={{height: 'fit-content', marginTop: '20px'}}>Try accessing it from your PC or a tablet.</Typography>
+                    <Typography variant={'body1'} style={{height: 'fit-content', marginTop: '20px'}}>Try accessing it
+                        from your PC or a tablet.</Typography>
                 </div>
             </NoView>
         </>
