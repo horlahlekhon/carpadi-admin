@@ -1,4 +1,5 @@
 import React, {ErrorInfo} from 'react';
+import ErrorX from "./ErrorX";
 
 export default class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
     constructor(props: {}) {
@@ -18,7 +19,8 @@ export default class ErrorBoundary extends React.Component<{ children: React.Rea
 
     render() {
         if (this.state.hasError) {    // You can render any custom fallback UI
-            return <h1>Something went wrong.</h1>;
+            // return <h1>Something went wrong.</h1>;\
+            return <ErrorX></ErrorX>
         }
         return this.props.children;
     }
