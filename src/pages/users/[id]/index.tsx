@@ -1,6 +1,6 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {Grid, Typography, Paper, Modal} from '@material-ui/core'
+import {Grid, Modal, Paper, Typography} from '@material-ui/core'
 import {t} from '../../../styles/theme'
 import {useRouter} from 'next/router'
 import Button from '../../../components/shared/Button'
@@ -12,7 +12,7 @@ import {ArrowBack, Check} from '@material-ui/icons'
 import CPToast from "../../../components/shared/CPToast";
 import {merchantService} from "../../../services/merchant";
 import {walletService} from "../../../services/wallet";
-import {formatDate, formatNumber} from "../../../helpers/formatters";
+import {formatDate, formatNumber, trimString} from "../../../helpers/formatters";
 import {transactionService} from "../../../services/transaction";
 import {TransactionStates} from "../../../lib/enums";
 import Loader from "../../../components/layouts/core/Loader";
@@ -188,6 +188,30 @@ function UserProfilePage({pageId}) {
                                 <b>Users</b>
                             </Typography>
                         </Header>
+                        <Breadcrumbs>
+                            <img loading="lazy"
+                                 src="/icons/Trade-Black.svg"
+                                 width={'20px'}
+                                 height={'18px'}
+                                 style={{marginRight: '12px'}}
+                            />
+                            <div
+                                onClick={() => {
+                                    handleNavigation('/users')
+                                }}
+                            >
+                                <span className="text">Users</span>
+                                <span className="separator"></span>
+                            </div>
+                            <div
+                                onClick={() => {
+                                    handleNavigation(`users/${user?.id}`)
+                                }}
+                            >
+                                <span className="text">{trimString(user?.id)}</span>
+                                <span className="separator"></span>
+                            </div>
+                        </Breadcrumbs>
                         <Body>
                             <SplitContainer>
                                 <div className="left">
@@ -764,6 +788,33 @@ const Transaction = styled.div`
       .date {
         font-size: 11px;
         margin-top: 4px;
+      }
+    }
+  }
+`
+
+const Breadcrumbs = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  color: black;
+  font-weight: bold;
+  justify-content: start;
+
+  div {
+    &:not(:last-child) {
+      margin-right: 10px;
+
+      .text {
+        padding-right: 10px;
+        cursor: pointer;
+      }
+
+      .separator {
+        :after {
+          color: ${t.grey};
+          content: '|';
+        }
       }
     }
   }

@@ -381,7 +381,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                 <div className="left">
                                     <div className="title">Trade Information</div>
                                     <TextField className="input" placeholder="Slot Quantity" label="Slot Quantity"
-                                               value={trade.slots_available} type='text'
+                                               value={trade.slots_available} type='number'
                                                InputProps={{inputProps: {min: 1}}}
                                                onChange={handleTradeChange('slots_available')}/>
                                     <FlexRow className="input">
@@ -410,6 +410,7 @@ const CreateTrade = ({modalOpen = true, onClick, car = null}) => {
                                         placeholder="Trading Duration in Months"
                                         label="Trading Duration in Months"
                                         variant='standard'
+                                        type={'number'}
                                         value={trade?.estimated_sales_duration}
                                         onChange={handleTradeChange('estimated_sales_duration')}
                                     />

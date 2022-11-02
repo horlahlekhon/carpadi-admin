@@ -95,7 +95,7 @@ function SideNav() {
                         {router.pathname == '/' && <ActiveNavItem>&nbsp;</ActiveNavItem>}
                     </NavItem>
                 </Link>
-                <Link href="/notifications" shallow>
+                <Link href="/notifications" prefetch={true} shallow>
                     <NavItem
                         className={router.pathname.startsWith('/notifications') ? 'active' : ''}
                     >
@@ -117,7 +117,7 @@ function SideNav() {
                         )}
                     </NavItem>
                 </Link>
-                <Link href="/trade" shallow>
+                <Link href="/trade" prefetch={true} shallow>
                     <NavItem className={router.pathname.startsWith('/trade') ? 'active' : ''}>
                         <Image src="/icons/Trade-White.svg" width={18} height={21.5}/>
                         <p
@@ -132,7 +132,7 @@ function SideNav() {
                         )}
                     </NavItem>
                 </Link>
-                <Link href="/sales" shallow>
+                <Link href="/sales" prefetch={true} shallow>
                     <NavItem className={router.pathname.startsWith('/sales') ? 'active' : ''}>
                         <Image src="/icons/Sales-White.svg" width={18} height={21.5}/>
                         <p
@@ -147,7 +147,7 @@ function SideNav() {
                         )}
                     </NavItem>
                 </Link>
-                <Link href="/inventory" shallow>
+                <Link href="/inventory" prefetch={true} shallow>
                     <NavItem className={router.pathname.startsWith('/inventory') ? 'active' : ''}>
                         <Image src="/icons/Inventory-White.svg" width={18} height={21.5}/>
                         <p
@@ -162,7 +162,7 @@ function SideNav() {
                         )}
                     </NavItem>
                 </Link>
-                <Link href="/users" shallow>
+                <Link href="/users" prefetch={true} shallow>
                     <NavItem className={router.pathname.startsWith('/users') ? 'active' : ''}>
                         <Image src="/icons/Users-White.svg" width={18} height={21.5}/>
                         <p

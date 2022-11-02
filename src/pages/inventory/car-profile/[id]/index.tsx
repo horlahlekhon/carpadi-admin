@@ -1,18 +1,12 @@
 import MainLayout from '../../../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {
-    Typography,
-    Modal,
-    TextField,
-    Select,
-    FormControl, Grid, InputLabel, MenuItem
-} from '@material-ui/core'
+import {FormControl, Grid, InputLabel, MenuItem, Modal, Select, TextField, Typography} from '@material-ui/core'
 import {t} from '../../../../styles/theme'
 import {useRouter} from 'next/router'
 import Button from '../../../../components/shared/Button'
 import Image from 'next/image'
 import {withStyles} from '@material-ui/styles'
-import {useState, useRef, useEffect} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import Checkbox from "../../../../components/shared/Checkbox";
 import {toast} from "react-hot-toast";
 import {formatDate, formatNumber, humanReadableDate, trimString} from "../../../../helpers/formatters";
@@ -21,8 +15,8 @@ import {
     CarStates,
     CarTransmissionTypes,
     FuelTypes,
-    InspectionStates, RequiredCarDocuments,
-    TradeStates,
+    InspectionStates,
+    RequiredCarDocuments,
     UploadTypes
 } from "../../../../lib/enums";
 import CreateTrade from "../../../../components/shared/CreateTrade";
@@ -161,6 +155,7 @@ function CarProfilePage({pageId}) {
         "licence_plate": null
     })
     const [editedCar, setEditedCarData] = useState({})
+    const [editedVehicle, setEditedVehicleData] = useState({})
     const [newInspection, setNewInspection] = useState({
         "owners_name": null,
         "owners_review": null,
@@ -342,43 +337,41 @@ function CarProfilePage({pageId}) {
     const updateCarData = () => {
         setIsSaving(true)
         const data = editedCar;
-        const vehicleData = {
-            "transmission": car?.information?.transmission,
-            "fuel_type": car?.information?.fuel_type,
-            "mileage": car?.information?.mileage,
-            "age": car?.information?.age,
-            "description": car?.description,
+        const vehicleData = editedVehicle;
+
+        if (Object.keys(data).length > 0) {
+            updateCar(carId, data)
+                .then((response) => {
+                    if (response.status) {
+                        toast.success('Updated Car Successfully!')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+                .finally(() => {
+                    setIsSaving(false)
+                })
         }
 
-        updateCar(carId, data)
-            .then((response) => {
-                if (response.status) {
-                    toast.success('Updated Car Successfully!')
-                } else {
-                    toast.error(response.data)
-                }
-            })
-            .catch((error) => {
-                toast.error(error)
-            })
-            .finally(() => {
-                setIsSaving(false)
-            })
-
-        updateVehicle(car.information.id, vehicleData)
-            .then((response) => {
-                if (response.status) {
-                    toast.success('Updated Vehicle Successfully!')
-                } else {
-                    toast.error(response.data)
-                }
-            })
-            .catch((error) => {
-                toast.error(error)
-            })
-            .finally(() => {
-                setIsSaving(false)
-            })
+        if (Object.keys(vehicleData).length > 0) {
+            updateVehicle(car.information.id, vehicleData)
+                .then((response) => {
+                    if (response.status) {
+                        toast.success('Updated Vehicle Successfully!')
+                    } else {
+                        toast.error(response.data)
+                    }
+                })
+                .catch((error) => {
+                    toast.error(error)
+                })
+                .finally(() => {
+                    setIsSaving(false)
+                })
+        }
     }
 
     function removePicture(url) {
@@ -398,9 +391,19 @@ function CarProfilePage({pageId}) {
         obj2[fieldName] = value;
         setCarData(obj)
         setEditedCarData(obj2)
+        if (["transmission", "fuel_type", "mileage", "age", "description"].includes(fieldName)) {
+            let obj3 = {...editedVehicle}
+            obj3[fieldName] = value;
+            setEditedVehicleData(obj3)
+        }
     }
 
     function setInfoField(fieldName, value) {
+        if (["transmission", "fuel_type", "mileage", "age", "description"].includes(fieldName)) {
+            let obj3 = {...editedVehicle}
+            obj3[fieldName] = value;
+            setEditedVehicleData(obj3)
+        }
         let obj = {...car}
         obj['information'][fieldName] = value;
         setCarData(obj)
@@ -1313,7 +1316,7 @@ function CarProfilePage({pageId}) {
                                             marginLeft="auto"
                                             marginRight="auto"
                                             marginTop={40}
-                                            disabled={isSaving}
+                                            disabled={isSaving || (Object.keys(editedVehicle).length < 1 && Object.keys(editedCar).length < 1)}
                                             onClick={() => updateCarData()}
                                         />
                                     </>
@@ -1724,7 +1727,7 @@ const ImageGrid = styled.div`
 
   @media screen and (max-width: 1700px) {
     grid-template-columns: 1fr 1fr 1fr;
-    .image{
+    .image {
       width: 85%;
     }
   }
