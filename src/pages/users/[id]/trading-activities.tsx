@@ -1,6 +1,6 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
-import {Grid, Paper, Typography, withStyles} from '@material-ui/core'
+import { Avatar, Grid, Paper, Typography, withStyles } from '@material-ui/core'
 import {t} from '../../../styles/theme'
 import {useEffect, useState} from 'react'
 import {useRouter} from 'next/router'
@@ -12,11 +12,12 @@ import {merchantService} from "../../../services/merchant";
 import {tradeService} from "../../../services/trade";
 import {formatDate, formatNumber, trimString} from "../../../helpers/formatters";
 import Loader from "../../../components/layouts/core/Loader";
+import { randomColor } from '../../../helpers/condeGenerators'
 
 function TradingActivitiesPage({pageId}) {
     enum ActivityStatus {
-        ACTIVE = 'purchased',
-        SOLD = 'completed',
+        ACTIVE = 'active',
+        SOLD = 'sold',
         CLOSED = 'closed'
     }
 
@@ -98,7 +99,7 @@ function TradingActivitiesPage({pageId}) {
     const updateTrades = (status = ActivityStatus.ACTIVE) => {
         setActivityTab(status)
         // @ts-ignore
-        retrieveActivities(userId, status.valueOf())
+        retrieveActivities(userId, status)
     }
 
     return (
@@ -117,11 +118,15 @@ function TradingActivitiesPage({pageId}) {
                                 <Activities>
                                     <CardHeader>
                                         <div className='profile'>
-                                            <ProfileImage>
-                                                <img loading="lazy" src={user?.user?.profile_picture} width={'100%'}
-                                                     height={'100%'} alt={user?.user?.first_name}
-                                                     style={{borderRadius: '100%'}}/>
-                                            </ProfileImage>
+                                            {!user?.user?.profile_picture && <Avatar
+                                              alt={user?.user?.first_name}
+                                                className='image' style={{width: '48px', height: '48px', backgroundColor: randomColor()}}> {String(user?.user?.first_name).slice(0, 1) + String(user?.user?.last_name).slice(0, 1)  || 'NA'}
+                                            </Avatar>}
+                                            {/*<ProfileImage>*/}
+                                            {/*    <img loading="lazy" src={user?.user?.profile_picture} width={'100%'}*/}
+                                            {/*         height={'100%'} alt={user?.user?.first_name}*/}
+                                            {/*         style={{borderRadius: '100%'}}/>*/}
+                                            {/*</ProfileImage>*/}
                                             <div className='details'>
                                                 <div
                                                     className='name'>{user?.user?.first_name} {user?.user?.last_name}</div>
@@ -186,8 +191,7 @@ function TradingActivitiesPage({pageId}) {
                                                             <Grid item xs={4}>
                                                                 <ActivityCardItem>
                                                                     <div>Total Bought Slot</div>
-                                                                    <div
-                                                                        className='value'>{trade?.slots_quantity}</div>
+                                                                    <div className='value'>{trade?.slots_quantity}</div>
                                                                 </ActivityCardItem>
                                                             </Grid>
                                                             <Grid item xs={4}>

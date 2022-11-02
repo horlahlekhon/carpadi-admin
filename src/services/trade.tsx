@@ -95,8 +95,14 @@ const deleteSingleTrade = (id) => {
         })
 }
 
-const retrieveUserTrades = (merchantId, status = 'purchased') => {
-    return fetchWrapper.get(`${baseUrl}/trade-units?limit=${50}&offset=${0}&merchant=${merchantId}&trade_status=${status}`)
+const retrieveUserTrades = (merchantId, status = 'active') => {
+    const activityStatusMap = {
+        active: ['purchased', 'ongoing'],
+        sold: ['completed'],
+        closed: ['closed', 'expired']
+    }
+    const parsed = activityStatusMap[status].map(e => `trade_status=${e}`).join('&')
+    return fetchWrapper.get(`${baseUrl}/trade-units?limit=${50}&offset=${0}&merchant=${merchantId}&${parsed}`)
         .then((response) => {
             return {status: true, data: response}
         })
