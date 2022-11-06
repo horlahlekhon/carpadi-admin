@@ -41,7 +41,7 @@ function UserProfilePage({pageId}) {
         "created": null,
         "modified": null,
         "bvn": null,
-        "is_approved": false
+        "status": "pending"
     })
     const [wallet, setWalletData] = useState({
         "id": "NA",
@@ -154,7 +154,7 @@ function UserProfilePage({pageId}) {
         setPageLoading(true)
         if (userId !== 'NA' && userId !== undefined) {
             merchantService
-                .updateSingleMerchant(userId, {is_approved: true})
+                .updateSingleMerchant(userId, {status: "approved"})
                 .then((response) => {
                     if (response.status) {
                         retrieveUser()
@@ -216,13 +216,13 @@ function UserProfilePage({pageId}) {
                             <SplitContainer>
                                 <div className="left">
                                     <Button
-                                        text={user?.is_approved ? 'Approved' : 'Pending Approval'}
+                                        text={user?.status == "approved" ? 'Approved' : 'Pending Approval'}
                                         title="This user is already approved"
                                         width={165}
                                         outlined={true}
                                         marginLeft="auto"
                                         marginTop={4}
-                                        disabled={user?.is_approved}
+                                        disabled={user?.status == "approved"}
                                         onClick={() => {
                                             approveUser()
                                         }}

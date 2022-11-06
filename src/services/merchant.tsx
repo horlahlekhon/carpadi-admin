@@ -6,8 +6,8 @@ import {fetchWrapper} from '../helpers/fetchWrapper';
 const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
-const retrieveMerchants = (limit = 10, offset = 1, tradeStatus = "", user = "", status = "", is_approved = "") => {
-    return fetchWrapper.get(`${baseUrl}/merchants?limit=${limit}&offset=${offset}&trading_status=${tradeStatus}&user=${user}&status=${status}&is_approved=${is_approved}`)
+const retrieveMerchants = (limit = 10, offset = 1, tradeStatus = "", user = "", status = "", approvalStatus = "") => {
+    return fetchWrapper.get(`${baseUrl}/merchants?limit=${limit}&offset=${offset}&trading_status=${tradeStatus}&user=${user}&status=${status}&status=${approvalStatus}`)
         .then((response) => {
             return {status: true, data: response}
         })
