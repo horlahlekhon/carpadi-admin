@@ -73,7 +73,7 @@ function UnderInspectionPage() {
 
     const retrieveCarList = (page = 0) => {
         setPageLoading(true)
-        retrieveCars(rowsPerPage, page, CarStates.ONGOING_INSPECTION)
+        retrieveCars(rowsPerPage, page, [CarStates.ONGOING_INSPECTION, CarStates.PENDING_INSPECTION, CarStates.INSPECTED])
             .then((response) => {
                 if (response.status) {
                     setPagination({

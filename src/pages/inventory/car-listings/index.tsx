@@ -74,7 +74,7 @@ function CarListingsPage() {
     const retrieveCarList = (page = 0) => {
         setPageLoading(true)
         setCars([])
-        retrieveCars(rowsPerPage, page, CarStates.ALL)
+        retrieveCars(rowsPerPage, page, [CarStates.ALL])
             .then((response) => {
                 if (response.status) {
                     setPagination({

@@ -73,7 +73,7 @@ function ArchivedPage() {
 
     const retrieveCarList = (page = 0) => {
         setPageLoading(true)
-        retrieveCars(rowsPerPage, page, CarStates.ARCHIVED)
+        retrieveCars(rowsPerPage, page, [CarStates.ARCHIVED])
             .then((response) => {
                 if (response.status) {
                     setPagination({

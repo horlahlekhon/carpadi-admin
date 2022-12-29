@@ -73,7 +73,7 @@ function SoldInventoryPage() {
 
     const retrieveCarList = (page = 0) => {
         setPageLoading(true)
-        retrieveCars(rowsPerPage, page, CarStates.SOLD)
+        retrieveCars(rowsPerPage, page, [CarStates.SOLD])
             .then((response) => {
                 if (response.status) {
                     setPagination({

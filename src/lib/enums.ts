@@ -9,6 +9,7 @@ enum CarStates {
     ONGOING_TRADE = "ongoing_trade",
     BOUGHT = "bought",
     ARCHIVED = "archived",
+    PENDING_INSPECTION = "pending_inspection"
 }
 
 enum TradeStates {

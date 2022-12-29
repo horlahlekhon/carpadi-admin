@@ -73,7 +73,7 @@ function OngoingTradePage() {
 
     const retrieveCarList = (page = 0) => {
         setPageLoading(true)
-        retrieveCars(rowsPerPage, page, CarStates.ONGOING_TRADE)
+        retrieveCars(rowsPerPage, page, [CarStates.ONGOING_TRADE])
             .then((response) => {
                 if (response.status) {
                     setPagination({
