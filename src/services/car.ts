@@ -7,7 +7,7 @@ const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
 const retrieveCars = (limit = 10, offset = 0, status = ['sold']) => {
-    const stat = status.map(e => `status=${e}`).join("&")
+    const stat = status.filter(e => e !== '').map(e => `status=${e}`).join("&")
     return fetchWrapper.get(`${baseUrl}/cars?limit=${limit}&offset=${offset}&${stat}`)
         .then((response) => {
             return {status: true, data: response}

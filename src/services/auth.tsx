@@ -14,7 +14,7 @@ const authSubject = new BehaviorSubject(false);
 export const authService = {
     user: userSubject.asObservable(),
     isAuthenticated: authSubject.asObservable(),
-    get userValue() {
+    userValue: () => {
         return userSubject.value
     },
     get authValue() {

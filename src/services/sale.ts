@@ -7,6 +7,7 @@ const {publicRuntimeConfig} = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/admins`;
 
 const retrieveSales = (limit = 10, offset = 0, status = 'active') => {
+    
     return fetchWrapper.get(`${baseUrl}/car-products?limit=${limit}&offset=${offset}&status=${status}`)
         .then((response) => {
             return {status: true, data: response}
