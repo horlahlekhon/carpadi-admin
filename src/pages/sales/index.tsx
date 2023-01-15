@@ -263,7 +263,7 @@ function SalesPage() {
                                                     {/*<img loading="lazy" src={row?.product_images.length > 0 ? applyTransformation(row?.product_images[0], 48, 48) : null}*/}
                                                     {/*     width={48} height={48} alt={trimString(row?.id)}/>*/}
                                                     <Avatar alt={trimString(row?.id)}
-                                                            style={{width: '48px', height: '48px', backgroundColor: randomColor()}}
+                                                            style={{width: '48px', height: '48px', backgroundColor: randomColor(), borderRadius: 0}}
                                                             src={row.product_images.length > 0 ? applyTransformation(row.product_images[0], 48, 48) : null}>{String(row?.car?.name).slice(0, 2).toUpperCase() || 'NA'}</Avatar>
                                                 </TableCell>
                                                 <TableCell align="right">{row?.car?.vin}</TableCell>
