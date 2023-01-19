@@ -15,8 +15,29 @@ const retrieveBuying = (limit = 10, offset = 0, status = 'active') => {
         })
 }
 
+const retrieveSell = (limit = 10, offset = 0, status = 'active') => {
+
+    return fetchWrapper.get(`${baseUrl}/sell?limit=${limit}&offset=${offset}&status=${status}`)
+        .then((response) => {
+            return { status: true, data: response }
+        })
+        .catch((error) => {
+            return { status: false, data: error };
+        })
+}
+
 const retrieveSingleBuying = (id) => {
     return fetchWrapper.get(`${baseUrl}/buy/${id}`)
+        .then((response) => {
+            return { status: true, data: response }
+        })
+        .catch((error) => {
+            return { status: false, data: error };
+        })
+}
+
+const retrieveSingleSell = (id) => {
+    return fetchWrapper.get(`${baseUrl}/sell/${id}`)
         .then((response) => {
             return { status: true, data: response }
         })
@@ -28,5 +49,7 @@ const retrieveSingleBuying = (id) => {
 
 export {
     retrieveBuying,
-    retrieveSingleBuying
+    retrieveSingleBuying,
+    retrieveSell,
+    retrieveSingleSell
 }
