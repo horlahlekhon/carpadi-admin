@@ -194,7 +194,7 @@ function SideNav() {
                     <ListItemText primary="Selling" />
                   </ListItem>
                 </Link>
-                <Link href="/buying" prefetch={true} shallow>
+                <Link href="/sales/buying" prefetch={true} shallow>
                   <ListItem button className={classes.nested}>
                     <ListItemText primary="Buying" />
                   </ListItem>
