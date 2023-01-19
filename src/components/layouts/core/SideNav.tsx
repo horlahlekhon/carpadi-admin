@@ -187,16 +187,21 @@ function SideNav() {
                 <ActiveNavItem>&nbsp;</ActiveNavItem>
               )}
             </NavItem>
-            <Collapse in={open} timeout="auto" unmountOnExit style={{marginLeft: '24px'}}>
+            <Collapse
+              in={open}
+              timeout="auto"
+              unmountOnExit
+              style={{ marginLeft: '24px' }}
+            >
               <List component="div" disablePadding>
                 <Link href="/sales" prefetch={true} shallow>
                   <ListItem button className={classes.nested}>
-                    <ListItemText primary="Selling" />
+                    <ListItemText primary={!isFullNav ? 'Sell' : 'Selling'} />
                   </ListItem>
                 </Link>
                 <Link href="/sales/buying" prefetch={true} shallow>
                   <ListItem button className={classes.nested}>
-                    <ListItemText primary="Buying" />
+                    <ListItemText primary={!isFullNav ? 'Buy' : 'Buying'} />
                   </ListItem>
                 </Link>
               </List>
