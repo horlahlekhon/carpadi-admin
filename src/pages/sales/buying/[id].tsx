@@ -158,7 +158,7 @@ function SalesProfilePage({ pageId }) {
             </Breadcrumbs>
             <Body>
               <Typography variant="h6" color="secondary">
-                Car Sales Highlight
+                Highlight
               </Typography>
               <p style={{ marginBottom: 10 }}>
                 Vehicle Description: {sale?.vehicle_info.description}
