@@ -1,10 +1,13 @@
 import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
   Modal,
   Paper,
-  Switch,
+  Select,
   TextField,
   Typography
 } from '@material-ui/core'
@@ -21,10 +24,19 @@ import {
 } from '../../../helpers/formatters'
 import CPToast from '../../../components/shared/CPToast'
 import Loader from '../../../components/layouts/core/Loader'
+import Button from '../../../components/shared/Button'
+import Moment from 'moment'
+import {
+  createInspection,
+  retrieveInspection,
+  retrieveInspectors
+} from '../../../services/inspection'
+import { createCar } from '../../../services/car'
 
 function SalesProfilePage({ pageId }) {
   const router = useRouter()
   const [saleId, setSaleId] = useState(null)
+  const [isSaving, setIsSaving] = useState(false)
   const [state, setState] = useState({
     saleActive: false
   })
@@ -47,6 +59,7 @@ function SalesProfilePage({ pageId }) {
     car_condition: null,
     note: null,
     price: 0,
+    inspection: null,
     inspection_location: null,
     contact_preference: null,
     is_negotiable: false,
@@ -82,7 +95,94 @@ function SalesProfilePage({ pageId }) {
       torque: null
     }
   })
+  const [car, setCarData] = useState({
+    id: null,
+    maintenance_cost: 0,
+    total_cost: 0,
+    pictures: [],
+    vin: null,
+    information: {
+      id: null,
+      engine: null,
+      transmission: null,
+      car_type: null,
+      fuel_type: null,
+      mileage: 0,
+      age: 0,
+      description: null,
+      trim: null,
+      manufacturer: null,
+      vin: null,
+      brand: {
+        id: null,
+        created: null,
+        modified: null,
+        name: null,
+        model: null,
+        year: 0
+      },
+      created: null,
+      modified: null
+    },
+    status: null,
+    bought_price: '0',
+    inspection: { id: null, status: null },
+    created: null,
+    modified: null,
+    colour: null,
+    cost_of_repairs: null,
+    resale_price: null,
+    margin: null,
+    description: null,
+    name: null,
+    licence_plate: null
+  })
   const [pageLoading, setPageLoading] = useState(false)
+  const [newInspection, setNewInspection] = useState({
+    owners_name: null,
+    owners_review: null,
+    inspection_date: null,
+    owners_phone: null,
+    address: null,
+    inspector: null,
+    car: null
+  })
+  const [inspection, setInspection] = useState({
+    id: null,
+    created: null,
+    modified: null,
+    owners_name: null,
+    inspection_date: null,
+    owners_phone: null,
+    owners_review: null,
+    address: null,
+    status: 'ongoing',
+    inspection_verdict: null,
+    inspector: null,
+    inspection_assignor: null,
+    car: null
+  })
+  const [inspectorList, setInspectors] = useState([])
+  const [inspectorId, setInspectorID] = useState(null)
+  const [modalOpen, setModalState] = useState(false)
+  const [modalView, setModalView] = useState('')
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalTagline, setModalTagline] = useState(
+    ' Kindly provide the following information below.'
+  )
+
+  const showModal = (
+    viewName: string,
+    title: string,
+    customTagline: string = null!
+  ) => {
+    setModalView(viewName)
+    setModalTitle(title)
+    if (!!customTagline) {
+      setModalTagline(customTagline)
+    }
+    setModalState(true)
+  }
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked })
@@ -111,6 +211,99 @@ function SalesProfilePage({ pageId }) {
         })
         .finally(() => {
           setPageLoading(false)
+        })
+    }
+  }
+
+  const updateInspectionFields = (field, value) => {
+    if (
+      field == 'inspection_date' &&
+      Moment(value).toDate() < Moment().toDate()
+    ) {
+      toast.dismiss()
+      toast.error('Date cannot be less than today')
+      return
+    } else {
+      let obj = { ...newInspection }
+      obj[field] = value
+      setNewInspection(obj)
+    }
+  }
+
+  function getInspectors() {
+    //TODO: Handle case for vin already existing
+    const data = { vin: sale.vehicle_info.vin, color: 'black' }
+    createCar(data)
+      .then((response) => {
+        if (response.status) {
+          toast.success('Created Car Successfully!')
+        } else {
+          toast.error(response.data)
+        }
+      })
+      .catch((error) => {
+        toast.error(error)
+      })
+      .finally(() => {
+        setIsSaving(false)
+        retrieveInspectors()
+          .then((response) => {
+            if (response.status) {
+              setInspectors(response.data?.results || [])
+              showModal('createInspection', 'Add Inspection')
+            } else {
+              toast.error(response.data)
+            }
+          })
+          .catch((error) => {
+            toast.error(error.data)
+          })
+      })
+  }
+
+  function addInspection(): void {
+    const data = {
+      ...newInspection,
+      inspection_date: Moment(newInspection?.inspection_date).toISOString(),
+      inspector: inspectorId,
+      car: car?.id
+    }
+    setIsSaving(true)
+    createInspection(data)
+      .then((res) => {
+        if (res.status) {
+          toast.success('Created Inspection Successfully')
+          getSale(String(router.query.id))
+        } else {
+          toast.error(res?.data)
+        }
+      })
+      .catch((err) => {
+        toast.error(err)
+      })
+      .finally(() => {
+        setIsSaving(false)
+        setModalState(false)
+      })
+  }
+
+  function viewInspectionReport() {
+    if (sale?.inspection?.id) {
+      retrieveInspection(sale.inspection.id)
+        .then((response) => {
+          if (response.status) {
+            setInspection(response.data)
+            showModal(
+              'vehicleInspectionReport',
+              'Vehicle Inspection Report',
+              'An overview of the information gathered.'
+            )
+          } else {
+            toast.error(response.data)
+          }
+        })
+        .catch((error) => {
+          toast.error(error.data)
         })
     }
   }
@@ -157,6 +350,23 @@ function SalesProfilePage({ pageId }) {
               </div>
             </Breadcrumbs>
             <Body>
+              <ActionBar>
+                <div className="button-group">
+                  <Button
+                    text="Create Inspection"
+                    width={150}
+                    outlined={true}
+                    onClick={() => getInspectors()}
+                  />
+                  <Button
+                    text="Reject Sale"
+                    width={170}
+                    outlined={true}
+                    marginLeft="16px"
+                    bgColor={t.alertError}
+                  />
+                </div>
+              </ActionBar>
               <Typography variant="h6" color="secondary">
                 Highlight
               </Typography>
@@ -214,7 +424,7 @@ function SalesProfilePage({ pageId }) {
                     <div className="value">{sale?.count_of_previous_users}</div>
                   </Detail>
                   <Detail>
-                    <div className="key">Inspected At</div>
+                    <div className="key">Inspection Location</div>
                     <div className="value">{sale?.inspection_location}</div>
                   </Detail>
                   <Detail>
@@ -294,6 +504,167 @@ function SalesProfilePage({ pageId }) {
                 </Grid>
               </PriceSection>
             </Body>
+            <Modal
+              open={modalOpen}
+              onClose={() => {
+                setModalState(false)
+              }}
+            >
+              <ModalBody>
+                <ModalBodyHeader>
+                  <Typography variant="h5" style={{ fontWeight: 600 }}>
+                    {modalTitle}
+                  </Typography>
+                  <img
+                    src="/icons/Cancel-Black.svg"
+                    width={25}
+                    height={25}
+                    onClick={() => setModalState(false)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                </ModalBodyHeader>
+                <Typography variant="inherit" style={{ marginBottom: 20 }}>
+                  {modalTitle !== '' ? modalTagline : ''} &nbsp;
+                </Typography>
+                {modalView === 'createInspection' && (
+                  <>
+                    <InputGrid>
+                      <Flex style={{ marginBottom: '5px' }}>
+                        <HeaderText style={{ marginTop: 10 }}>
+                          Enter Inspection Date
+                        </HeaderText>
+                        <TextField
+                          type="date"
+                          className="text-field"
+                          fullWidth
+                          variant="standard"
+                          value={newInspection?.inspection_date}
+                          onChange={(e) =>
+                            updateInspectionFields(
+                              'inspection_date',
+                              e.target.value
+                            )
+                          }
+                        />
+                      </Flex>
+                    </InputGrid>
+                    <InputGrid style={{ marginTop: 5 }}>
+                      <Flex style={{ marginBottom: '5px' }}>
+                        <HeaderText style={{ marginTop: 10 }}>
+                          Enter Owners Name
+                        </HeaderText>
+                        <TextField
+                          className="text-field"
+                          fullWidth
+                          variant="standard"
+                          value={newInspection?.owners_name}
+                          onChange={(e) =>
+                            updateInspectionFields(
+                              'owners_name',
+                              e.target.value
+                            )
+                          }
+                        />
+                      </Flex>
+                      <Flex style={{ marginBottom: '5px' }}>
+                        <HeaderText style={{ marginTop: 10 }}>
+                          Enter Owners Phone Number
+                        </HeaderText>
+                        <TextField
+                          className="text-field"
+                          fullWidth
+                          variant="standard"
+                          value={newInspection?.owners_phone}
+                          error={
+                            !new RegExp(
+                              /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+                            ).test(newInspection?.owners_phone)
+                          }
+                          onChange={(e) => {
+                            updateInspectionFields(
+                              'owners_phone',
+                              e.target.value
+                            )
+                          }}
+                        />
+                      </Flex>
+                    </InputGrid>
+                    <FormControl variant="outlined" fullWidth>
+                      <InputLabel id="demo-simple-select-outlined-label">
+                        Inspector
+                      </InputLabel>
+                      <Select
+                        labelId="demo-simple-select-outlined-label"
+                        id="demo-simple-select-outlined"
+                        value={inspectorId}
+                        onChange={(e) => setInspectorID(e.target.value)}
+                        label="Inspector"
+                      >
+                        <MenuItem value="" disabled>
+                          <em>None</em>
+                        </MenuItem>
+                        {inspectorList.map((i, _) => (
+                          <MenuItem key={_} value={i.id}>
+                            {i?.username}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <Flex style={{ marginBottom: '5px', marginTop: 5 }}>
+                      <HeaderText style={{ marginTop: 10 }}>
+                        Enter Review
+                      </HeaderText>
+                      <TextField
+                        className="text-field"
+                        fullWidth
+                        variant="standard"
+                        multiline
+                        rows={3}
+                        maxRows={6}
+                        value={newInspection?.owners_review}
+                        onChange={(e) =>
+                          updateInspectionFields(
+                            'owners_review',
+                            e.target.value
+                          )
+                        }
+                      />
+                    </Flex>
+                    <Flex style={{ marginBottom: '5px' }}>
+                      <HeaderText style={{ marginTop: 10 }}>
+                        Enter Owners Address
+                      </HeaderText>
+                      <TextField
+                        className="text-field"
+                        fullWidth
+                        variant="standard"
+                        multiline
+                        rows={3}
+                        maxRows={6}
+                        value={newInspection?.address}
+                        onChange={(e) =>
+                          updateInspectionFields('address', e.target.value)
+                        }
+                      />
+                    </Flex>
+                    <Button
+                      text={isSaving ? 'Saving...' : 'Add Inspection'}
+                      width={510}
+                      marginLeft="auto"
+                      marginRight="auto"
+                      marginTop={40}
+                      disabled={
+                        isSaving ||
+                        !new RegExp(
+                          /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im
+                        ).test(newInspection?.owners_phone)
+                      }
+                      onClick={() => addInspection()}
+                    />
+                  </>
+                )}
+              </ModalBody>
+            </Modal>
           </>
         )}
         {pageLoading && <Loader />}
@@ -311,6 +682,113 @@ export async function getServerSideProps({ params }) {
 }
 
 export default SalesProfilePage
+
+const InputGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-column-gap: 24px;
+  margin-bottom: 20px;
+  width: 700px;
+
+  .input {
+    width: 97%;
+    background: ${t.white};
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: fit-content;
+    padding: 5px 10px;
+    margin: auto;
+    border-bottom: 1px solid ${t.lightGrey};
+  }
+
+  .text-field {
+    width: 97%;
+    background: ${t.white};
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    justify-content: space-between;
+    height: 39px;
+    margin: auto;
+  }
+`
+
+const Flex = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 40px;
+  margin-top: 16px;
+
+  .slideshow {
+    margin-right: 20px;
+    position: relative;
+    height: fit-content;
+
+    .main {
+      object-fit: cover;
+      border-radius: 14px;
+    }
+
+    .next,
+    .previous {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      bottom: 0;
+      margin: auto 0;
+    }
+
+    .previous {
+      left: 16px;
+    }
+
+    .next {
+      right: 16px;
+    }
+  }
+
+  @media screen and (max-width: 1080px) {
+    .slideshow {
+      img.main {
+        width: 400px;
+        height: 240px;
+
+        .next,
+        .prev {
+        }
+      }
+    }
+  }
+`
+
+const ModalBody = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  padding: 24px 32px;
+  background: white;
+  width: fit-content;
+  border-radius: 12px;
+  height: fit-content;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
+const ModalBodyHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`
 
 const Detail = styled.div`
   display: flex;
@@ -466,5 +944,27 @@ const FlexRow = styled.div`
     color: ${t.lightGrey};
     background: ${t.liteGrey};
     margin-right: 10px;
+  }
+`
+
+const ActionBar = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+
+  .button-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+  }
+
+  .vehicle-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-right: auto;
   }
 `

@@ -104,7 +104,7 @@ enum RequiredCarDocuments {
 
 enum BuyingStates {
     Accepted = "accepted",
-    Draft = "draft",
+    Pending = "pending",
     Rejected = "rejected",
 }
 

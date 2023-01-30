@@ -35,7 +35,7 @@ function BuyingPage() {
 
   const rowsPerPage = 10
   const router = useRouter()
-  const [selectedSales, setSelected] = useState(BuyingStates.Draft)
+  const [selectedSales, setSelected] = useState(BuyingStates.Pending)
   const [page, setPage] = useState(0)
   const [createSale, setCreateSale] = useState(false)
   const [sales, setSales] = useState([])
@@ -156,24 +156,24 @@ function BuyingPage() {
                         <Grid item xs={4}>
                             <StatsCard
                                 onClick={() => {
-                                    selectSale(BuyingStates.Draft)
+                                    selectSale(BuyingStates.Pending)
                                     setPage(0);
-                                    getSales(BuyingStates.Draft)
+                                    getSales(BuyingStates.Pending)
                                 }}
                                 style={{
                                     border:
-                                        selectedSales === BuyingStates.Draft ? '3px solid #00AEEF' : 'none'
+                                        selectedSales === BuyingStates.Pending ? '3px solid #00AEEF' : 'none'
                                 }}
                             >
                                 <Typography
                                     variant="inherit"
-                                    color={selectedSales == BuyingStates.Draft ? 'primary' : 'inherit'}
+                                    color={selectedSales == BuyingStates.Pending ? 'primary' : 'inherit'}
                                 >
-                                    Draft
+                                    Pending
                                 </Typography>
                                 <Typography
                                     variant="h5"
-                                    color={selectedSales == BuyingStates.Draft ? 'primary' : 'inherit'}
+                                    color={selectedSales == BuyingStates.Pending ? 'primary' : 'inherit'}
                                 >
                                     NA
                                 </Typography>
