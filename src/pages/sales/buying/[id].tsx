@@ -36,6 +36,7 @@ import {
   retrieveInspectors
 } from '../../../services/inspection'
 import { createCar } from '../../../services/car'
+import { BuyingStates } from '../../../lib/enums'
 
 function SalesProfilePage({ pageId }) {
   const router = useRouter()
@@ -46,6 +47,7 @@ function SalesProfilePage({ pageId }) {
   })
   const [sale, setSale] = useState({
     id: null,
+    status: null,
     seller: {
       first_name: null,
       last_name: null,
@@ -391,6 +393,7 @@ function SalesProfilePage({ pageId }) {
                     marginLeft="16px"
                     bgColor={t.alertSuccess}
                     onClick={accept}
+                    disabled={sale.status === BuyingStates.Accepted}
                   />
                   <Button
                     text="Reject Sale"
@@ -399,6 +402,7 @@ function SalesProfilePage({ pageId }) {
                     marginLeft="16px"
                     bgColor={t.alertError}
                     onClick={reject}
+                    disabled={sale.status === BuyingStates.Rejected}
                   />
                 </div>
               </ActionBar>
