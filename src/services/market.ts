@@ -1,5 +1,6 @@
 import getConfig from 'next/config';
 import { fetchWrapper } from '../helpers/fetchWrapper';
+import { BuyingStates } from '../lib/enums';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/market`;
@@ -46,10 +47,32 @@ const retrieveSingleSell = (id) => {
         })
 }
 
+const rejectSale = (id) => {
+    return fetchWrapper.patch(`${baseUrl}/sell/${id}/`, {status: BuyingStates.Rejected})
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
+const acceptSale = (id) => {
+    return fetchWrapper.patch(`${baseUrl}/sell/${id}/`, {status: BuyingStates.Accepted})
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
 
 export {
     retrieveBuying,
     retrieveSingleBuying,
     retrieveSell,
-    retrieveSingleSell
+    retrieveSingleSell,
+    acceptSale,
+    rejectSale
 }

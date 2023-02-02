@@ -16,7 +16,11 @@ import { useRouter } from 'next/router'
 import { withStyles } from '@material-ui/styles'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { retrieveSingleSell } from '../../../services/market'
+import {
+  acceptSale,
+  rejectSale,
+  retrieveSingleSell
+} from '../../../services/market'
 import {
   formatNumber,
   humanReadableDate,
@@ -230,6 +234,28 @@ function SalesProfilePage({ pageId }) {
     }
   }
 
+  const reject = () => {
+    rejectSale(saleId).then((response) => {
+      if (response.status) {
+        toast.success('Rejected Successfully!')
+        getSale(saleId)
+      } else {
+        toast.error(response.data)
+      }
+    })
+  }
+
+  const accept = () => {
+    acceptSale(saleId).then((response) => {
+      if (response.status) {
+        toast.success('Accepted Successfully!')
+        getSale(saleId)
+      } else {
+        toast.error(response.data)
+      }
+    })
+  }
+
   function getInspectors() {
     //TODO: Handle case for vin already existing
     const data = { vin: sale.vehicle_info.vin, color: 'black' }
@@ -354,16 +380,25 @@ function SalesProfilePage({ pageId }) {
                 <div className="button-group">
                   <Button
                     text="Create Inspection"
-                    width={150}
+                    width={155}
                     outlined={true}
                     onClick={() => getInspectors()}
                   />
                   <Button
+                    text="Accept Sale"
+                    width={150}
+                    outlined={true}
+                    marginLeft="16px"
+                    bgColor={t.alertSuccess}
+                    onClick={accept}
+                  />
+                  <Button
                     text="Reject Sale"
-                    width={170}
+                    width={150}
                     outlined={true}
                     marginLeft="16px"
                     bgColor={t.alertError}
+                    onClick={reject}
                   />
                 </div>
               </ActionBar>
