@@ -259,12 +259,24 @@ function SalesProfilePage({ pageId }) {
   }
 
   function getInspectors() {
-    //TODO: Handle case for vin already existing
-    const data = { vin: sale.vehicle_info.vin, color: 'black' }
+    const data = { vin: sale.vehicle_info.vin, colour: 'black' }
     createCar(data)
       .then((response) => {
         if (response.status) {
           toast.success('Created Car Successfully!')
+          setCarData(response.data)
+          retrieveInspectors()
+            .then((response) => {
+              if (response.status) {
+                setInspectors(response.data?.results || [])
+                showModal('createInspection', 'Add Inspection')
+              } else {
+                toast.error(response.data)
+              }
+            })
+            .catch((error) => {
+              toast.error(error.data)
+            })
         } else {
           toast.error(response.data)
         }
@@ -274,18 +286,6 @@ function SalesProfilePage({ pageId }) {
       })
       .finally(() => {
         setIsSaving(false)
-        retrieveInspectors()
-          .then((response) => {
-            if (response.status) {
-              setInspectors(response.data?.results || [])
-              showModal('createInspection', 'Add Inspection')
-            } else {
-              toast.error(response.data)
-            }
-          })
-          .catch((error) => {
-            toast.error(error.data)
-          })
       })
   }
 
