@@ -37,6 +37,7 @@ import {
 } from '../../../services/inspection'
 import { createCar } from '../../../services/car'
 import { BuyingStates } from '../../../lib/enums'
+import { getColorName } from '../../../helpers/utils'
 
 function SalesProfilePage({ pageId }) {
   const router = useRouter()
@@ -176,6 +177,8 @@ function SalesProfilePage({ pageId }) {
   const [modalTagline, setModalTagline] = useState(
     ' Kindly provide the following information below.'
   )
+  const [color, setColour] = useState(null)
+  const [reason, setReason] = useState('')
 
   const showModal = (
     viewName: string,
@@ -237,10 +240,11 @@ function SalesProfilePage({ pageId }) {
   }
 
   const reject = () => {
-    rejectSale(saleId).then((response) => {
+    rejectSale(saleId, reason).then((response) => {
       if (response.status) {
         toast.success('Rejected Successfully!')
         getSale(saleId)
+        setModalState(false)
       } else {
         toast.error(response.data)
       }
@@ -259,7 +263,11 @@ function SalesProfilePage({ pageId }) {
   }
 
   function getInspectors() {
-    const data = { vin: sale.vehicle_info.vin, colour: 'black' }
+    showModal('setColor', 'Set Car Colour')
+  }
+
+  function proceedToCarCreation() {
+    const data = { vin: sale.vehicle_info.vin, colour: color }
     createCar(data)
       .then((response) => {
         if (response.status) {
@@ -401,7 +409,13 @@ function SalesProfilePage({ pageId }) {
                     outlined={true}
                     marginLeft="16px"
                     bgColor={t.alertError}
-                    onClick={reject}
+                    onClick={() =>
+                      showModal(
+                        'declineSale',
+                        'Decline Sale',
+                        'Please enter a reason for rejecting this sale'
+                      )
+                    }
                     disabled={sale.status === BuyingStates.Rejected}
                   />
                 </div>
@@ -565,6 +579,52 @@ function SalesProfilePage({ pageId }) {
                 <Typography variant="inherit" style={{ marginBottom: 20 }}>
                   {modalTitle !== '' ? modalTagline : ''} &nbsp;
                 </Typography>
+                {modalView === 'declineSale' && (
+                  <>
+                    <Flex style={{ marginBottom: '5px' }}>
+                      <TextField
+                        className="text-field"
+                        fullWidth
+                        placeholder="Color"
+                        error={reason === ''}
+                        label="Reason"
+                        type="text"
+                        variant="standard"
+                        onChange={(e) => setReason(e.target.value)}
+                      />
+                      <Button
+                        width={500}
+                        marginTop={'40px'}
+                        text="Proceed"
+                        onClick={reject}
+                        disabled={reason === null || reason === ''}
+                      />
+                    </Flex>
+                  </>
+                )}
+                {modalView === 'setColor' && (
+                  <>
+                    <Flex style={{ marginBottom: '5px' }}>
+                      <TextField
+                        className="text-field"
+                        fullWidth
+                        placeholder="Color"
+                        error={color === ''}
+                        label={color !== '' ? getColorName(color) : 'Color'}
+                        type="color"
+                        variant="standard"
+                        onChange={(e) => setColour(e.target.value)}
+                      />
+                      <Button
+                        width={500}
+                        marginTop={'40px'}
+                        text="Proceed"
+                        onClick={proceedToCarCreation}
+                        disabled={color === null}
+                      />
+                    </Flex>
+                  </>
+                )}
                 {modalView === 'createInspection' && (
                   <>
                     <InputGrid>

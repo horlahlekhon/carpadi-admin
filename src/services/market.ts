@@ -47,8 +47,8 @@ const retrieveSingleSell = (id) => {
         })
 }
 
-const rejectSale = (id) => {
-    return fetchWrapper.patch(`${baseUrl}/sell/${id}/`, {status: BuyingStates.Rejected})
+const rejectSale = (id, reason) => {
+    return fetchWrapper.patch(`${baseUrl}/sell/${id}/`, {status: BuyingStates.Rejected, decline_reason: reason})
         .then((response) => {
             return {status: true, data: response}
         })
