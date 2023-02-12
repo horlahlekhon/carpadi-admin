@@ -22,7 +22,7 @@ import { usePagination } from '@material-ui/lab/Pagination'
 import CPToast from '../../../components/shared/CPToast'
 import CreateSale from '../../../components/shared/CreateSale'
 import { toast } from 'react-hot-toast'
-import { retrieveSell } from '../../../services/market'
+import { retrieveSell, retrieveSellStats } from '../../../services/market'
 import { formatDate, formatNumber } from '../../../helpers/formatters'
 import Loader from '../../../components/layouts/core/Loader'
 import { BuyingStates } from '../../../lib/enums'
@@ -45,6 +45,7 @@ function BuyingPage() {
     previous: null
   })
   const [pageLoading, setPageLoading] = useState(false)
+  const [stats, setStats] = useState({ declined: 0, accepted: 0, pending: 0 })
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage - 1)
@@ -82,7 +83,13 @@ function BuyingPage() {
     setSelected(sale)
   }
 
-  const retrieveSaleStats = () => {}
+  const retrieveSaleStats = () => {
+    retrieveSellStats().then((response) => {
+      if (response.status) {
+        setStats(response.data)
+      }
+    })
+  }
 
   const getSales = (saleStatus = selectedSales, page = 0) => {
     setPageLoading(true)
@@ -152,87 +159,121 @@ function BuyingPage() {
               }}
             ></div>
           </Breadcrumbs>
-          <Grid container spacing={3} style={{marginTop: 21, marginBottom: 15}}>
-                        <Grid item xs={4}>
-                            <StatsCard
-                                onClick={() => {
-                                    selectSale(BuyingStates.Pending)
-                                    setPage(0);
-                                    getSales(BuyingStates.Pending)
-                                }}
-                                style={{
-                                    border:
-                                        selectedSales === BuyingStates.Pending ? '3px solid #00AEEF' : 'none'
-                                }}
-                            >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedSales == BuyingStates.Pending ? 'primary' : 'inherit'}
-                                >
-                                    Pending
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedSales == BuyingStates.Pending ? 'primary' : 'inherit'}
-                                >
-                                    NA
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        <Grid item xs={4}>
-                            <StatsCard
-                                onClick={() => {
-                                    selectSale(BuyingStates.Accepted)
-                                    setPage(0);
-                                    getSales(BuyingStates.Accepted)
-                                }}
-                                style={{
-                                    border:
-                                        selectedSales === BuyingStates.Accepted ? '3px solid #00AEEF' : 'none'
-                                }}
-                            >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedSales == BuyingStates.Accepted ? 'primary' : 'inherit'}
-                                >
-                                    Accepted
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedSales == BuyingStates.Accepted ? 'primary' : 'inherit'}
-                                >
-                                    NA
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                        
-                        <Grid item xs={4}>
-                            <StatsCard
-                                onClick={() => {
-                                    selectSale(BuyingStates.Rejected)
-                                    setPage(0);
-                                    getSales(BuyingStates.Rejected)
-                                }}
-                                style={{
-                                    border:
-                                        selectedSales === BuyingStates.Rejected ? '3px solid #00AEEF' : 'none'
-                                }}
-                            >
-                                <Typography
-                                    variant="inherit"
-                                    color={selectedSales == BuyingStates.Rejected ? 'primary' : 'inherit'}
-                                >
-                                    Rejected
-                                </Typography>
-                                <Typography
-                                    variant="h5"
-                                    color={selectedSales == BuyingStates.Rejected ? 'primary' : 'inherit'}
-                                >
-                                    NA
-                                </Typography>
-                            </StatsCard>
-                        </Grid>
-                    </Grid>
+          <Grid
+            container
+            spacing={3}
+            style={{ marginTop: 21, marginBottom: 15 }}
+          >
+            <Grid item xs={4}>
+              <StatsCard
+                onClick={() => {
+                  selectSale(BuyingStates.Pending)
+                  setPage(0)
+                  getSales(BuyingStates.Pending)
+                }}
+                style={{
+                  border:
+                    selectedSales === BuyingStates.Pending
+                      ? '3px solid #00AEEF'
+                      : 'none'
+                }}
+              >
+                <Typography
+                  variant="inherit"
+                  color={
+                    selectedSales == BuyingStates.Pending
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  Pending
+                </Typography>
+                <Typography
+                  variant="h5"
+                  color={
+                    selectedSales == BuyingStates.Pending
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  {stats.pending}
+                </Typography>
+              </StatsCard>
+            </Grid>
+            <Grid item xs={4}>
+              <StatsCard
+                onClick={() => {
+                  selectSale(BuyingStates.Accepted)
+                  setPage(0)
+                  getSales(BuyingStates.Accepted)
+                }}
+                style={{
+                  border:
+                    selectedSales === BuyingStates.Accepted
+                      ? '3px solid #00AEEF'
+                      : 'none'
+                }}
+              >
+                <Typography
+                  variant="inherit"
+                  color={
+                    selectedSales == BuyingStates.Accepted
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  Accepted
+                </Typography>
+                <Typography
+                  variant="h5"
+                  color={
+                    selectedSales == BuyingStates.Accepted
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  {stats.accepted}
+                </Typography>
+              </StatsCard>
+            </Grid>
+
+            <Grid item xs={4}>
+              <StatsCard
+                onClick={() => {
+                  selectSale(BuyingStates.Rejected)
+                  setPage(0)
+                  getSales(BuyingStates.Rejected)
+                }}
+                style={{
+                  border:
+                    selectedSales === BuyingStates.Rejected
+                      ? '3px solid #00AEEF'
+                      : 'none'
+                }}
+              >
+                <Typography
+                  variant="inherit"
+                  color={
+                    selectedSales == BuyingStates.Rejected
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  Rejected
+                </Typography>
+                <Typography
+                  variant="h5"
+                  color={
+                    selectedSales == BuyingStates.Rejected
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  {stats.declined}
+                </Typography>
+              </StatsCard>
+            </Grid>
+          </Grid>
           <TableCard>
             <TableContainer>
               <Table style={{ minWidth: 650 }} aria-label="simple table">

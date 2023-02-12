@@ -4,6 +4,7 @@ import { BuyingStates } from '../lib/enums';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/market`;
+const bBaseUrl = `${publicRuntimeConfig.apiUrl}`;
 
 const retrieveBuying = (limit = 10, offset = 0, status = 'active') => {
 
@@ -67,8 +68,18 @@ const acceptSale = (id) => {
         })
 }
 
-const createInspection = (id, data) => {
-    return fetchWrapper.post(`${baseUrl}/sell/${id}/approve/`, data)
+const retrieveSellStats = (limit = 10, offset = 1, ordering = "") => {
+    return fetchWrapper.get(`${bBaseUrl}/admins/dashboards/sell`)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
+
+const retrieveBuyStats = (limit = 10, offset = 1, ordering = "") => {
+    return fetchWrapper.get(`${bBaseUrl}/admins/dashboards/car-products`)
         .then((response) => {
             return {status: true, data: response}
         })
@@ -84,5 +95,6 @@ export {
     retrieveSingleSell,
     acceptSale,
     rejectSale,
-    createInspection
+    retrieveBuyStats,
+    retrieveSellStats
 }
