@@ -58,7 +58,7 @@ const rejectSale = (id, reason) => {
 }
 
 const acceptSale = (id) => {
-    return fetchWrapper.patch(`${baseUrl}/sell/${id}/`, {status: BuyingStates.Accepted})
+    return fetchWrapper.post(`${baseUrl}/sell/${id}/approve/`, {})
         .then((response) => {
             return {status: true, data: response}
         })
@@ -67,6 +67,15 @@ const acceptSale = (id) => {
         })
 }
 
+const createInspection = (id, data) => {
+    return fetchWrapper.post(`${baseUrl}/sell/${id}/approve/`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error};
+        })
+}
 
 export {
     retrieveBuying,
@@ -74,5 +83,6 @@ export {
     retrieveSell,
     retrieveSingleSell,
     acceptSale,
-    rejectSale
+    rejectSale,
+    createInspection
 }

@@ -22,6 +22,7 @@ import {
   retrieveSingleSell
 } from '../../../services/market'
 import {
+  formatDate,
   formatNumber,
   humanReadableDate,
   trimString
@@ -55,6 +56,56 @@ function SalesProfilePage({ pageId }) {
       phone: null,
       email: null
     },
+    car: {
+      id: '94751013-5db6-4c1a-a3d3-c82c6bd1200d',
+      maintenance_cost: 0,
+      total_cost: 0,
+      pictures: [],
+      vin: null,
+      information: {
+        id: null,
+        engine: null,
+        transmission: null,
+        car_type: null,
+        fuel_type: null,
+        mileage: 0,
+        age: 0,
+        description: null,
+        trim: null,
+        manufacturer: null,
+        vin: null,
+        brand: {
+          id: null,
+          created: null,
+          modified: null,
+          name: null,
+          model: null,
+          year: 0
+        },
+        created: null,
+        modified: null,
+        specifications: null,
+        drive_type: null,
+        last_service_date: null,
+        last_service_mileage: null,
+        previous_owners: null,
+        num_of_cylinders: null,
+        engine_power: null,
+        torque: null
+      },
+      status: null,
+      bought_price: null,
+      inspection: null,
+      created: null,
+      modified: null,
+      colour: null,
+      cost_of_repairs: null,
+      resale_price: null,
+      margin: null,
+      description: null,
+      name: null,
+      licence_plate: null
+    },
     created: null,
     modified: null,
     licence_plate: null,
@@ -69,38 +120,7 @@ function SalesProfilePage({ pageId }) {
     inspection: null,
     inspection_location: null,
     contact_preference: null,
-    is_negotiable: false,
-    vehicle_info: {
-      id: null,
-      engine: null,
-      transmission: null,
-      car_type: null,
-      fuel_type: null,
-      mileage: 0,
-      age: 0,
-      description: null,
-      trim: null,
-      manufacturer: null,
-      vin: null,
-      brand: {
-        id: null,
-        created: null,
-        modified: null,
-        model: null,
-        name: null,
-        year: null
-      },
-      created: null,
-      modified: null,
-      specifications: null,
-      drive_type: null,
-      last_service_date: null,
-      last_service_mileage: null,
-      previous_owners: null,
-      num_of_cylinders: null,
-      engine_power: null,
-      torque: null
-    }
+    is_negotiable: false
   })
   const [car, setCarData] = useState({
     id: null,
@@ -267,33 +287,17 @@ function SalesProfilePage({ pageId }) {
   }
 
   function proceedToCarCreation() {
-    const data = { vin: sale.vehicle_info.vin, colour: color }
-    createCar(data)
+    retrieveInspectors()
       .then((response) => {
         if (response.status) {
-          toast.success('Created Car Successfully!')
-          setCarData(response.data)
-          retrieveInspectors()
-            .then((response) => {
-              if (response.status) {
-                setInspectors(response.data?.results || [])
-                showModal('createInspection', 'Add Inspection')
-              } else {
-                toast.error(response.data)
-              }
-            })
-            .catch((error) => {
-              toast.error(error.data)
-            })
+          setInspectors(response.data?.results || [])
+          showModal('createInspection', 'Add Inspection')
         } else {
           toast.error(response.data)
         }
       })
       .catch((error) => {
-        toast.error(error)
-      })
-      .finally(() => {
-        setIsSaving(false)
+        toast.error(error.data)
       })
   }
 
@@ -302,7 +306,7 @@ function SalesProfilePage({ pageId }) {
       ...newInspection,
       inspection_date: Moment(newInspection?.inspection_date).toISOString(),
       inspector: inspectorId,
-      car: car?.id
+      car: sale?.car!.id
     }
     setIsSaving(true)
     createInspection(data)
@@ -324,8 +328,8 @@ function SalesProfilePage({ pageId }) {
   }
 
   function viewInspectionReport() {
-    if (sale?.inspection?.id) {
-      retrieveInspection(sale.inspection.id)
+    if (sale?.car?.inspection?.id) {
+      retrieveInspection(sale.car.inspection.id)
         .then((response) => {
           if (response.status) {
             setInspection(response.data)
@@ -388,12 +392,28 @@ function SalesProfilePage({ pageId }) {
             <Body>
               <ActionBar>
                 <div className="button-group">
-                  <Button
-                    text="Create Inspection"
-                    width={155}
-                    outlined={true}
-                    onClick={() => getInspectors()}
-                  />
+                  {(sale?.car !== null && sale?.car?.inspection !== null) && (
+                    <>
+                      <Button
+                        text="View Inspection"
+                        width={155}
+                        outlined={true}
+                        onClick={viewInspectionReport}
+                      />
+                    </>
+                  )}
+                  {(sale?.car === null || sale?.car?.inspection === null) && (
+                    <>
+                      <Button
+                        text="Create Inspection"
+                        width={155}
+                        outlined={true}
+                        disabled={sale.status !== BuyingStates.Accepted}
+                        title="Sale must be approved"
+                        onClick={() => getInspectors()}
+                      />
+                    </>
+                  )}
                   <Button
                     text="Accept Sale"
                     width={150}
@@ -424,7 +444,7 @@ function SalesProfilePage({ pageId }) {
                 Highlight
               </Typography>
               <p style={{ marginBottom: 10 }}>
-                Vehicle Description: {sale?.vehicle_info.description}
+                Vehicle Description: {sale?.car?.description}
               </p>
               <p style={{ marginBottom: 40 }}>Note: {sale?.note}</p>
               <PriceSection container spacing={3}>
@@ -500,38 +520,46 @@ function SalesProfilePage({ pageId }) {
                   <Detail>
                     <div className="key">Date Added</div>
                     <div className="value">
-                      {humanReadableDate(sale?.vehicle_info?.created)}
+                      {humanReadableDate(sale?.car?.information?.created)}
                     </div>
                   </Detail>
                   <Detail>
                     <div className="key">VIN</div>
-                    <div className="value">{sale?.vehicle_info?.vin}</div>
+                    <div className="value">{sale?.car?.information?.vin}</div>
                   </Detail>
                   <Detail>
                     <div className="key">Engine</div>
-                    <div className="value">{sale?.vehicle_info?.engine}</div>
+                    <div className="value">
+                      {sale?.car?.information?.engine}
+                    </div>
                   </Detail>
                   <Detail>
                     <div className="key">Transmission</div>
                     <div className="value">
-                      {sale?.vehicle_info?.transmission}
+                      {sale?.car?.information?.transmission}
                     </div>
                   </Detail>
                   <Detail>
                     <div className="key">Vehicle Type</div>
-                    <div className="value">{sale?.vehicle_info?.car_type}</div>
+                    <div className="value">
+                      {sale?.car?.information?.car_type}
+                    </div>
                   </Detail>
                   <Detail>
                     <div className="key">Fuel Type</div>
-                    <div className="value">{sale?.vehicle_info?.fuel_type}</div>
+                    <div className="value">
+                      {sale?.car?.information?.fuel_type}
+                    </div>
                   </Detail>
                   <Detail>
                     <div className="key">Vehicle Age</div>
-                    <div className="value">{sale?.vehicle_info?.age}</div>
+                    <div className="value">{sale?.car?.information?.age}</div>
                   </Detail>
                   <Detail>
                     <div className="key">Mileage</div>
-                    <div className="value">{sale?.vehicle_info?.mileage}</div>
+                    <div className="value">
+                      {sale?.car?.information?.mileage}
+                    </div>
                   </Detail>
                   <Typography variant="h6" color="secondary">
                     Brand Information
@@ -539,19 +567,19 @@ function SalesProfilePage({ pageId }) {
                   <Detail>
                     <div className="key">Brand</div>
                     <div className="value">
-                      {sale?.vehicle_info?.brand?.name}
+                      {sale?.car?.information?.brand?.name}
                     </div>
                   </Detail>
                   <Detail>
                     <div className="key">Model</div>
                     <div className="value">
-                      {sale?.vehicle_info?.brand?.model}
+                      {sale?.car?.information?.brand?.model}
                     </div>
                   </Detail>
                   <Detail>
                     <div className="key">Year</div>
                     <div className="value">
-                      {sale?.vehicle_info?.brand?.year}
+                      {sale?.car?.information?.brand?.year}
                     </div>
                   </Detail>
                 </Grid>
@@ -761,6 +789,110 @@ function SalesProfilePage({ pageId }) {
                       onClick={() => addInspection()}
                     />
                   </>
+                )}
+                {modalView === 'vehicleInspectionReport' && (
+                  <div style={{ maxWidth: 980 }}>
+                    <HeaderText variant="inherit" style={{ marginTop: '40px' }}>
+                      Inspection Report for
+                    </HeaderText>
+                    <InfoSection container spacing={3}>
+                      <Grid item xs={12} style={{ display: 'flex' }}>
+                        <VehicleDetails style={{ width: 700 }}>
+                          <img
+                            loading="lazy"
+                            src={
+                              sale?.car?.pictures.length > 0 ? sale?.car.pictures[0] : null
+                            }
+                            width={185}
+                            height={135}
+                            alt={car?.name}
+                            style={{ borderRadius: '8px' }}
+                          />
+                          <div className="stats">
+                            <img
+                              loading="lazy"
+                              src="/images/Toyota-Full.png"
+                              width={80}
+                              height={22}
+                              style={{ marginBottom: -15 }}
+                            />
+                            <Typography variant="h5" className="trade">
+                              {trimString(inspection?.id || 'NA')}
+                            </Typography>
+                            <Typography variant="h6">
+                              {car?.name || 'NA'}
+                            </Typography>
+                          </div>
+                        </VehicleDetails>
+                        <Button
+                          text="View Full Report"
+                          width={150}
+                          outlined={true}
+                          onClick={() => handleNavigation('/')}
+                        />
+                      </Grid>
+                    </InfoSection>
+                    <div
+                      style={{
+                        width: '80%',
+                        marginRight: 'auto',
+                        marginLeft: 'auto',
+                        padding: '16px',
+                        border: `2px dashed ${t.lightGrey}`,
+                        borderRadius: '10px'
+                      }}
+                    >
+                      {/*<Typography variant='h6'>Inspection Summary</Typography>*/}
+                      <div className="content">
+                        <Grid item xs={12} style={{ marginTop: -10 }}>
+                          <Statistic>
+                            <div className="key">Status</div>
+                            <div className="value">{inspection?.status}</div>
+                          </Statistic>
+                          <Statistic>
+                            <div className="key">Owner’s Name</div>
+                            <div className="value">
+                              {trimString(inspection?.owners_name, 25) || 'NA'}
+                            </div>
+                          </Statistic>
+                          <Statistic>
+                            <div className="key">Owners Phone</div>
+                            <div className="value">
+                              {inspection?.owners_phone}
+                            </div>
+                          </Statistic>
+                          <Statistic>
+                            <div className="key">Inspector</div>
+                            <div className="value">
+                              {inspection?.inspector?.username || 'NA'}
+                            </div>
+                          </Statistic>
+                          <Statistic>
+                            <div className="key">Inspection Date</div>
+                            <div className="value">
+                              {formatDate(inspection?.inspection_date)}
+                            </div>
+                          </Statistic>
+                          <Statistic>
+                            <div className="key">Inspection Verdict</div>
+                            <div className="value">
+                              {inspection?.inspection_verdict}
+                            </div>
+                          </Statistic>
+                          <Statistic>
+                            <div className="key">Address</div>
+                            <div className="value">{inspection?.address}</div>
+                          </Statistic>
+                          <Statistic>
+                            <div className="key">Owners Review</div>
+                            <div className="value">
+                              {inspection?.owners_review || 'NA'}
+                            </div>
+                          </Statistic>
+                        </Grid>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </ModalBody>
             </Modal>
@@ -1065,5 +1197,44 @@ const ActionBar = styled.div`
     flex-direction: row;
     align-items: center;
     margin-right: auto;
+  }
+`
+
+const Statistic = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  margin-top: 20px;
+  padding-bottom: 5px;
+  font-size: 16px;
+  border-bottom: 1px solid ${t.extraLiteGrey};
+  width: 100%;
+
+  .value {
+    font-weight: bold;
+  }
+`
+
+const VehicleDetails = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  width: 800px;
+  margin-bottom: 27px;
+
+  .stats {
+    height: 100%;
+    margin-left: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .trade {
+      color: ${t.primaryBlue};
+      margin-top: 36px;
+      margin-bottom: 17px;
+    }
   }
 `
