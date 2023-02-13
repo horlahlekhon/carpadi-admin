@@ -1,4 +1,4 @@
-import MainLayout from '../../components/layouts/MainLayout'
+import MainLayout from '../../../components/layouts/MainLayout'
 import styled from 'styled-components'
 import {
   Avatar,
@@ -13,23 +13,21 @@ import {
   Typography,
   withStyles
 } from '@material-ui/core'
-import { t } from '../../styles/theme'
+import { t } from '../../../styles/theme'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import Button from '../../components/shared/Button'
+import Button from '../../../components/shared/Button'
 import { makeStyles } from '@material-ui/styles'
 import { usePagination } from '@material-ui/lab/Pagination'
-import CPToast from '../../components/shared/CPToast'
-import CreateSale from '../../components/shared/CreateSale'
+import CPToast from '../../../components/shared/CPToast'
+import CreateSale from '../../../components/shared/CreateSale'
 import { toast } from 'react-hot-toast'
-import { retrieveSales } from '../../services/sale'
-import { formatDate, formatNumber, trimString } from '../../helpers/formatters'
-import Loader from '../../components/layouts/core/Loader'
-import { applyTransformation } from '../../services/upload'
-import { randomColor } from '../../helpers/condeGenerators'
-import { retrieveBuyStats } from '../../services/market'
+import { retrieveSell, retrieveSellStats } from '../../../services/market'
+import { formatDate, formatNumber } from '../../../helpers/formatters'
+import Loader from '../../../components/layouts/core/Loader'
+import { BuyingStates } from '../../../lib/enums'
 
-function SalesPage() {
+function BuyingPage() {
   enum Sales {
     ACTIVE = 'active',
     INACTIVE = 'inactive'
@@ -37,7 +35,7 @@ function SalesPage() {
 
   const rowsPerPage = 10
   const router = useRouter()
-  const [selectedSales, setSelected] = useState(Sales.ACTIVE)
+  const [selectedSales, setSelected] = useState(BuyingStates.Pending)
   const [page, setPage] = useState(0)
   const [createSale, setCreateSale] = useState(false)
   const [sales, setSales] = useState([])
@@ -46,26 +44,12 @@ function SalesPage() {
     next: null,
     previous: null
   })
-  const [stats, setStats] = useState({ active: 0, inactive: 0 })
-  const [saleStats, setSaleStats] = useState({
-    active_trades: {
-      trading_users: 0,
-      active_trades: 0
-    },
-    sold_trades: {
-      trading_users: 0,
-      sold_trades: 0
-    },
-    closed_trades: {
-      trading_users: 0,
-      closed_trades: 0
-    }
-  })
   const [pageLoading, setPageLoading] = useState(false)
+  const [stats, setStats] = useState({ declined: 0, accepted: 0, pending: 0 })
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage - 1)
-    getSales(selectedSales.valueOf(), (newPage - 1) * rowsPerPage)
+    getSales(selectedSales, (newPage - 1) * rowsPerPage)
   }
 
   const handleNavigation = (action: string) => {
@@ -95,21 +79,21 @@ function SalesPage() {
 
   const classes = useStyles()
 
-  const selectSale = (sale: Sales) => {
+  const selectSale = (sale: BuyingStates) => {
     setSelected(sale)
   }
 
   const retrieveSaleStats = () => {
-    retrieveBuyStats().then((response) => {
+    retrieveSellStats().then((response) => {
       if (response.status) {
         setStats(response.data)
       }
     })
   }
 
-  const getSales = (saleStatus = 'active', page = 0) => {
+  const getSales = (saleStatus = selectedSales, page = 0) => {
     setPageLoading(true)
-    retrieveSales(rowsPerPage, page, saleStatus)
+    retrieveSell(rowsPerPage, page, saleStatus)
       .then((response) => {
         if (response.status) {
           setSales(response.data.results)
@@ -150,19 +134,10 @@ function SalesPage() {
           )}
           <Header>
             <Typography variant="h4">
-              <b>Selling</b>
+              <b>Buying</b>
             </Typography>
-            <Button
-              text="Add Car to Sales Platform"
-              width={210}
-              fontSize="13px"
-              outlined={true}
-              onClick={() => {
-                setCreateSale(true)
-              }}
-            />
           </Header>
-          <Breadcrumbs>
+          <Breadcrumbs style={{ marginBottom: '32px' }}>
             <img
               loading="lazy"
               src="/icons/Vehicle-Blue.svg"
@@ -172,10 +147,10 @@ function SalesPage() {
             />
             <div
               onClick={() => {
-                handleNavigation('sales')
+                handleNavigation('sales/buying')
               }}
             >
-              <span className="text">Selling</span>
+              <span className="text">Buying</span>
               <span className="separator"></span>
             </div>
             <div
@@ -189,44 +164,52 @@ function SalesPage() {
             spacing={3}
             style={{ marginTop: 21, marginBottom: 15 }}
           >
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <StatsCard
                 onClick={() => {
-                  selectSale(Sales.ACTIVE)
+                  selectSale(BuyingStates.Pending)
                   setPage(0)
-                  getSales('active')
+                  getSales(BuyingStates.Pending)
                 }}
                 style={{
                   border:
-                    selectedSales === Sales.ACTIVE
+                    selectedSales === BuyingStates.Pending
                       ? '3px solid #00AEEF'
                       : 'none'
                 }}
               >
                 <Typography
                   variant="inherit"
-                  color={selectedSales == Sales.ACTIVE ? 'primary' : 'inherit'}
+                  color={
+                    selectedSales == BuyingStates.Pending
+                      ? 'primary'
+                      : 'inherit'
+                  }
                 >
-                  Active
+                  Pending
                 </Typography>
                 <Typography
                   variant="h5"
-                  color={selectedSales == Sales.ACTIVE ? 'primary' : 'inherit'}
+                  color={
+                    selectedSales == BuyingStates.Pending
+                      ? 'primary'
+                      : 'inherit'
+                  }
                 >
-                  {stats.active}
+                  {stats.pending}
                 </Typography>
               </StatsCard>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={4}>
               <StatsCard
                 onClick={() => {
-                  selectSale(Sales.INACTIVE)
+                  selectSale(BuyingStates.Accepted)
                   setPage(0)
-                  getSales('inactive')
+                  getSales(BuyingStates.Accepted)
                 }}
                 style={{
                   border:
-                    selectedSales === Sales.INACTIVE
+                    selectedSales === BuyingStates.Accepted
                       ? '3px solid #00AEEF'
                       : 'none'
                 }}
@@ -234,18 +217,59 @@ function SalesPage() {
                 <Typography
                   variant="inherit"
                   color={
-                    selectedSales == Sales.INACTIVE ? 'primary' : 'inherit'
+                    selectedSales == BuyingStates.Accepted
+                      ? 'primary'
+                      : 'inherit'
                   }
                 >
-                  Inctive
+                  Accepted
                 </Typography>
                 <Typography
                   variant="h5"
                   color={
-                    selectedSales == Sales.INACTIVE ? 'primary' : 'inherit'
+                    selectedSales == BuyingStates.Accepted
+                      ? 'primary'
+                      : 'inherit'
                   }
                 >
-                  {stats.inactive}
+                  {stats.accepted}
+                </Typography>
+              </StatsCard>
+            </Grid>
+
+            <Grid item xs={4}>
+              <StatsCard
+                onClick={() => {
+                  selectSale(BuyingStates.Rejected)
+                  setPage(0)
+                  getSales(BuyingStates.Rejected)
+                }}
+                style={{
+                  border:
+                    selectedSales === BuyingStates.Rejected
+                      ? '3px solid #00AEEF'
+                      : 'none'
+                }}
+              >
+                <Typography
+                  variant="inherit"
+                  color={
+                    selectedSales == BuyingStates.Rejected
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  Rejected
+                </Typography>
+                <Typography
+                  variant="h5"
+                  color={
+                    selectedSales == BuyingStates.Rejected
+                      ? 'primary'
+                      : 'inherit'
+                  }
+                >
+                  {stats.declined}
                 </Typography>
               </StatsCard>
             </Grid>
@@ -256,58 +280,47 @@ function SalesPage() {
                 <TableHead>
                   <TableRow>
                     <TableCell>No</TableCell>
-                    <TableCell align="right">Image</TableCell>
+                    <TableCell align="right">Vehicle</TableCell>
+                    <TableCell align="right">Seller</TableCell>
                     <TableCell align="right">VIN</TableCell>
-                    <TableCell align="right">Make</TableCell>
-                    <TableCell align="right">Model</TableCell>
+                    <TableCell align="right">Plate</TableCell>
                     <TableCell align="right">Year</TableCell>
                     <TableCell align="right">Fuel Type</TableCell>
-                    <TableCell align="right">Selling Price</TableCell>
+                    <TableCell align="right">Price</TableCell>
                     <TableCell align="right">Date Listed</TableCell>
                     <TableCell align="right">&nbsp;</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {sales.map((row, idx) => (
-                    <TableRow
-                      key={idx}
-                      // style={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                    >
+                    <TableRow key={idx}>
                       <TableCell component="th" scope="row">
                         {idx + 1 + (page > 0 ? rowsPerPage / page : 0)}
                       </TableCell>
                       <TableCell component="th" scope="row">
-                        {/*<img loading="lazy" src={row?.product_images.length > 0 ? applyTransformation(row?.product_images[0], 48, 48) : null}*/}
-                        {/*     width={48} height={48} alt={trimString(row?.id)}/>*/}
-                        <Avatar
-                          alt={trimString(row?.id)}
-                          style={{
-                            width: '48px',
-                            height: '48px',
-                            backgroundColor: randomColor(),
-                            borderRadius: 0
-                          }}
-                          src={
-                            row.product_images.length > 0
-                              ? applyTransformation(
-                                  row.product_images[0],
-                                  48,
-                                  48
-                                )
-                              : null
-                          }
-                        >
-                          {String(row?.car?.name).slice(0, 2).toUpperCase() ||
-                            'NA'}
-                        </Avatar>
+                        {row?.vehicle_info?.manufacturer || 'NA'} (
+                        {row?.vehicle_info?.brand?.model || 'NA'})
                       </TableCell>
-                      <TableCell align="right">{row?.car?.vin}</TableCell>
-                      <TableCell align="right">{row?.car?.make}</TableCell>
-                      <TableCell align="right">{row?.car?.model}</TableCell>
-                      <TableCell align="right">{row?.car?.year}</TableCell>
-                      <TableCell align="right">{row?.car?.fuel_type}</TableCell>
                       <TableCell align="right">
-                        &#8358;{formatNumber(row?.selling_price)}
+                        {row?.seller?.first_name} {row?.seller?.last_name}
+                      </TableCell>
+                      <TableCell align="right">
+                        {row?.vehicle_info?.vin}
+                      </TableCell>
+                      <TableCell
+                        align="right"
+                        style={{ textTransform: 'uppercase' }}
+                      >
+                        {row?.licence_plate}
+                      </TableCell>
+                      <TableCell align="right">
+                        {row?.vehicle_info?.brand?.year}
+                      </TableCell>
+                      <TableCell align="right">
+                        {row?.vehicle_info?.fuel_type}
+                      </TableCell>
+                      <TableCell align="right">
+                        &#8358;{formatNumber(row?.price)}
                       </TableCell>
                       <TableCell align="right">
                         {formatDate(row?.created)}
@@ -317,7 +330,9 @@ function SalesPage() {
                           text="View"
                           width={66}
                           outlined={true}
-                          onClick={() => handleNavigation(`sales/${row.id}`)}
+                          onClick={() =>
+                            handleNavigation(`/sales/buying/${row.id}`)
+                          }
                         />
                       </TableCell>
                     </TableRow>
@@ -404,9 +419,9 @@ function SalesPage() {
   )
 }
 
-export default SalesPage
+export default BuyingPage
 
-SalesPage.getLayout = function getLayout(page) {
+BuyingPage.getLayout = function getLayout(page) {
   return <MainLayout>{page}</MainLayout>
 }
 

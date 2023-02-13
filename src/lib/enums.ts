@@ -102,6 +102,12 @@ enum RequiredCarDocuments {
     OwnerInformation = "owner_identification"
 }
 
+enum BuyingStates {
+    Accepted = "accepted",
+    Pending = "pending",
+    Rejected = "declined",
+}
+
 export {
     CarStates,
     TradeStates,
@@ -113,5 +119,6 @@ export {
     UploadTypes,
     ActivityTypes,
     TransactionStates,
-    RequiredCarDocuments
+    RequiredCarDocuments,
+    BuyingStates
 }
