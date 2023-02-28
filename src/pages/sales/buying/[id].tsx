@@ -39,6 +39,7 @@ import {
 import { createCar } from '../../../services/car'
 import { BuyingStates } from '../../../lib/enums'
 import { getColorName } from '../../../helpers/utils'
+import ColorPickerDropdown from '../../../components/charts/ColorPickerDropdown'
 
 function SalesProfilePage({ pageId }) {
   const router = useRouter()
@@ -392,7 +393,7 @@ function SalesProfilePage({ pageId }) {
             <Body>
               <ActionBar>
                 <div className="button-group">
-                  {(sale?.car !== null && sale?.car?.inspection !== null) && (
+                  {sale?.car !== null && sale?.car?.inspection !== null && (
                     <>
                       <Button
                         text="View Inspection"
@@ -633,16 +634,32 @@ function SalesProfilePage({ pageId }) {
                 {modalView === 'setColor' && (
                   <>
                     <Flex style={{ marginBottom: '5px' }}>
-                      <TextField
-                        className="text-field"
-                        fullWidth
-                        placeholder="Color"
-                        error={color === ''}
-                        label={color !== '' ? getColorName(color) : 'Color'}
-                        type="color"
-                        variant="standard"
-                        onChange={(e) => setColour(e.target.value)}
-                      />
+                      <Flex
+                        style={{
+                          marginBottom: '5px',
+                          flexDirection: 'row',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <ColorPickerDropdown
+                          onChange={setColour}
+                          value={'#000'}
+                        />
+                        <div
+                          style={{
+                            width: 40,
+                            height: 20,
+                            backgroundColor: color,
+                            marginRight: 10,
+                            border: '1px solid black'
+                          }}
+                        />
+                        <div style={{ marginLeft: '5px' }}>
+                          {color !== '' && color !== null
+                            ? getColorName(color)
+                            : 'Color not selected'}
+                        </div>
+                      </Flex>
                       <Button
                         width={500}
                         marginTop={'40px'}
@@ -801,7 +818,9 @@ function SalesProfilePage({ pageId }) {
                           <img
                             loading="lazy"
                             src={
-                              sale?.car?.pictures.length > 0 ? sale?.car.pictures[0] : null
+                              sale?.car?.pictures.length > 0
+                                ? sale?.car.pictures[0]
+                                : null
                             }
                             width={185}
                             height={135}
