@@ -1,485 +1,557 @@
-import {FormControl, Modal, Select, TextField, Typography, withStyles} from "@material-ui/core";
-import Image from "next/image";
-import {t} from "../../styles/theme";
-import Button from "./Button";
-import {useRouter} from "next/router";
-import {useRef, useState} from "react";
-import {toast} from "react-hot-toast";
-import styled from "styled-components";
-import {retrieveVINDetails} from "../../services/vehicle";
-import {resizeFile, uploadFile} from "../../services/upload";
-import ntc from "../../lib/ntc";
-import {trimString} from "../../helpers/formatters";
-import {createCar} from "../../services/car";
-import {UploadTypes} from "../../lib/enums";
-import {getColorName} from "../../helpers/utils";
+import {
+  FormControl,
+  Modal,
+  Select,
+  TextField,
+  Typography,
+  withStyles
+} from '@material-ui/core'
+import Image from 'next/image'
+import { t } from '../../styles/theme'
+import Button from './Button'
+import { useRouter } from 'next/router'
+import { useRef, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import styled from 'styled-components'
+import { retrieveVINDetails } from '../../services/vehicle'
+import { resizeFile, uploadFile } from '../../services/upload'
+import ntc from '../../lib/ntc'
+import { trimString } from '../../helpers/formatters'
+import { createCar } from '../../services/car'
+import { UploadTypes } from '../../lib/enums'
+import { getColorName } from '../../helpers/utils'
+import ColorPickerDropdown from '../charts/ColorPickerDropdown'
 
-const AddCarProfile = ({modalOpen = true, onClick}) => {
-    const router = useRouter()
-    let [uploadedPictures, setUploadedPictures] = useState([]);
-    const [modalView, setModalView] = useState('createCarProfile')
-    const [carColor, setCarColor] = useState('')
-    const [transmissionType, setTransmissionType] = useState('')
-    const [seatNumber, setSeatNumber] = useState(4)
-    const [vin, setVin] = useState(null)
-    const [licence_plate, setPlate] = useState(null)
-    const [bought_price, setPrice] = useState(null)
-    const [car, setCar] = useState({
-            "engine": null,
-            "transmission": null,
-            "car_type": null,
-            "fuel_type": null,
-            "mileage": 0,
-            "age": 0,
-            "description": null,
-            "trim": null,
-            "year": 0,
-            "model": null,
-            "manufacturer": null,
-            "make": null,
-            "vin": vin
-        }
-    )
-    const [isLoading, setLoading] = useState(false)
-    const [isUploading, setisUploading] = useState(false)
-    const [fuelType, setFuelType] = useState('')
-    const options = {
-        createCarProfile: {
-            title: '',
-            description: ''
-        },
-        fetchedCarProfile: {
-            title: 'Fetched Car Profile',
-            description: ''
-        },
-        uploadCarImages: {
-            title: 'Upload Car Images',
-            description: 'Upload minimum of 3 images to complete profile '
-        }
+const AddCarProfile = ({ modalOpen = true, onClick }) => {
+  const router = useRouter()
+  let [uploadedPictures, setUploadedPictures] = useState([])
+  const [modalView, setModalView] = useState('createCarProfile')
+  const [carColor, setCarColor] = useState('')
+  const [transmissionType, setTransmissionType] = useState('')
+  const [seatNumber, setSeatNumber] = useState(4)
+  const [vin, setVin] = useState(null)
+  const [licence_plate, setPlate] = useState(null)
+  const [bought_price, setPrice] = useState(null)
+  const [car, setCar] = useState({
+    engine: null,
+    transmission: null,
+    car_type: null,
+    fuel_type: null,
+    mileage: 0,
+    age: 0,
+    description: null,
+    trim: null,
+    year: 0,
+    model: null,
+    manufacturer: null,
+    make: null,
+    vin: vin
+  })
+  const [isLoading, setLoading] = useState(false)
+  const [isUploading, setisUploading] = useState(false)
+  const [fuelType, setFuelType] = useState('')
+  const options = {
+    createCarProfile: {
+      title: '',
+      description: ''
+    },
+    fetchedCarProfile: {
+      title: 'Fetched Car Profile',
+      description: ''
+    },
+    uploadCarImages: {
+      title: 'Upload Car Images',
+      description: 'Upload minimum of 3 images to complete profile '
     }
+  }
 
-    const hiddenFileInput = useRef(null);
+  const hiddenFileInput = useRef(null)
 
-    const handleNavigation = (action: string) => {
-        router.push(`${action}`)
-            .then(() => {
-            })
-    }
+  const handleNavigation = (action: string) => {
+    router.push(`${action}`).then(() => {})
+  }
 
-    const handleFileClick = event => {
-        hiddenFileInput.current.click();
-    };
+  const handleFileClick = (event) => {
+    hiddenFileInput.current.click()
+  }
 
-    const handleFileChange = event => {
-        const fileUploaded = event.target.files;
-        handleFile(fileUploaded);
-    };
+  const handleFileChange = (event) => {
+    const fileUploaded = event.target.files
+    handleFile(fileUploaded)
+  }
 
-    const handleFile = (files) => {
-        files = Array.from(files)
-        const arr = files.map((a) => {
-            return {
-                secure_url: URL.createObjectURL(a),
-                file: a
-            }
-        })
-        setUploadedPictures([...uploadedPictures, ...arr])
-    }
+  const handleFile = (files) => {
+    files = Array.from(files)
+    const arr = files.map((a) => {
+      return {
+        secure_url: URL.createObjectURL(a),
+        file: a
+      }
+    })
+    setUploadedPictures([...uploadedPictures, ...arr])
+  }
 
-    const fetchCar = () => {
-        setLoading(true)
-        retrieveVINDetails(vin, {vin})
-            .then((response) => {
-                if (response.status) {
-                    setCar(response.data)
-                    setModalView('fetchedCarProfile')
-                } else {
-                    toast.error(response.data)
-                }
-            })
-            .catch((error) => {
-                toast.error(error.data)
-            })
-            .finally(() => {
-                setLoading(false)
-            })
-    }
-
-    function removePicture(id) {
-        const arr = uploadedPictures.filter(a => a.secure_url !== id);
-        setUploadedPictures(arr)
-    }
-
-    function setColor(colorCode) {
-        setCarColor(colorCode)
-    }
-
-    function saveCarProfile() {
-        setLoading(true)
-        setisUploading(true)
-        const data = {
-            "vin": vin,
-            "car_pictures": [],
-            "colour": carColor,
-            "licence_plate": licence_plate
-        }
-        if (bought_price) {
-            data['bought_price'] = bought_price
-        }
-        if (uploadedPictures.length > 0) {
-            uploadedPictures.forEach(async (picture) => {
-                const p = await resizeFile(picture?.file, {width: 950, height: 500, format: 'WEBP'})
-                // uploadFile(p, UploadTypes.CAR, vin)
-                //     .then((res) => {
-                //         if (res.status) {
-                //             data.car_pictures.push(res.data?.secure_url)
-                //         } else {
-                //             toast.error(res.data)
-                //         }
-                //     })
-                //     .catch((error) => {
-                //         toast.error(error)
-                //     })
-                const res = await uploadFile(p, UploadTypes.CAR, vin);
-                if (res.status) {
-                    data.car_pictures.push(res.data?.secure_url)
-                    if (data.car_pictures.length === uploadedPictures.length) {
-                        createCar(data)
-                            .then((response) => {
-                                if (response.status) {
-                                    toast.success('Created Successfully!')
-                                    onClick()
-                                    if (response.data?.id) {
-                                        handleNavigation(`/inventory/car-profile/${response.data.id}?status=car listings`)
-                                    }
-                                } else {
-                                    toast.error(response.data)
-                                }
-                            })
-                            .catch((error) => {
-                                toast.error(error)
-                            })
-                            .finally(() => {
-                                setisUploading(false)
-                                setLoading(false)
-                            })
-                    }
-                } else {
-                    toast.error(res.data)
-                }
-            })
+  const fetchCar = () => {
+    setLoading(true)
+    retrieveVINDetails(vin, { vin })
+      .then((response) => {
+        if (response.status) {
+          setCar(response.data)
+          setModalView('fetchedCarProfile')
         } else {
-            createCar(data)
-                .then((response) => {
-                    if (response.status) {
-                        toast.success('Created Successfully!')
-                        onClick()
-                        if (response.data?.id) {
-                            handleNavigation(`/inventory/car-profile/${response.data.id}?status=car listings`)
-                        }
-                    } else {
-                        toast.error(response.data)
-                    }
-                })
-                .catch((error) => {
-                    toast.error(error)
-                })
-                .finally(() => {
-                    setisUploading(false)
-                    setLoading(false)
-                })
+          toast.error(response.data)
         }
+      })
+      .catch((error) => {
+        toast.error(error.data)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
 
+  function removePicture(id) {
+    const arr = uploadedPictures.filter((a) => a.secure_url !== id)
+    setUploadedPictures(arr)
+  }
+
+  function setColor(colorCode) {
+    setCarColor(colorCode)
+  }
+
+  function saveCarProfile() {
+    setLoading(true)
+    setisUploading(true)
+    const data = {
+      vin: vin,
+      car_pictures: [],
+      colour: carColor,
+      licence_plate: licence_plate
     }
-
-    const setCarDetail = (key, value) => {
-        let c = {...car}
-        c[key] = value;
-        setCar(c)
+    if (bought_price) {
+      data['bought_price'] = bought_price
     }
+    if (uploadedPictures.length > 0) {
+      uploadedPictures.forEach(async (picture) => {
+        const p = await resizeFile(picture?.file, {
+          width: 950,
+          height: 500,
+          format: 'WEBP'
+        })
+        // uploadFile(p, UploadTypes.CAR, vin)
+        //     .then((res) => {
+        //         if (res.status) {
+        //             data.car_pictures.push(res.data?.secure_url)
+        //         } else {
+        //             toast.error(res.data)
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         toast.error(error)
+        //     })
+        const res = await uploadFile(p, UploadTypes.CAR, vin)
+        if (res.status) {
+          data.car_pictures.push(res.data?.secure_url)
+          if (data.car_pictures.length === uploadedPictures.length) {
+            createCar(data)
+              .then((response) => {
+                if (response.status) {
+                  toast.success('Created Successfully!')
+                  onClick()
+                  if (response.data?.id) {
+                    handleNavigation(
+                      `/inventory/car-profile/${response.data.id}?status=car listings`
+                    )
+                  }
+                } else {
+                  toast.error(response.data)
+                }
+              })
+              .catch((error) => {
+                toast.error(error)
+              })
+              .finally(() => {
+                setisUploading(false)
+                setLoading(false)
+              })
+          }
+        } else {
+          toast.error(res.data)
+        }
+      })
+    } else {
+      createCar(data)
+        .then((response) => {
+          if (response.status) {
+            toast.success('Created Successfully!')
+            onClick()
+            if (response.data?.id) {
+              handleNavigation(
+                `/inventory/car-profile/${response.data.id}?status=car listings`
+              )
+            }
+          } else {
+            toast.error(response.data)
+          }
+        })
+        .catch((error) => {
+          toast.error(error)
+        })
+        .finally(() => {
+          setisUploading(false)
+          setLoading(false)
+        })
+    }
+  }
 
-    // @ts-ignore
-    return (<>
-        <Modal
-            open={true}
-            onClose={() => {
-                onClick()
-            }}
-        >
-            <ModalBody>
-                <ModalBodyHeader>
-                    <Typography variant="h5" style={{fontWeight: 600}}>
-                        {options[modalView].title}
-                    </Typography>
-                    <Image
-                        src="/icons/Cancel-Black.svg"
-                        width={25}
-                        height={25}
-                        onClick={() => onClick()}
-                        style={{cursor: 'pointer'}}
-                    />
-                </ModalBodyHeader>
-                <Typography variant="inherit" style={{marginBottom: 20}}>
-                    {options[modalView].title !== ''
-                        ? options[modalView].description
-                        : ''}{' '}
-                    &nbsp;
+  const setCarDetail = (key, value) => {
+    let c = { ...car }
+    c[key] = value
+    setCar(c)
+  }
+
+  // @ts-ignore
+  return (
+    <>
+      <Modal
+        open={true}
+        onClose={() => {
+          onClick()
+        }}
+      >
+        <ModalBody>
+          <ModalBodyHeader>
+            <Typography variant="h5" style={{ fontWeight: 600 }}>
+              {options[modalView].title}
+            </Typography>
+            <Image
+              src="/icons/Cancel-Black.svg"
+              width={25}
+              height={25}
+              onClick={() => onClick()}
+              style={{ cursor: 'pointer' }}
+            />
+          </ModalBodyHeader>
+          <Typography variant="inherit" style={{ marginBottom: 20 }}>
+            {options[modalView].title !== ''
+              ? options[modalView].description
+              : ''}{' '}
+            &nbsp;
+          </Typography>
+          {modalView === 'createCarProfile' && (
+            <>
+              <Info>
+                <img
+                  loading="lazy"
+                  src="/images/Fetched-car-Green.png"
+                  alt="Trash"
+                  height={98}
+                  width={98}
+                />
+                <Typography
+                  variant="h6"
+                  style={{ marginTop: 48, marginBottom: 16 }}
+                >
+                  Upload Vehicle Info
                 </Typography>
-                {modalView === 'createCarProfile' && (
-                    <>
-                        <Info>
-                            <img loading="lazy"
-                                 src="/images/Fetched-car-Green.png"
-                                 alt="Trash"
-                                 height={98}
-                                 width={98}
-                            />
-                            <Typography
-                                variant="h6"
-                                style={{marginTop: 48, marginBottom: 16}}
-                            >
-                                Upload Vehicle Info
-                            </Typography>
-                            <Typography
-                                variant="subtitle2"
-                                style={{maxWidth: 206, marginBottom: 39}}
-                            >
-                                Kindly provide the registration number (VIN) of the car below
-                            </Typography>
-                            <TextField fullWidth placeholder='Enter VIN number' label='Enter VIN number'
-                                       onChange={(e) => {
-                                           if (e.target.value === '' || e.target.value === null || e.target.value === undefined) {
-                                               setVin(null)
-                                           } else {
-                                               setVin(e.target.value)
-                                           }
-                                       }}/>
-                            <Button
-                                text={isLoading ? 'Loading...' : "Fetch Car Information"}
-                                width={372}
-                                marginTop={30}
-                                disabled={vin === null}
-                                onClick={() => fetchCar()}
-                            />
-                        </Info>
-                    </>
-                )}
-                {modalView === 'fetchedCarProfile' && (
-                    <>
-                        {/*<HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>*/}
-                        {/*<TextField placeholder='Number Plate' label='Number Plate'*/}
-                        {/*           style={{width: 330, marginBottom: 30}}*/}
-                        {/*           value={licence_plate} onChange={(e) => setPlate(e.target.value)}/>*/}
-                        <HeaderText style={{marginBottom: 10, marginTop: 10}}>Vehicle Info</HeaderText>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                label="Number Plate"
-                                placeholder="Number Plate"
-                                value={licence_plate}
-                                variant='standard'
-                                error={!(new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(licence_plate))}
-                                onChange={(e) => {
-                                    setPlate(e.target.value)
-                                }}
-                            />
-                            <TextField
-                                className="text-field"
-                                type='text'
-                                fullWidth
-                                label="Bought Price"
-                                placeholder="Bought Price"
-                                value={bought_price}
-                                variant='standard'
-                                onChange={(e) => setPrice(e.target.value)}
-                            />
-                        </InputGrid>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                disabled
-                                label="VIN"
-                                placeholder="VIN"
-                                value={vin}
-                                variant='standard'
-                            />
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                placeholder="Color"
-                                error={carColor === ''}
-                                label={carColor !== '' ? getColorName(carColor) : 'Color'}
-                                type='color'
-                                variant='standard'
-                                onChange={(e) => setColor(e.target.value)}
-                            />
-                        </InputGrid>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                disabled
-                                label="Transmission Type"
-                                placeholder="Transmission Type"
-                                value={car?.transmission || 'NA'}
-                                variant='standard'
-                            />
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                disabled
-                                label="Fuel Type"
-                                placeholder="Fuel Type"
-                                value={car?.fuel_type || 'NA'}
-                                variant='standard'
-                            />
-                        </InputGrid>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                disabled
-                                label="Vehicle Engine"
-                                placeholder="Vehicle Engine"
-                                value={car?.engine || 'NA'}
-                                variant='standard'
-                            />
-                            <FormControl fullWidth>
-                                <Select
-                                    value={seatNumber}
-                                    onChange={(event) =>
-                                        setSeatNumber(Number(event.target.value))
-                                    }
-                                    displayEmpty
-                                    inputProps={{'aria-label': 'Without label'}}
-                                    label='Number of Seats'
-                                    placeholder='Number of Seats'
-                                    variant='standard'
-                                >
-                                    <option value="" disabled>
-                                        Number of Seats
-                                    </option>
-                                    <option value={'4'}>4</option>
-                                    <option value={'5'}>5</option>
-                                    <option value={'6'}>6</option>
-                                    <option value={'7'}>7</option>
-                                    <option value={'8'}>8</option>
-                                    <option value={'9'}>9</option>
-                                    <option value={'10'}>10</option>
-                                    <option value={'11'}>11</option>
-                                    <option value={'12'}>12</option>
-                                </Select>
-                            </FormControl>
-                        </InputGrid>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                disabled
-                                label="Make"
-                                placeholder="Make"
-                                value={car?.make || 'NA'}
-                                variant='standard'
-                            />
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                label="Current Mileage"
-                                placeholder="Current Mileage"
-                                value={car?.mileage || 'NA'}
-                                variant='standard'
-                                type='text'
-                                onChange={(e) => setCarDetail('mileage', e.target.value)}
-                            />
-                        </InputGrid>
-                        <InputGrid>
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                disabled
-                                label="Year"
-                                placeholder="Year"
-                                value={car?.year || 'NA'}
-                                variant='standard'
-                            />
-                            <TextField
-                                className="text-field"
-                                fullWidth
-                                disabled
-                                label="Model"
-                                placeholder="Model"
-                                value={car?.model || 'NA'}
-                                variant='standard'
-                            />
-                        </InputGrid>
-                        <Button
-                            text="Proceed"
-                            width={510}
-                            marginLeft="auto"
-                            marginRight="auto"
-                            marginTop={40}
-                            disabled={!licence_plate || !carColor || !car?.mileage || !(new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(licence_plate))}
-                            onClick={() => setModalView('uploadCarImages')}
-                        />
-                    </>
-                )}
-                {modalView === 'uploadCarImages' && (
-                    <>
-                        <ImageGrid style={{justifyContent: 'start', maxWidth: 745}}>
-                            {uploadedPictures.map((image, idx) => (
-                                <div className='image' key={idx}>
-                                    <img loading="lazy" src={image.secure_url} className="image"/>
-                                    <img loading="lazy" src="/icons/Delete-Circular-Green.svg" className='delete'
-                                         onClick={() => removePicture(image.secure_url)}/>
-                                </div>
-                            ))}
-                        </ImageGrid>
-                        <ImageUpload>
-                            <div className='content'>
-                                <Image src='/images/Upload.png' alt='Upload' height={38} width={44}/>
-                                <div style={{marginTop: 10}}>
-                                    Upload Vehicle Image
-                                </div>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    ref={hiddenFileInput}
-                                    multiple={true}
-                                    onChange={handleFileChange}
-                                    style={{display: 'none'}}
-                                />
-                                <Button text={isUploading ? 'Uploading ...' : 'Upload'} disabled={isUploading}
-                                        width={128} marginTop={40}
-                                        onClick={() => handleFileClick(event)}/>
-                            </div>
-                        </ImageUpload>
-                        <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
-                            <Button
-                                text={isLoading ? 'Saving ...' : 'Skip'}
-                                width={200}
-                                marginLeft="auto"
-                                marginRight="10px"
-                                marginTop={50}
-                                outlined={true}
-                                disabled={isLoading}
-                                onClick={() => saveCarProfile()}
-                            />
-                            <Button
-                                text={isLoading ? 'Saving ...' : 'Create Car Profile'}
-                                width={200}
-                                marginLeft="auto"
-                                marginRight="auto"
-                                marginTop={50}
-                                disabled={(uploadedPictures.length < 3) || isLoading}
-                                onClick={() => saveCarProfile()}
-                            />
-                        </div>
-                    </>
-                )}
-            </ModalBody>
-        </Modal></>)
+                <Typography
+                  variant="subtitle2"
+                  style={{ maxWidth: 206, marginBottom: 39 }}
+                >
+                  Kindly provide the registration number (VIN) of the car below
+                </Typography>
+                <TextField
+                  fullWidth
+                  placeholder="Enter VIN number"
+                  label="Enter VIN number"
+                  onChange={(e) => {
+                    if (
+                      e.target.value === '' ||
+                      e.target.value === null ||
+                      e.target.value === undefined
+                    ) {
+                      setVin(null)
+                    } else {
+                      setVin(e.target.value)
+                    }
+                  }}
+                />
+                <Button
+                  text={isLoading ? 'Loading...' : 'Fetch Car Information'}
+                  width={372}
+                  marginTop={30}
+                  disabled={vin === null}
+                  onClick={() => fetchCar()}
+                />
+              </Info>
+            </>
+          )}
+          {modalView === 'fetchedCarProfile' && (
+            <>
+              {/*<HeaderText style={{marginBottom: 10, marginTop: 20}}>Number Plate</HeaderText>*/}
+              {/*<TextField placeholder='Number Plate' label='Number Plate'*/}
+              {/*           style={{width: 330, marginBottom: 30}}*/}
+              {/*           value={licence_plate} onChange={(e) => setPlate(e.target.value)}/>*/}
+              <HeaderText style={{ marginBottom: 10, marginTop: 10 }}>
+                Vehicle Info
+              </HeaderText>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Number Plate"
+                  placeholder="Number Plate"
+                  value={licence_plate}
+                  variant="standard"
+                  error={
+                    !new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(
+                      licence_plate
+                    )
+                  }
+                  onChange={(e) => {
+                    setPlate(e.target.value)
+                  }}
+                />
+                <TextField
+                  className="text-field"
+                  type="text"
+                  fullWidth
+                  label="Bought Price"
+                  placeholder="Bought Price"
+                  value={bought_price}
+                  variant="standard"
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  disabled
+                  label="VIN"
+                  placeholder="VIN"
+                  value={vin}
+                  variant="standard"
+                />
+                <div
+                  style={{
+                    marginBottom: '5px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center'
+                  }}
+                >
+                  <ColorPickerDropdown onChange={setColor} value={'#000'} />
+                  <div
+                    style={{
+                      width: 40,
+                      height: 20,
+                      backgroundColor: carColor,
+                      marginRight: 10,
+                      border: '1px solid black'
+                    }}
+                  />
+                  <div style={{ marginLeft: '5px' }}>
+                    {carColor !== '' && carColor !== null
+                      ? getColorName(carColor)
+                      : 'Color not selected'}
+                  </div>
+                </div>
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  disabled
+                  label="Transmission Type"
+                  placeholder="Transmission Type"
+                  value={car?.transmission || 'NA'}
+                  variant="standard"
+                />
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  disabled
+                  label="Fuel Type"
+                  placeholder="Fuel Type"
+                  value={car?.fuel_type || 'NA'}
+                  variant="standard"
+                />
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  disabled
+                  label="Vehicle Engine"
+                  placeholder="Vehicle Engine"
+                  value={car?.engine || 'NA'}
+                  variant="standard"
+                />
+                <FormControl fullWidth>
+                  <Select
+                    value={seatNumber}
+                    onChange={(event) =>
+                      setSeatNumber(Number(event.target.value))
+                    }
+                    displayEmpty
+                    inputProps={{ 'aria-label': 'Without label' }}
+                    label="Number of Seats"
+                    placeholder="Number of Seats"
+                    variant="standard"
+                  >
+                    <option value="" disabled>
+                      Number of Seats
+                    </option>
+                    <option value={'4'}>4</option>
+                    <option value={'5'}>5</option>
+                    <option value={'6'}>6</option>
+                    <option value={'7'}>7</option>
+                    <option value={'8'}>8</option>
+                    <option value={'9'}>9</option>
+                    <option value={'10'}>10</option>
+                    <option value={'11'}>11</option>
+                    <option value={'12'}>12</option>
+                  </Select>
+                </FormControl>
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  disabled
+                  label="Make"
+                  placeholder="Make"
+                  value={car?.make || 'NA'}
+                  variant="standard"
+                />
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Current Mileage"
+                  placeholder="Current Mileage"
+                  value={car?.mileage || 'NA'}
+                  variant="standard"
+                  type="text"
+                  onChange={(e) => setCarDetail('mileage', e.target.value)}
+                />
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  disabled
+                  label="Year"
+                  placeholder="Year"
+                  value={car?.year || 'NA'}
+                  variant="standard"
+                />
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  disabled
+                  label="Model"
+                  placeholder="Model"
+                  value={car?.model || 'NA'}
+                  variant="standard"
+                />
+              </InputGrid>
+              <Button
+                text="Proceed"
+                width={510}
+                marginLeft="auto"
+                marginRight="auto"
+                marginTop={40}
+                disabled={
+                  !licence_plate ||
+                  !carColor ||
+                  !car?.mileage ||
+                  !new RegExp(/(^[A-Z]{3}-[0-9]{3}[A-Z])\w+/g).test(
+                    licence_plate
+                  )
+                }
+                onClick={() => setModalView('uploadCarImages')}
+              />
+            </>
+          )}
+          {modalView === 'uploadCarImages' && (
+            <>
+              <ImageGrid style={{ justifyContent: 'start', maxWidth: 745 }}>
+                {uploadedPictures.map((image, idx) => (
+                  <div className="image" key={idx}>
+                    <img
+                      loading="lazy"
+                      src={image.secure_url}
+                      className="image"
+                    />
+                    <img
+                      loading="lazy"
+                      src="/icons/Delete-Circular-Green.svg"
+                      className="delete"
+                      onClick={() => removePicture(image.secure_url)}
+                    />
+                  </div>
+                ))}
+              </ImageGrid>
+              <ImageUpload>
+                <div className="content">
+                  <Image
+                    src="/images/Upload.png"
+                    alt="Upload"
+                    height={38}
+                    width={44}
+                  />
+                  <div style={{ marginTop: 10 }}>Upload Vehicle Image</div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={hiddenFileInput}
+                    multiple={true}
+                    onChange={handleFileChange}
+                    style={{ display: 'none' }}
+                  />
+                  <Button
+                    text={isUploading ? 'Uploading ...' : 'Upload'}
+                    disabled={isUploading}
+                    width={128}
+                    marginTop={40}
+                    onClick={() => handleFileClick(event)}
+                  />
+                </div>
+              </ImageUpload>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center'
+                }}
+              >
+                <Button
+                  text={isLoading ? 'Saving ...' : 'Skip'}
+                  width={200}
+                  marginLeft="auto"
+                  marginRight="10px"
+                  marginTop={50}
+                  outlined={true}
+                  disabled={isLoading}
+                  onClick={() => saveCarProfile()}
+                />
+                <Button
+                  text={isLoading ? 'Saving ...' : 'Create Car Profile'}
+                  width={200}
+                  marginLeft="auto"
+                  marginRight="auto"
+                  marginTop={50}
+                  disabled={uploadedPictures.length < 3 || isLoading}
+                  onClick={() => saveCarProfile()}
+                />
+              </div>
+            </>
+          )}
+        </ModalBody>
+      </Modal>
+    </>
+  )
 }
 export default AddCarProfile
 
@@ -510,11 +582,11 @@ const ModalBodyHeader = styled.div`
   align-items: center;
 `
 const HeaderText = withStyles({
-    root: {
-        color: t.lightGrey,
-        fontWeight: 'bold',
-        display: 'block'
-    }
+  root: {
+    color: t.lightGrey,
+    fontWeight: 'bold',
+    display: 'block'
+  }
 })(Typography)
 const Info = styled.div`
   display: flex;
@@ -596,5 +668,3 @@ const ImageUpload = styled.div`
     justify-content: center;
   }
 `
-
-        
