@@ -134,8 +134,18 @@ function HomePage() {
     setPieData(arr)
   }
 
+  function getLastDayOfMonth(monthIndex) {
+    const momentObj = moment().month(monthIndex).date(1)
+    // Use the endOf() method to get the last day of the month
+    const lastDayOfMonth = momentObj.endOf('month').date()
+    // Return the last day of the month
+    return lastDayOfMonth
+  }
+
   const getHomeStats = () => {
-    const endDate = moment(new Date()).format('YYYY-MM-DD')
+    const endDate = yearOnlyFilter
+      ? moment(new Date()).format('YYYY-MM-DD')
+      : `${year}-${monthIdx + 1}-${getLastDayOfMonth(monthIdx)}`
     const startDate = `${year}-${monthIdx + 1}-01`
     retrieveHomeStats(yearOnlyFilter, startDate, endDate)
       .then((res) => {
