@@ -46,9 +46,25 @@ const LChart = ({ ttc = [], rot = [], weeks = 5 }) => {
     }
   }
 
-  const labels = Array.from({ length: weeks }, (_, i) => {
-    return `WK ${i + 1}`
-  })
+  const labels =
+    weeks < 12
+      ? Array.from({ length: weeks }, (_, i) => {
+          return `WK ${i + 1}`
+        })
+      : [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec'
+        ]
 
   const chartData = {
     labels,
