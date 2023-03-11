@@ -31,11 +31,9 @@ const useStyles = makeStyles((theme) => ({
     padding: '10px',
     height: '300px',
     overflowY: 'auto',
-    '& div': {
-      '& ul': {
-        display: 'flex',
-        flexDirection: 'column'
-      }
+    '& ul': {
+      display: 'flex',
+      flexDirection: 'column'
     }
   }
 }))
