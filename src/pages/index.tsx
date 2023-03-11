@@ -376,7 +376,7 @@ function HomePage() {
                       }
                       weeks={
                         pageData?.total_trading_cash_vs_return_on_trades?.ttc
-                          .length || 5
+                          .length || 4
                       }
                     />
                   </div>

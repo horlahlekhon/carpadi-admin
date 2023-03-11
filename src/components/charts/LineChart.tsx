@@ -21,7 +21,7 @@ ChartJS.register(
   Legend
 )
 
-const LChart = ({ ttc = [], rot = [], weeks = 5 }) => {
+const LChart = ({ ttc = [], rot = [], weeks = 4 }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
