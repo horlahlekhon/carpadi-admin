@@ -26,3 +26,8 @@ img {
   max-width: 100%;
   display: block;
 }
+
+.custom-menu-list>div>ul{
+  display: flex;
+  flex-direction: column;
+}
