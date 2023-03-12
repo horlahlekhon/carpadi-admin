@@ -22,7 +22,6 @@ import CreateTrade from '../components/shared/CreateTrade'
 import AddCarProfile from '../components/shared/AddCarProfile'
 import Loader from '../components/layouts/core/Loader'
 import moment from 'moment'
-
 function HomePage() {
   const router = useRouter()
   let currentYear = new Date().getFullYear()

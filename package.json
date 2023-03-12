@@ -11,6 +11,9 @@
   },
   "dependencies": {
     "@material-ui/pickers": "^3.3.10",
+    "@sentry/nextjs": "^7.42.0",
+    "@sentry/tracing": "^7.42.0",
+    "@sentry/wizard": "^2.6.0",
     "chart.js": "^3.8.0",
     "chartjs-plugin-datalabels": "^2.0.0",
     "crypto-js": "^4.1.1",
