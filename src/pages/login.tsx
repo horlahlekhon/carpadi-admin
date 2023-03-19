@@ -19,8 +19,10 @@ import ReCAPTCHA from 'react-google-recaptcha'
 import { useState } from 'react'
 import Button from '../components/shared/Button'
 import { authService } from '../services/auth'
+import { verifyCapcha } from '../services/user'
 import { useRouter } from 'next/router'
 import { toast, Toaster } from 'react-hot-toast'
+import getConfig from 'next/config'
 
 function LoginPage() {
   const router = useRouter()
@@ -30,10 +32,14 @@ function LoginPage() {
     username: '',
     isLoading: false
   })
+  const [isVerified, setIsVerified] = useState(false)
+  const { publicRuntimeConfig } = getConfig()
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      if (values.username !== '' && values.password !== '') {
+      if (!isVerified) {
+        toast.error('Please verify captcha')
+      } else if (values.username !== '' && values.password !== '') {
         loginUser()
       } else {
         toast.error('Please fill all fields')
@@ -58,6 +64,13 @@ function LoginPage() {
 
   const onCaptchaChange = (value) => {
     console.log('Captcha value:', value)
+    verifyCapcha(value)
+      .then((res) => {
+        setIsVerified(true)
+      })
+      .catch((err) => {
+        toast.error('Captcha verification failed')
+      })
   }
 
   const loginUser = () => {
@@ -161,7 +174,7 @@ function LoginPage() {
                   <Typography>Remember Me</Typography>
                 </RememberMe>
                 <ReCAPTCHA
-                  sitekey="6LcIFiAgAAAAAO5J1kPxk306OqFVPaUUiDesLsG5"
+                  sitekey={publicRuntimeConfig.captchaKey}
                   onChange={onCaptchaChange}
                   size="normal"
                 />
@@ -169,7 +182,11 @@ function LoginPage() {
                   width="372px"
                   marginTop="32px"
                   text={values.isLoading ? 'Loading...' : 'Login'}
-                  disabled={values.password === '' || values.username === ''}
+                  disabled={
+                    values.password === '' ||
+                    values.username === '' ||
+                    !isVerified
+                  }
                   onClick={loginUser}
                 />
               </CardContent>
