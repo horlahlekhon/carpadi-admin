@@ -1,6 +1,7 @@
 module.exports = {
     reactStrictMode: false,
     publicRuntimeConfig: {
+        captchaKey: process.env.CAPTCHA_SITE_KEY || "6LcZ2v0kAAAAAIDgjw6dUUeXEcBtyveFEJqfrGhV",
         accessKeyId: process.env.KEY_ID || 'AKIAZEW6KCSPYAHB3ZDW',
         secretAccessKey: process.env.ACCESS_KEY || '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',
         region: process.env.REGION || 'eu-west-2',
