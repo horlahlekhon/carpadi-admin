@@ -26,7 +26,7 @@ const verifyCapcha = async (response) => {
         response: response,
         ip: await getUserIp()
     }
-    return fetch(`${baseUrl}/users/verify-captcha/`, {
+    return fetch(`${baseUrl}/users/captcha/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

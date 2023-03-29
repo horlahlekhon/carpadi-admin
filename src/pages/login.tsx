@@ -15,7 +15,6 @@ import {
 import { Visibility, VisibilityOff } from '@material-ui/icons'
 import Image from 'next/image'
 import classes from '../styles/Auth.module.css'
-import ReCAPTCHA from 'react-google-recaptcha'
 import { useState } from 'react'
 import Button from '../components/shared/Button'
 import { authService } from '../services/auth'
@@ -23,6 +22,10 @@ import { verifyCapcha } from '../services/user'
 import { useRouter } from 'next/router'
 import { toast, Toaster } from 'react-hot-toast'
 import getConfig from 'next/config'
+import {
+  GoogleReCaptchaProvider,
+  GoogleReCaptcha
+} from 'react-google-recaptcha-v3'
 
 function LoginPage() {
   const router = useRouter()
@@ -63,10 +66,15 @@ function LoginPage() {
   }
 
   const onCaptchaChange = (value) => {
-    console.log('Captcha value:', value)
     verifyCapcha(value)
       .then((res) => {
-        setIsVerified(true)
+        if (res.data?.error) {
+          toast.success(res.data?.error?.data || 'Captcha verification failed')
+          setIsVerified(false)
+        } else {
+          toast.error('Captcha verification success')
+          setIsVerified(true)
+        }
       })
       .catch((err) => {
         toast.error('Captcha verification failed')
@@ -173,11 +181,16 @@ function LoginPage() {
                   <Checkbox></Checkbox>
                   <Typography>Remember Me</Typography>
                 </RememberMe>
-                <ReCAPTCHA
+                <GoogleReCaptchaProvider
+                  reCaptchaKey={publicRuntimeConfig.captchaKey}
+                >
+                  <GoogleReCaptcha onVerify={onCaptchaChange} />
+                </GoogleReCaptchaProvider>
+                {/* <ReCAPTCHA
                   sitekey={publicRuntimeConfig.captchaKey}
                   onChange={onCaptchaChange}
                   size="normal"
-                />
+                /> */}
                 <Button
                   width="372px"
                   marginTop="32px"
