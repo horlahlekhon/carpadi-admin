@@ -181,24 +181,18 @@ function LoginPage() {
                   <Checkbox></Checkbox>
                   <Typography>Remember Me</Typography>
                 </RememberMe>
-                <GoogleReCaptchaProvider
+                {/* <GoogleReCaptchaProvider
                   reCaptchaKey={publicRuntimeConfig.captchaKey}
                 >
                   <GoogleReCaptcha onVerify={onCaptchaChange} />
-                </GoogleReCaptchaProvider>
-                {/* <ReCAPTCHA
-                  sitekey={publicRuntimeConfig.captchaKey}
-                  onChange={onCaptchaChange}
-                  size="normal"
-                /> */}
+                </GoogleReCaptchaProvider> */}
                 <Button
                   width="372px"
                   marginTop="32px"
                   text={values.isLoading ? 'Loading...' : 'Login'}
                   disabled={
                     values.password === '' ||
-                    values.username === '' ||
-                    !isVerified
+                    values.username === ''
                   }
                   onClick={loginUser}
                 />
