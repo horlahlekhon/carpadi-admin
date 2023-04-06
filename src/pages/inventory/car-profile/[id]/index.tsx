@@ -1125,7 +1125,7 @@ function CarProfilePage({ pageId }) {
                   <Detail style={{ alignItems: 'end' }}>
                     <div className="key">Description</div>
                     <div className="value" style={{ marginLeft: '25px' }}>
-                      {car?.information?.description || 'NA'}
+                      {car?.information?.description || car?.description || 'NA'}
                     </div>
                   </Detail>
                   {[
