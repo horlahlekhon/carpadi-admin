@@ -26,7 +26,7 @@ function HomePage() {
   const router = useRouter()
   let currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear)
-  const [monthIdx, setMonthIdx] = useState(0)
+  const [monthIdx, setMonthIdx] = useState(new Date().getMonth());
   const [yearOnlyFilter, setYearOnlyFilter] = useState(true)
   const [createTrade, setCreateTrade] = useState(false)
   const [addCarProfile, setAddCarProfile] = useState(false)

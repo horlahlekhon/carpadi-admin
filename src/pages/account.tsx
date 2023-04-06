@@ -18,7 +18,7 @@ function AccountPage() {
   let currentYear = new Date().getFullYear()
   const [pageLoading, setPageLoading] = useState(false)
   const [year, setYear] = useState(currentYear)
-  const [monthIdx, setMonthIdx] = useState(0)
+  const [monthIdx, setMonthIdx] = useState(new Date().getMonth())
   const [yearOnlyFilter, setYearOnlyFilter] = useState(true)
   const [pieChartData, setPieChartData] = useState([
     { name: 'Total Deposits', value: 0 },
@@ -91,9 +91,19 @@ function AccountPage() {
     setYearOnlyFilter(!yearOnlyFilter)
   }
 
+  function getLastDayOfMonth(monthIndex) {
+    const momentObj = moment().month(monthIndex).date(1)
+    // Use the endOf() method to get the last day of the month
+    const lastDayOfMonth = momentObj.endOf('month').date()
+    // Return the last day of the month
+    return lastDayOfMonth
+  }
+
   const getAccountStats = () => {
     setPageLoading(true)
-    const endDate = moment(new Date()).format('YYYY-MM-DD')
+    const endDate = yearOnlyFilter
+      ? moment(new Date()).format('YYYY-MM-DD')
+      : `${year}-${monthIdx + 1}-${getLastDayOfMonth(monthIdx)}`
     const startDate = `${year}-${monthIdx + 1}-01`
     accountService
       .retrieveAccountStats(yearOnlyFilter, startDate, endDate)
