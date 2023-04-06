@@ -42,6 +42,9 @@ const LChart = ({ ttc = [], rot = [], weeks = 4 }) => {
       },
       title: {
         display: false
+      },
+      datalabels: {
+        display: false
       }
     }
   }
