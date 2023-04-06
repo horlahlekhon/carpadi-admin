@@ -280,13 +280,12 @@ function BuyingPage() {
                 <TableHead>
                   <TableRow>
                     <TableCell>No</TableCell>
-                    <TableCell align="right">Vehicle</TableCell>
                     <TableCell align="right">Seller</TableCell>
-                    <TableCell align="right">VIN</TableCell>
                     <TableCell align="right">Plate</TableCell>
-                    <TableCell align="right">Year</TableCell>
-                    <TableCell align="right">Fuel Type</TableCell>
-                    <TableCell align="right">Price</TableCell>
+                    <TableCell align="right">Deal Preference</TableCell>
+                    <TableCell align="right">Inspection Location</TableCell>
+                    <TableCell align="right">Registration State</TableCell>
+                    <TableCell align="right">Usage Timeframe</TableCell>
                     <TableCell align="right">Date Listed</TableCell>
                     <TableCell align="right">&nbsp;</TableCell>
                   </TableRow>
@@ -297,15 +296,8 @@ function BuyingPage() {
                       <TableCell component="th" scope="row">
                         {idx + 1 + (page > 0 ? rowsPerPage / page : 0)}
                       </TableCell>
-                      <TableCell component="th" scope="row">
-                        {row?.vehicle_info?.manufacturer || 'NA'} (
-                        {row?.vehicle_info?.brand?.model || 'NA'})
-                      </TableCell>
                       <TableCell align="right">
-                        {row?.seller?.first_name} {row?.seller?.last_name}
-                      </TableCell>
-                      <TableCell align="right">
-                        {row?.vehicle_info?.vin}
+                        {row?.seller?.name}
                       </TableCell>
                       <TableCell
                         align="right"
@@ -314,13 +306,16 @@ function BuyingPage() {
                         {row?.licence_plate}
                       </TableCell>
                       <TableCell align="right">
-                        {row?.vehicle_info?.brand?.year}
+                        {row?.deal_preference}
                       </TableCell>
                       <TableCell align="right">
-                        {row?.vehicle_info?.fuel_type}
+                        {row?.inspection_location}
                       </TableCell>
                       <TableCell align="right">
-                        &#8358;{formatNumber(row?.price)}
+                        {row?.registration_state}
+                      </TableCell>
+                      <TableCell align="right">
+                        {formatNumber(row?.current_usage_timeframe_by_user)}
                       </TableCell>
                       <TableCell align="right">
                         {formatDate(row?.created)}
