@@ -4,6 +4,9 @@ import ChartDataLabels from 'chartjs-plugin-datalabels'
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
+// Register the plugin to all charts:
+ChartJS.register(ChartDataLabels);
+
 const PChart = ({
   data = [],
   colors = [],
@@ -43,11 +46,12 @@ const PChart = ({
             context.chart.data.datasets[0].data.map((d) => d.value)[
               context.dataIndex
             ]
-          }%`
+          }`
         },
         clamp: true,
         clip: true,
-        rotate: 60
+        rotate: 180,
+        display: 'auto'
       }
     }
   }
