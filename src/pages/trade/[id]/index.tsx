@@ -121,10 +121,13 @@ function TradeProfilePage({pageId}) {
     const retrieveTrade = () => {
         setPageLoading(true)
         tradeService
-            .retrieveSingleTrade(tradeId)
+            .retrieveSingleTradeX(tradeId)
             .then((response) => {
+                console.log(response)
                 if (response.status) {
-                    setTradeData(response.data)
+                    if(response.data.results.length > 0) {
+                        setTradeData(response.data.results[0])
+                    }
                 } else {
                     // toast.error(response.data)
                     showModal(CPModal, {title: "Oops...", message: response.data, type: "error"})

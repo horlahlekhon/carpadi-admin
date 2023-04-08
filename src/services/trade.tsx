@@ -24,6 +24,16 @@ const retrieveSingleTrade = (id) => {
         })
 }
 
+const retrieveSingleTradeX = (id) => {
+    return fetchWrapper.get(`${baseUrl}/trades?car=${id}`)
+      .then((response) => {
+          return {status: true, data: response}
+      })
+      .catch((error) => {
+          return {status: false, data: error};
+      })
+}
+
 const retrieveTradeStats = () => {
     return fetchWrapper.get(`${baseUrl}/dashboards/trades`)
         .then((response) => {
@@ -121,5 +131,6 @@ export const tradeService = {
     createSingleTrade,
     retrieveUserTrades,
     disburseTradeROT,
-    rollbackTrade
+    rollbackTrade,
+    retrieveSingleTradeX
 }
