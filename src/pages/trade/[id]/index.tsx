@@ -123,7 +123,6 @@ function TradeProfilePage({pageId}) {
         tradeService
             .retrieveSingleTradeX(tradeId)
             .then((response) => {
-                console.log(response)
                 if (response.status) {
                     if(response.data.results.length > 0) {
                         setTradeData(response.data.results[0])

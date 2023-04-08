@@ -312,7 +312,7 @@ function BuyingPage() {
                         {row?.inspection_location}
                       </TableCell>
                       <TableCell align="right">
-                        {row?.registration_state}
+                        {row?.registeration_state}
                       </TableCell>
                       <TableCell align="right">
                         {formatNumber(row?.current_usage_timeframe_by_user)}
