@@ -51,7 +51,6 @@ export default class CustomDocument extends NextDocument {
     return (
       <Html lang="ja-JP">
         <Head>
-          <title>Carpadi Admin</title>
           <link rel="icon" href="/favicon.png" />
         </Head>
         <body style={{margin: 0}}>

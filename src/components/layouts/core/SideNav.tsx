@@ -27,7 +27,8 @@ const useStyles = makeStyles((theme: Theme) =>
       backgroundColor: theme.palette.background.paper
     },
     nested: {
-      paddingLeft: theme.spacing(4)
+      paddingLeft: theme.spacing(4),
+      color: '#111',
     }
   })
 )
@@ -63,7 +64,7 @@ function SideNav() {
     authService.logout()
   }
 
-  const Hamburger = styled.p`
+  const Hamburger = styled.div`
     width: ${isFullNav ? '' : 'fit-content'};
     height: 48px;
     padding: 16px 25px;
@@ -94,6 +95,7 @@ function SideNav() {
           src={isFullNav ? '/logos/white-full.png' : '/logos/white-no-text.png'}
           width={isFullNav ? 244 : 56}
           height={isFullNav ? 93 : 56}
+          alt=""
         />
       </div>
       {isFullNav && (
@@ -108,14 +110,14 @@ function SideNav() {
           }
           width={isFullNav ? 24 : 24}
           height={isFullNav ? 24 : 24}
+          alt=""
           className={styles.pointer}
           onClick={toggleNav}
         />
       </Hamburger>
       <Nav>
-        <Link href="/" shallow>
-          <NavItem className={router.pathname == '/' ? 'active' : ''}>
-            <Image src="/icons/Home-White.svg" width={18} height={21.5} />
+          <NavItem onClick={() => router.push('/')} className={router.pathname == '/' ? 'active' : ''}>
+            <Image src="/icons/Home-White.svg" width={18} height={21.5} alt=""/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden
@@ -125,9 +127,8 @@ function SideNav() {
             </p>
             {router.pathname == '/' && <ActiveNavItem>&nbsp;</ActiveNavItem>}
           </NavItem>
-        </Link>
-        <Link href="/notifications" prefetch={true} shallow>
           <NavItem
+          onClick={() => router.push('/notifications')}
             className={
               router.pathname.startsWith('/notifications') ? 'active' : ''
             }
@@ -136,6 +137,7 @@ function SideNav() {
               src="/icons/Notification-White.svg"
               width={18}
               height={21.5}
+              alt=''
             />
             <p
               className={`${styles.navitem__text} ${
@@ -149,12 +151,11 @@ function SideNav() {
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
           </NavItem>
-        </Link>
-        <Link href="/trade" prefetch={true} shallow>
           <NavItem
+           onClick={() => router.push('/trade')}
             className={router.pathname.startsWith('/trade') ? 'active' : ''}
           >
-            <Image src="/icons/Trade-White.svg" width={18} height={21.5} />
+            <Image src="/icons/Trade-White.svg" width={18} height={21.5} alt=""/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden
@@ -166,14 +167,12 @@ function SideNav() {
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
           </NavItem>
-        </Link>
-        <Link href="/sales" prefetch={true} shallow>
           <>
             <NavItem
               className={router.pathname.startsWith('/sales') ? 'active' : ''}
               onClick={handleClick}
             >
-              <Image src="/icons/Sales-White.svg" width={18} height={21.5} />
+              <Image src="/icons/Sales-White.svg" width={18} height={21.5} alt=""/>
               <p
                 className={`${styles.navitem__text} ${
                   isFullNav ? '' : styles.hidden
@@ -191,15 +190,15 @@ function SideNav() {
               in={open}
               timeout="auto"
               unmountOnExit
-              style={{ marginLeft: '24px' }}
+              style={{ margin: '0 24px' }}
             >
-              <List component="div" disablePadding>
-                <Link href="/sales" prefetch={true} shallow>
+              <List style={{ borderRadius: '5px', height: '100px', position:'relative', zIndex: '10000', background: '#FAFAFA' }} component="div" disablePadding>
+                <Link href="/sales">
                   <ListItem button className={classes.nested}>
                     <ListItemText primary={!isFullNav ? 'Sell' : 'Selling'} />
                   </ListItem>
                 </Link>
-                <Link href="/sales/buying" prefetch={true} shallow>
+                <Link href="/sales/buying">
                   <ListItem button className={classes.nested}>
                     <ListItemText primary={!isFullNav ? 'Buy' : 'Buying'} />
                   </ListItem>
@@ -207,12 +206,11 @@ function SideNav() {
               </List>
             </Collapse>
           </>
-        </Link>
-        <Link href="/inventory" prefetch={true} shallow>
           <NavItem
+                    onClick={() => router.push('/inventory')}
             className={router.pathname.startsWith('/inventory') ? 'active' : ''}
           >
-            <Image src="/icons/Inventory-White.svg" width={18} height={21.5} />
+            <Image src="/icons/Inventory-White.svg" width={18} height={21.5} alt=""/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden
@@ -224,12 +222,11 @@ function SideNav() {
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
           </NavItem>
-        </Link>
-        <Link href="/users" prefetch={true} shallow>
           <NavItem
+           onClick={() => router.push('/users')}
             className={router.pathname.startsWith('/users') ? 'active' : ''}
           >
-            <Image src="/icons/Users-White.svg" width={18} height={21.5} />
+            <Image src="/icons/Users-White.svg" width={18} height={21.5} alt=""/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden
@@ -241,10 +238,8 @@ function SideNav() {
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
           </NavItem>
-        </Link>
-        <Link href="/account" shallow>
-          <NavItem className={router.pathname == '/account' ? 'active' : ''}>
-            <Image src="/icons/Account-White.svg" width={18} height={21.5} />
+          <NavItem  onClick={() => router.push('/account')} className={router.pathname == '/account' ? 'active' : ''}>
+            <Image src="/icons/Account-White.svg" width={18} height={21.5} alt=""/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden
@@ -256,10 +251,8 @@ function SideNav() {
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
           </NavItem>
-        </Link>
-        <Link href="/settings" shallow>
-          <NavItem className={router.pathname == '/settings' ? 'active' : ''}>
-            <Image src="/icons/Settings-White.svg" width={18} height={21.5} />
+          <NavItem onClick={() => router.push('/settings')} className={router.pathname == '/settings' ? 'active' : ''}>
+            <Image src="/icons/Settings-White.svg" width={18} height={21.5} alt=""/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden
@@ -271,10 +264,9 @@ function SideNav() {
               <ActiveNavItem>&nbsp;</ActiveNavItem>
             )}
           </NavItem>
-        </Link>
         <Logout onClick={logout}>
           <NavItem>
-            <Image src="/icons/Logout-White.svg" width={18} height={21.5} />
+            <Image src="/icons/Logout-White.svg" width={18} height={21.5} alt=""/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden
@@ -317,6 +309,8 @@ const NavItem = styled.a`
   padding-left: 41px;
   cursor: pointer;
   position: relative;
+  color: white;
+  text-decoration: none;
 
   &.active {
     background: ${t.primaryDeepBlue};

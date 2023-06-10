@@ -1,4 +1,5 @@
 module.exports = {
+    presets: ["next/babel"],
     reactStrictMode: false,
     publicRuntimeConfig: {
         captchaKey: process.env.CAPTCHA_SITE_KEY || "6LcZ2v0kAAAAAIDgjw6dUUeXEcBtyveFEJqfrGhV",
@@ -16,5 +17,6 @@ module.exports = {
     compiler: {
         styledComponents: true,
         ssr: false
-    }
+    },
+ 
 }

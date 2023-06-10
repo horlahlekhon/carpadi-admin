@@ -795,7 +795,7 @@ function CarProfilePage({ pageId }) {
             <Body>
               <ActionBar>
                 <div className="vehicle-info">
-                  <Image src="/images/Toyota-Full.png" height={11} width={40} />
+                  <Image src="/images/Toyota-Full.png" height={11} width={40} alt=""/>
                   <Typography variant="h5" style={{ marginLeft: 20 }}>
                     {car?.name || 'NA'}
                   </Typography>
@@ -876,6 +876,7 @@ function CarProfilePage({ pageId }) {
                         src={car.pictures[carouselIdx]}
                         height={255}
                         width="100%"
+                        alt=""
                       />
                       <img
                         loading="lazy"
@@ -1187,6 +1188,7 @@ function CarProfilePage({ pageId }) {
                     height={25}
                     onClick={() => setModalState(false)}
                     style={{ cursor: 'pointer' }}
+                    alt=""
                   />
                 </ModalBodyHeader>
                 <Typography variant="inherit" style={{ marginBottom: 20 }}>

@@ -131,9 +131,10 @@ function LoginPage() {
               <CardContent className={classes.centered}>
                 <Image
                   src={'/logos/blue-full.png'}
-                  width="300px"
-                  height="114px"
-                ></Image>
+                  width={300}
+                  height={114}
+                  alt=""
+                />
 
                 <TextField
                   id="standard-basic"
