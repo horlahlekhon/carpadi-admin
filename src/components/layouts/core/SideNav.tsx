@@ -95,7 +95,7 @@ function SideNav() {
           src={isFullNav ? '/logos/white-full.png' : '/logos/white-no-text.png'}
           width={isFullNav ? 244 : 56}
           height={isFullNav ? 93 : 56}
-          alt=""
+          alt="logo"
         />
       </div>
       {isFullNav && (
@@ -117,7 +117,7 @@ function SideNav() {
       </Hamburger>
       <Nav>
           <NavItem onClick={() => router.push('/')} className={router.pathname == '/' ? 'active' : ''}>
-            <Image src="/icons/Home-White.svg" width={18} height={21.5} alt=""/>
+            <Image src="/icons/Home-White.svg" width={18} height={21.5} alt="logo"/>
             <p
               className={`${styles.navitem__text} ${
                 isFullNav ? '' : styles.hidden

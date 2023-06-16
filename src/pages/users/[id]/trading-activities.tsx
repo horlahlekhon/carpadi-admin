@@ -175,8 +175,12 @@ function TradingActivitiesPage({pageId}) {
                                                     />
                                                     <div className='content'>
                                                         <div className='header'>
-                                                            <Image src="/images/Toyota-Full.png" height={11}
-                                                                   width={40}/>
+                                                            <Image 
+                                                                src="/images/Toyota-Full.png" 
+                                                                alt="toyota"
+                                                                height={11}
+                                                                width={40}
+                                                            />
                                                             <div
                                                                 className='text'>{trade?.trade_car?.manufacturer} {trade?.trade_car?.model} {trade?.trade_car?.year}</div>
                                                         </div>
@@ -247,7 +251,7 @@ function TradingActivitiesPage({pageId}) {
                                                     />
                                                     <div className='content'>
                                                         <div className='header'>
-                                                            <Image src="/images/Toyota-Full.png" height={11}
+                                                            <Image src="/images/Toyota-Full.png" alt="toyota" height={11}
                                                                    width={40}/>
                                                             <div
                                                                 className='text'>{trade?.trade_car?.manufacturer} {trade?.trade_car?.model} {trade?.trade_car?.year}</div>

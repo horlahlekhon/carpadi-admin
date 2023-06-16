@@ -309,7 +309,7 @@ function SalesProfilePage({ pageId }) {
             <Body>
               <ActionBar>
                 <div className="vehicle-info">
-                  <Image src="/images/Toyota-Full.png" height={11} width={40} />
+                  <Image src="/images/Toyota-Full.png" alt="toyota-icon" height={11} width={40} />
                   <Typography variant="h5" style={{ marginLeft: 20 }}>
                     {trimString(saleId)}
                   </Typography>
@@ -489,6 +489,7 @@ function SalesProfilePage({ pageId }) {
                   </Typography>
                   <Image
                     src="/icons/Cancel-Black.svg"
+                    alt="cancel-icon"
                     width={25}
                     height={25}
                     onClick={() => setModalState(false)}
