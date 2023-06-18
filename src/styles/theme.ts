@@ -57,30 +57,30 @@ export const theme = createTheme({
     MuiBreadcrumbs: {
       root: {
         color: 'black !important',
-        fontSize: '14px !important',
+        fontSize: '14px !important'
       },
       separator: {
         color: `${t.grey} !important`,
-        height: '21px !important',
+        height: '21px !important'
       }
     },
     MuiRadio: {
       colorSecondary: {
-        color: `${t.primaryBlue} !important`,
+        color: `${t.primaryBlue} !important`
       }
     },
     MuiTypography: {
       root: {
-        fontFamily: 'Roboto',
+        fontFamily: 'Roboto'
       },
       colorPrimary: {
-        color: `${t.primaryDeepBlue} !important`,
+        color: `${t.primaryDeepBlue} !important`
       },
-      colorSecondary:{
-        color: `${t.primaryBlue} !important`,
+      colorSecondary: {
+        color: `${t.primaryBlue} !important`
       },
       colorTextPrimary: {
-        color: `${t.primaryDeepBlue} !important`,
+        color: `${t.primaryDeepBlue} !important`
       },
       colorTextSecondary: {
         color: `${t.primaryBlue} !important`
@@ -105,6 +105,18 @@ export const GlobalStyles = createGlobalStyle`
       font-weight: 400;
       font-style: normal;
     }
+
+    option{
+      cursor: pointer !important;
+      margin: 10px !important;
+    }
+
+    
+    .MuiFormLabel-root{
+      line-height: 0 !important;
+    }
+
+
     input, textarea, button {font-family: inherit}
     `
 // background: ${({ theme }) => theme.body};

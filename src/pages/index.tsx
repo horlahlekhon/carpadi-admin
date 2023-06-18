@@ -22,7 +22,225 @@ import CreateTrade from '../components/shared/CreateTrade'
 import AddCarProfile from '../components/shared/AddCarProfile'
 import Loader from '../components/layouts/core/Loader'
 import moment from 'moment'
+
+
 function HomePage() {
+
+  const GreyTextTypography = withStyles({
+    root: {
+      color: `${t.grey}`
+    }
+  })(Typography)
+  
+  const CarsSummaryCard = withStyles({
+    elevation1: { boxShadow: 'none' },
+    root: {
+      height: '301px',
+      padding: '11px 20px'
+    }
+  })(Paper)
+  
+  const Filter = withStyles({
+    elevation1: { boxShadow: 'none' },
+    root: {
+      height: '70px',
+      padding: '11px 16px 11px 22px',
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between'
+    }
+  })(Paper)
+  
+  const AveragesCard = withStyles({
+    elevation1: { boxShadow: 'none' },
+    root: {
+      height: '127px',
+      padding: '14px 0 11px 16px',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between'
+    }
+  })(Paper)
+  
+  const ActivitiesCard = withStyles({
+    elevation1: { boxShadow: 'none' },
+    root: {
+      marginTop: '16px',
+      height: '409px',
+      padding: '16px 19px',
+      display: 'flex',
+      flexDirection: 'column',
+      overflowY: 'auto'
+    }
+  })(Paper)
+  
+  const Shares = withStyles({
+    elevation1: { boxShadow: 'none' },
+    root: {
+      marginTop: '16px',
+      height: '73px',
+      padding: '11px 20px',
+      display: 'flex',
+      flexDirection: 'row',
+      justifyContent: 'space-between'
+    }
+  })(Paper)
+  
+  const FilterCTA = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+  
+    @media screen and (max-width: 1080px) {
+      p.MuiTypography-root.MuiTypography-body1 {
+        font-size: 14px;
+      }
+  
+      button.MuiButtonBase-root.MuiButton-root {
+        margin-left: 12px !important;
+      }
+    }
+  `
+  
+  const Picker = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid ${t.lightGrey};
+    padding-bottom: 6px;
+    margin-right: 22px;
+  
+    svg {
+      height: 16px;
+      width: 13px;
+      cursor: pointer;
+    }
+  
+    @media screen and (max-width: 1080px) {
+      margin-right: 10px;
+      margin-left: 10px;
+    }
+  `
+  
+  const PickerText = styled.div`
+    font-size: 16px;
+    line-height: 24px;
+    margin: 0 14px;
+  
+    @media screen and (max-width: 1080px) {
+      font-size: 14px;
+      margin: 0 6px;
+    }
+  `
+  
+  const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+  `
+  
+  const Header = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  `
+  const ActionBar = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  `
+  const MainSection = styled.div`
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+  `
+  
+  const ShareItem = styled.div`
+    display: flex;
+    flex-direction: column;
+  
+    @media screen and (max-width: 1080px) {
+      h6.MuiTypography-root.MuiTypography-h6 {
+        font-size: 18px;
+      }
+    }
+  `
+  
+  const ActivitiesHeader = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 0.8px solid ${t.liteGrey};
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  `
+  
+  const ActivityItem = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    padding-bottom: 12px;
+    cursor: pointer;
+  
+    &:not(:last-child) {
+      margin-bottom: 12px;
+      border-bottom: 0.5px solid ${t.liteGrey};
+    }
+  `
+  
+  const ActivityItemText = styled.div`
+    margin-left: 11px;
+    line-height: 18px;
+    font-size: 13px;
+    font-weight: 300;
+    width: calc(100% - 40px);
+  `
+  
+  const ImageCircle = styled.div`
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: ${t.primaryExtraLite};
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  `
+  
+  const GraphStats = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    margin-bottom: 10px;
+  `
+  
+  const StatItem = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    width: 200px;
+  
+    &:not(:last-child) {
+      margin-right: 14px;
+    }
+  `
+  
+  const ColorSquare = styled.div`
+    width: 17px;
+    height: 17px;
+    margin-right: 9px;
+  
+    &::after {
+      content: '';
+    }
+  `
+
+  
   const router = useRouter()
   let currentYear = new Date().getFullYear()
   const [year, setYear] = useState(currentYear)
@@ -425,6 +643,7 @@ function HomePage() {
                           src="/icons/Users-Blue.svg"
                           width={16}
                           height={21}
+                          alt=""
                         />
                       </ImageCircle>
                       <ActivityItemText>
@@ -449,216 +668,3 @@ HomePage.getLayout = function getLayout(page) {
   return <MainLayout>{page}</MainLayout>
 }
 
-const GreyTextTypography = withStyles({
-  root: {
-    color: `${t.grey}`
-  }
-})(Typography)
-
-const CarsSummaryCard = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    height: '301px',
-    padding: '11px 20px'
-  }
-})(Paper)
-
-const Filter = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    height: '70px',
-    padding: '11px 16px 11px 22px',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
-  }
-})(Paper)
-
-const AveragesCard = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    height: '127px',
-    padding: '14px 0 11px 16px',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between'
-  }
-})(Paper)
-
-const ActivitiesCard = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    marginTop: '16px',
-    height: '409px',
-    padding: '16px 19px',
-    display: 'flex',
-    flexDirection: 'column',
-    overflowY: 'auto'
-  }
-})(Paper)
-
-const Shares = withStyles({
-  elevation1: { boxShadow: 'none' },
-  root: {
-    marginTop: '16px',
-    height: '73px',
-    padding: '11px 20px',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  }
-})(Paper)
-
-const FilterCTA = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: end;
-
-  @media screen and (max-width: 1080px) {
-    p.MuiTypography-root.MuiTypography-body1 {
-      font-size: 14px;
-    }
-
-    button.MuiButtonBase-root.MuiButton-root {
-      margin-left: 12px !important;
-    }
-  }
-`
-
-const Picker = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  border-bottom: 1px solid ${t.lightGrey};
-  padding-bottom: 6px;
-  margin-right: 22px;
-
-  svg {
-    height: 16px;
-    width: 13px;
-    cursor: pointer;
-  }
-
-  @media screen and (max-width: 1080px) {
-    margin-right: 10px;
-    margin-left: 10px;
-  }
-`
-
-const PickerText = styled.div`
-  font-size: 16px;
-  line-height: 24px;
-  margin: 0 14px;
-
-  @media screen and (max-width: 1080px) {
-    font-size: 14px;
-    margin: 0 6px;
-  }
-`
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const Header = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-`
-const ActionBar = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`
-const MainSection = styled.div`
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-`
-
-const ShareItem = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  @media screen and (max-width: 1080px) {
-    h6.MuiTypography-root.MuiTypography-h6 {
-      font-size: 18px;
-    }
-  }
-`
-
-const ActivitiesHeader = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 0.8px solid ${t.liteGrey};
-  padding-bottom: 8px;
-  margin-bottom: 16px;
-`
-
-const ActivityItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-  align-items: center;
-  padding-bottom: 12px;
-  cursor: pointer;
-
-  &:not(:last-child) {
-    margin-bottom: 12px;
-    border-bottom: 0.5px solid ${t.liteGrey};
-  }
-`
-
-const ActivityItemText = styled.div`
-  margin-left: 11px;
-  line-height: 18px;
-  font-size: 13px;
-  font-weight: 300;
-  width: calc(100% - 40px);
-`
-
-const ImageCircle = styled.div`
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: ${t.primaryExtraLite};
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`
-
-const GraphStats = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-  margin-bottom: 10px;
-`
-
-const StatItem = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: start;
-  width: 200px;
-
-  &:not(:last-child) {
-    margin-right: 14px;
-  }
-`
-
-const ColorSquare = styled.div`
-  width: 17px;
-  height: 17px;
-  margin-right: 9px;
-
-  &::after {
-    content: '';
-  }
-`

@@ -1,5 +1,6 @@
 import {
   FormControl,
+  InputLabel,
   Modal,
   Select,
   TextField,
@@ -18,6 +19,7 @@ import { resizeFile, uploadFile } from '../../services/upload'
 import ntc from '../../lib/ntc'
 import { trimString } from '../../helpers/formatters'
 import { createCar } from '../../services/car'
+import { createVehicle } from '../../services/vehicle'
 import { UploadTypes } from '../../lib/enums'
 import { getColorName } from '../../helpers/utils'
 import ColorPickerDropdown from '../charts/ColorPickerDropdown'
@@ -28,6 +30,7 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
   const [modalView, setModalView] = useState('createCarProfile')
   const [carColor, setCarColor] = useState('')
   const [transmissionType, setTransmissionType] = useState('')
+  const [fuelType, setFuelType] = useState('')
   const [seatNumber, setSeatNumber] = useState(4)
   const [vin, setVin] = useState(null)
   const [licence_plate, setPlate] = useState(null)
@@ -47,9 +50,42 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
     make: null,
     vin: vin
   })
+
+  const [addVehicleInfo, setAddVehicleInfo] = useState({
+    engine: '',
+    transmission: '',
+    car_type: '',
+    fuel_type: fuelType,
+    mileage: null,
+    age: null,
+    description: null,
+    trim: '',
+    manufacturer: '',
+    vin: '',
+    specifications: null,
+    drive_type: '',
+    last_service_date: null,
+    last_service_mileage: null,
+    previous_owners: null,
+    num_of_cylinders: null,
+    engine_power: '',
+    torque: null,
+    brand: {
+      name: '',
+      model: '',
+      year: null
+    }
+  })
+
+  const handleVehicleInfo = (event) => {
+    setAddVehicleInfo({
+      ...addVehicleInfo,
+      [event.target.name]: event.target.value
+    })
+  }
+
   const [isLoading, setLoading] = useState(false)
   const [isUploading, setisUploading] = useState(false)
-  const [fuelType, setFuelType] = useState('')
   const options = {
     createCarProfile: {
       title: '',
@@ -59,12 +95,17 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
       title: 'Fetched Car Profile',
       description: ''
     },
+    addCarInfo: {
+      title: 'Add New Vehicle Information',
+      description: ''
+    },
     uploadCarImages: {
       title: 'Upload Car Images',
       description: 'Upload minimum of 3 images to complete profile '
     }
   }
 
+  console.log(addVehicleInfo)
   const hiddenFileInput = useRef(null)
 
   const handleNavigation = (action: string) => {
@@ -210,6 +251,38 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
     setCar(c)
   }
 
+  const createVehicleInfo = () => {
+    setLoading(true);
+    const data = addVehicleInfo;
+    
+    createVehicle(data)
+      .then((response) => {
+        if(response.status){
+          toast.success('Created Vehicle Successfully!')
+          onClick()
+        }
+        else{
+          toast.error(response.data)
+        }
+      })
+      .catch((error) => {
+        toast.error(error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+
+    // const timer = setTimeout(() => {
+    //   setLoading(false)
+    // }, 3000); // Replace 3000 with the desired time in milliseconds
+
+    // return () => clearTimeout(timer);
+
+
+    
+    // .createVehicle()
+  }
+
   // @ts-ignore
   return (
     <>
@@ -230,6 +303,7 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
               height={25}
               onClick={() => onClick()}
               style={{ cursor: 'pointer' }}
+              alt=""
             />
           </ModalBodyHeader>
           <Typography variant="inherit" style={{ marginBottom: 20 }}>
@@ -282,6 +356,16 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                   marginTop={30}
                   disabled={vin === null}
                   onClick={() => fetchCar()}
+                />
+
+                <Typography style={{ marginTop: 10, marginBottom: 10 }}>
+                  or
+                </Typography>
+
+                <Button
+                  text={'Add Car Information'}
+                  width={372}
+                  onClick={() => setModalView('addCarInfo')}
                 />
               </Info>
             </>
@@ -474,6 +558,444 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
               />
             </>
           )}
+
+          {modalView === 'addCarInfo' && (
+            <>
+              <HeaderText style={{ marginBottom: 10, marginTop: 10 }}>
+                Add New Vehicle Info
+              </HeaderText>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="VIN"
+                  placeholder="VIN"
+                  variant="standard"
+                  name="vin"
+                  value={addVehicleInfo?.vin}
+                  onChange={handleVehicleInfo}
+                  error={!addVehicleInfo?.vin}
+                  helperText={!addVehicleInfo?.vin ? '*Please enter VIN' : ''}
+                />
+
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Vehicle Engine"
+                  placeholder="Vehicle Engine"
+                  variant="standard"
+                  name="engine"
+                  value={addVehicleInfo?.engine}
+                  onChange={handleVehicleInfo}
+                  error={!addVehicleInfo?.engine}
+                  helperText={
+                    !addVehicleInfo?.engine
+                      ? '*Please enter the vehicle engine'
+                      : ''
+                  }
+                />
+              </InputGrid>
+              <InputGrid>
+                <FormControl fullWidth>
+                  <InputLabel variant="standard">
+                    <span style={{ color: 'red' }}>*</span>Transmission
+                  </InputLabel>
+                  <Select
+                    name="transmission"
+                    value={addVehicleInfo?.transmission}
+                    onChange={handleVehicleInfo}
+                    variant="standard"
+                    error={!addVehicleInfo?.transmission}
+                  >
+                    <option value={'manual'}>Manual</option>
+                    <option value={'automatic'}>Automatic</option>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel variant="standard">
+                    <span style={{ color: 'red' }}>*</span>Car Type
+                  </InputLabel>
+                  <Select
+                    name="car_type"
+                    value={addVehicleInfo?.car_type}
+                    onChange={handleVehicleInfo}
+                    variant="standard"
+                    error={!addVehicleInfo?.car_type}
+                  >
+                    <option value={'suv'}>Suv</option>
+                    <option value={'saloon'}>Saloon</option>
+                    <option value={'minivan'}>Minivan</option>
+                    <option value={'convertible'}>Convertible</option>
+                    <option value={'hatchback'}>Hatchback</option>
+                    <option value={'pickup'}>Pickup</option>
+                    <option value={'coupe'}>Coupe</option>
+                  </Select>
+                </FormControl>
+              </InputGrid>
+              <InputGrid>
+                <FormControl fullWidth>
+                  <InputLabel variant="standard">
+                    <span style={{ color: 'red' }}>*</span>Fuel Type
+                  </InputLabel>
+                  <Select
+                    name="fuel_type"
+                    value={addVehicleInfo?.fuel_type}
+                    onChange={handleVehicleInfo}
+                    variant="standard"
+                    error={!addVehicleInfo?.fuel_type}
+                  >
+                    <option value={'petrol'}>Petrol</option>
+                    <option value={'diesel'}>Diesel</option>
+                    <option value={'cng'}>CNG</option>
+                    <option value={'lpg'}>LPG</option>
+                    <option value={'electric'}>Electric</option>
+                    <option value={'hybrid'}>Hybrid</option>
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  className="text-field"
+                  type="number"
+                  InputProps={{
+                    inputProps: { min: 0 }
+                  }}
+                  fullWidth
+                  label="Mileage"
+                  placeholder="Mileage"
+                  variant="standard"
+                  name="mileage"
+                  value={addVehicleInfo?.mileage}
+                  onChange={(event) =>
+                    setAddVehicleInfo({
+                      ...addVehicleInfo,
+                      [event.target.name]: Number(event.target.value)
+                    })
+                  }
+                  error={!addVehicleInfo?.mileage}
+                  helperText={
+                    !addVehicleInfo?.mileage ? '*Please enter mileage' : ''
+                  }
+                />
+              </InputGrid>
+
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  type="number"
+                  InputProps={{
+                    inputProps: { min: 0 }
+                  }}
+                  fullWidth
+                  label="Age"
+                  placeholder="Age"
+                  variant="standard"
+                  name="age"
+                  value={addVehicleInfo?.age}
+                  onChange={(event) =>
+                    setAddVehicleInfo({
+                      ...addVehicleInfo,
+                      [event.target.name]: Number(event.target.value)
+                    })
+                  }
+                />
+                <TextField
+                  className="text-field"
+                  type="number"
+                  fullWidth
+                  label="Year"
+                  placeholder="Year"
+                  variant="standard"
+                  name="year"
+                  value={addVehicleInfo?.brand.year}
+                  onChange={(event) => {
+                    const brand = {
+                      ...addVehicleInfo.brand,
+                      [event.target.name]: Number(event.target.value)
+                    }
+                    setAddVehicleInfo({ ...addVehicleInfo, brand: brand })
+                  }}
+                  error={!addVehicleInfo?.brand.year}
+                  helperText={
+                    !addVehicleInfo?.brand.year
+                      ? '*Please enter the vehicle year'
+                      : ''
+                  }
+                />
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Trim"
+                  placeholder="Trim"
+                  variant="standard"
+                  name="trim"
+                  value={addVehicleInfo?.trim}
+                  onChange={handleVehicleInfo}
+                  error={!addVehicleInfo?.trim}
+                  helperText={
+                    !addVehicleInfo?.trim ? '*Please enter vehicle trim' : ''
+                  }
+                />
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Manufacturer"
+                  placeholder="Manufacturer"
+                  variant="standard"
+                  type="text"
+                  name="manufacturer"
+                  value={addVehicleInfo?.manufacturer}
+                  onChange={handleVehicleInfo}
+                  error={!addVehicleInfo?.manufacturer}
+                  helperText={
+                    !addVehicleInfo?.manufacturer
+                      ? '*Please enter the vehicle manufacturer'
+                      : ''
+                  }
+                />
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Brand Name"
+                  placeholder="Brand Name"
+                  variant="standard"
+                  name="name"
+                  value={addVehicleInfo?.brand.name}
+                  onChange={(event) => {
+                    const brand = {
+                      ...addVehicleInfo.brand,
+                      [event.target.name]: event.target.value
+                    }
+                    setAddVehicleInfo({ ...addVehicleInfo, brand: brand })
+                  }}
+                  error={!addVehicleInfo?.brand.name}
+                  helperText={
+                    !addVehicleInfo?.brand.name
+                      ? '*Please enter the brand name'
+                      : ''
+                  }
+                />
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Brand Model"
+                  placeholder="Model"
+                  variant="standard"
+                  name="model"
+                  value={addVehicleInfo?.brand.model}
+                  onChange={(event) => {
+                    const brand = {
+                      ...addVehicleInfo.brand,
+                      [event.target.name]: event.target.value
+                    }
+                    setAddVehicleInfo({ ...addVehicleInfo, brand: brand })
+                  }}
+                  error={!addVehicleInfo?.brand.model}
+                  helperText={
+                    !addVehicleInfo?.brand.model
+                      ? '*Please enter the brand model'
+                      : ''
+                  }
+                />
+              </InputGrid>
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Drive Type"
+                  placeholder="Drive Type"
+                  variant="standard"
+                  name="drive_type"
+                  value={addVehicleInfo?.drive_type}
+                  onChange={handleVehicleInfo}
+                  error={!addVehicleInfo?.drive_type}
+                  helperText={
+                    !addVehicleInfo?.drive_type
+                      ? '*Please enter the drive type'
+                      : ''
+                  }
+                />
+
+<TextField
+                  className="text-field"
+                  fullWidth
+                  label="Engine Power"
+                  placeholder="Engine Power"
+                  variant="standard"
+                  name="engine_power"
+                  value={addVehicleInfo?.engine_power}
+                  onChange={handleVehicleInfo}
+                />
+               
+                {/* <TextField
+                 id="my-datefield"
+                  className="text-field"
+                  type="date"
+                  fullWidth
+                  label="Last Service Date"
+                  placeholder="Last Service Date"
+                  variant="standard"
+                  name="last_service_date"
+                  value={addVehicleInfo?.last_service_date}
+                  onChange={handleVehicleInfo}
+                  error={!addVehicleInfo?.last_service_date}
+                  helperText={
+                    !addVehicleInfo?.last_service_date
+                      ? '*Please enter the last service date'
+                      : ''
+                  }
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                /> */}
+              </InputGrid>
+              {/* <InputGrid>
+                <TextField
+                  className="text-field"
+                  type="number"
+                  InputProps={{
+                    inputProps: { min: 0 }
+                  }}
+                  fullWidth
+                  label="Last Service Mileage"
+                  placeholder="Last Service Mileage"
+                  variant="standard"
+                  name="last_service_mileage"
+                  value={addVehicleInfo?.last_service_mileage}
+                  onChange={(event) =>
+                    setAddVehicleInfo({
+                      ...addVehicleInfo,
+                      [event.target.name]: Number(event.target.value)
+                    })
+                  }
+                />
+
+                <TextField
+                  className="text-field"
+                  type="number"
+                  InputProps={{
+                    inputProps: { min: 0 }
+                  }}
+                  fullWidth
+                  label="Previous Owners"
+                  placeholder="Previous Owners"
+                  variant="standard"
+                  name="previous_owners"
+                  value={addVehicleInfo?.previous_owners}
+                  onChange={(event) =>
+                    setAddVehicleInfo({
+                      ...addVehicleInfo,
+                      [event.target.name]: Number(event.target.value)
+                    })
+                  }
+                  error={!addVehicleInfo?.previous_owners}
+                  helperText={
+                    !addVehicleInfo?.previous_owners
+                      ? '*Please enter the number of previous owners'
+                      : ''
+                  }
+                />
+              </InputGrid> */}
+              <InputGrid>
+                <TextField
+                  className="text-field"
+                  type="number"
+                  InputProps={{
+                    inputProps: { min: 0 }
+                  }}
+                  fullWidth
+                  label="Number of Cylinders"
+                  placeholder="Number of Cylinders"
+                  variant="standard"
+                  name="num_of_cylinders"
+                  value={addVehicleInfo?.num_of_cylinders}
+                  onChange={(event) =>
+                    setAddVehicleInfo({
+                      ...addVehicleInfo,
+                      [event.target.name]: Number(event.target.value)
+                    })
+                  }
+                  error={!addVehicleInfo?.num_of_cylinders}
+                  helperText={
+                    !addVehicleInfo?.num_of_cylinders
+                      ? '*Please enter the number of cylinders'
+                      : ''
+                  }
+                />
+                
+              </InputGrid>
+              {/* <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Specifications"
+                  placeholder="Specifications"
+                  variant="standard"
+                  name="specifications"
+                  value={addVehicleInfo?.specifications}
+                  onChange={handleVehicleInfo}
+                />
+
+                {/* <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Torque"
+                  placeholder="Torque"
+                  variant="standard"
+                  name="torque"
+                  value={addVehicleInfo?.torque}
+                  onChange={handleVehicleInfo}
+                /> 
+              </InputGrid> */}
+              {/* <InputGrid>
+                <TextField
+                  className="text-field"
+                  fullWidth
+                  label="Description"
+                  placeholder="A Short Description"
+                  variant="standard"
+                  name="description"
+                  value={addVehicleInfo?.description}
+                  onChange={handleVehicleInfo}
+                  error={!addVehicleInfo?.description}
+                  helperText={
+                    !addVehicleInfo?.description
+                      ? '*Please enter a short description of the vehicle'
+                      : ''
+                  }
+                />
+              </InputGrid> */}
+
+              <Button
+                text={isLoading ? 'Saving ...' : 'Create Vehicle Info'}
+                width={510}
+                marginLeft="auto"
+                marginRight="auto"
+                marginTop={40}
+                disabled={
+                  isLoading ||
+                  !addVehicleInfo?.transmission || 
+                  !addVehicleInfo?.car_type ||
+                  !addVehicleInfo?.fuel_type ||
+                  !addVehicleInfo?.mileage ||
+                  !addVehicleInfo?.trim ||
+                  !addVehicleInfo?.vin ||
+                  !addVehicleInfo?.drive_type ||
+                  !addVehicleInfo?.num_of_cylinders ||
+                  !addVehicleInfo?.brand.name ||
+                  !addVehicleInfo?.brand.model ||
+                  !addVehicleInfo?.brand.year
+
+                
+                }
+                onClick={() => createVehicleInfo()}
+              />
+            </>
+          )}
+
           {modalView === 'uploadCarImages' && (
             <>
               <ImageGrid style={{ justifyContent: 'start', maxWidth: 745 }}>
@@ -618,11 +1140,11 @@ const InputGrid = styled.div`
     width: 97%;
     background: ${t.white};
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: end;
     justify-content: space-between;
     height: 39px;
-    margin: auto;
+    margin: 10px auto;
   }
 `
 const ImageGrid = styled.div`

@@ -46,9 +46,21 @@ const updateVehicle = (id, data) => {
         })
 }
 
+const createVehicle = (data) => {
+    return fetchWrapper.post(`${baseUrl}/vehicles/create-vehicle/`, data)
+        .then((response) => {
+            return {status: true, data: response}
+        })
+        .catch((error) => {
+            return {status: false, data: error}
+        })
+
+}
+
 export {
     retrieveVehicles,
     retrieveSingleVehicle,
     retrieveVINDetails,
-    updateVehicle
+    updateVehicle,
+    createVehicle
 }

@@ -144,6 +144,7 @@ function NotificationsPage() {
                                                 <ActivityImage>
                                                     <Image
                                                         src="/icons/Users-Blue.svg"
+                                                        alt="user-icon"
                                                         width={16}
                                                         height={21}
                                                     />
@@ -170,6 +171,7 @@ function NotificationsPage() {
                                                 <ActivityImage style={{borderRadius: '50%'}}>
                                                     <Image
                                                         src="/icons/Users-Blue.svg"
+                                                        alt="user-icon"
                                                         width={16}
                                                         height={21}
                                                     />
@@ -196,6 +198,7 @@ function NotificationsPage() {
                                                 <ActivityImage>
                                                     <Image
                                                         src="/icons/Users-Blue.svg"
+                                                        alt="user-icon"
                                                         width={16}
                                                         height={21}
                                                     />
@@ -231,7 +234,7 @@ function NotificationsPage() {
                             <ActivityImage
                                 style={{borderRadius: '50%', height: 64, width: 64}}
                             >
-                                <Image src="/icons/Users-Blue.svg" width={16} height={21}/>
+                                <Image src="/icons/Users-Blue.svg"  alt="user-icon" width={16} height={21}/>
                             </ActivityImage>
                             <Typography
                                 variant="body1"
@@ -290,6 +293,7 @@ function NotificationsPage() {
                                 </div>
                                 <Image
                                     src="/icons/Send-Message-Dark-Blue.svg"
+                                    alt="message-icon"
                                     width={29}
                                     height={28}
                                     style={{cursor: 'pointer'}}

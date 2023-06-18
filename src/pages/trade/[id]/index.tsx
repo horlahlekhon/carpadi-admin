@@ -675,6 +675,7 @@ function TradeProfilePage({pageId}) {
                                     </Typography>
                                     <Image
                                         src="/icons/Cancel-Black.svg"
+                                        alt="cancel-icon"
                                         width={25}
                                         height={25}
                                         onClick={() => setModalState(false)}
