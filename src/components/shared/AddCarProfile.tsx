@@ -58,18 +58,18 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
     fuel_type: fuelType,
     mileage: null,
     age: null,
-    description: '',
+    description: null,
     trim: '',
     manufacturer: '',
     vin: '',
-    specifications: '',
+    specifications: null,
     drive_type: '',
-    last_service_date: '',
+    last_service_date: null,
     last_service_mileage: null,
     previous_owners: null,
     num_of_cylinders: null,
     engine_power: '',
-    torque: '',
+    torque: null,
     brand: {
       name: '',
       model: '',
@@ -105,7 +105,7 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
     }
   }
 
-  // console.log(addVehicleInfo)
+  console.log(addVehicleInfo)
   const hiddenFileInput = useRef(null)
 
   const handleNavigation = (action: string) => {
@@ -818,8 +818,19 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                       : ''
                   }
                 />
+
+<TextField
+                  className="text-field"
+                  fullWidth
+                  label="Engine Power"
+                  placeholder="Engine Power"
+                  variant="standard"
+                  name="engine_power"
+                  value={addVehicleInfo?.engine_power}
+                  onChange={handleVehicleInfo}
+                />
                
-                <TextField
+                {/* <TextField
                  id="my-datefield"
                   className="text-field"
                   type="date"
@@ -839,9 +850,9 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                   InputLabelProps={{
                     shrink: true,
                   }}
-                />
+                /> */}
               </InputGrid>
-              <InputGrid>
+              {/* <InputGrid>
                 <TextField
                   className="text-field"
                   type="number"
@@ -887,7 +898,7 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                       : ''
                   }
                 />
-              </InputGrid>
+              </InputGrid> */}
               <InputGrid>
                 <TextField
                   className="text-field"
@@ -914,18 +925,9 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                       : ''
                   }
                 />
-                <TextField
-                  className="text-field"
-                  fullWidth
-                  label="Engine Power"
-                  placeholder="Engine Power"
-                  variant="standard"
-                  name="engine_power"
-                  value={addVehicleInfo?.engine_power}
-                  onChange={handleVehicleInfo}
-                />
+                
               </InputGrid>
-              <InputGrid>
+              {/* <InputGrid>
                 <TextField
                   className="text-field"
                   fullWidth
@@ -937,7 +939,7 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                   onChange={handleVehicleInfo}
                 />
 
-                <TextField
+                {/* <TextField
                   className="text-field"
                   fullWidth
                   label="Torque"
@@ -946,9 +948,9 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                   name="torque"
                   value={addVehicleInfo?.torque}
                   onChange={handleVehicleInfo}
-                />
-              </InputGrid>
-              <InputGrid>
+                /> 
+              </InputGrid> */}
+              {/* <InputGrid>
                 <TextField
                   className="text-field"
                   fullWidth
@@ -965,7 +967,7 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                       : ''
                   }
                 />
-              </InputGrid>
+              </InputGrid> */}
 
               <Button
                 text={isLoading ? 'Saving ...' : 'Create Vehicle Info'}
@@ -979,12 +981,9 @@ const AddCarProfile = ({ modalOpen = true, onClick }) => {
                   !addVehicleInfo?.car_type ||
                   !addVehicleInfo?.fuel_type ||
                   !addVehicleInfo?.mileage ||
-                  !addVehicleInfo?.description ||
                   !addVehicleInfo?.trim ||
                   !addVehicleInfo?.vin ||
                   !addVehicleInfo?.drive_type ||
-                  !addVehicleInfo?.last_service_date ||
-                  !addVehicleInfo?.previous_owners ||
                   !addVehicleInfo?.num_of_cylinders ||
                   !addVehicleInfo?.brand.name ||
                   !addVehicleInfo?.brand.model ||
