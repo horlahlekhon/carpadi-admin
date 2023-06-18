@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     nested: {
       paddingLeft: theme.spacing(4),
-      color: '#111',
+      color: '#ffffff',
     }
   })
 )
@@ -192,7 +192,7 @@ function SideNav() {
               unmountOnExit
               style={{ margin: '0 24px' }}
             >
-              <List style={{ borderRadius: '5px', height: '100px', position:'relative', zIndex: '10000', background: '#FAFAFA' }} component="div" disablePadding>
+              <List style={{ borderRadius: '5px', height: '100px', position:'relative', zIndex: '10000', background: '#243773' }} component="div" disablePadding>
                 <Link href="/sales">
                   <ListItem button className={classes.nested}>
                     <ListItemText primary={!isFullNav ? 'Sell' : 'Selling'} />
